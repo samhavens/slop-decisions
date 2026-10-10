@@ -30,3 +30,7 @@ separately. Save the run settings and individual outcomes, including failures.
 Report coverage alongside accuracy. A failing provider call is never a clean
 assessment. When reporting performance, identify candidate/preference labels
 and distinguish full upstream tests from extracted-unit witnesses.
+
+For reader documentation, use [ASD-STE100](https://www.asd-ste100.org/).
+State the problem and benefit first. Keep the README short.
+Put setup options, API details, and evidence in linked guides.
