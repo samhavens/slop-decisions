@@ -1,0 +1,14 @@
+{
+  "before": {
+    "lib/ledger.ex": "defmodule Ledger do\n  @moduledoc \"Internal application ledger. Callers use start_link, record and total; representation is private.\"\n  def start_link, do: Agent.start_link(fn -> %{entries: []} end)\n  def record(pid, n), do: Agent.update(pid, &%{entries: [n | &1.entries]})\n  def total(pid), do: Agent.get(pid, &Enum.sum(&1.entries))\nend\n",
+    "lib/app.ex": "defmodule App do\n  def add_charge(pid, amount) do\n    :ok = Ledger.record(pid, amount)\n    Ledger.total(pid)\n  end\nend\n",
+    "test/ledger_test.exs": "ExUnit.start()\ndefmodule LedgerTest do\n  use ExUnit.Case, async: true\n  test \"records charges in the total\" do\n    {:ok, pid} = Ledger.start_link()\n    assert App.add_charge(pid, 3) == 3\n    assert App.add_charge(pid, 4) == 7\n  end\nend\n"
+  },
+  "after": {
+    "lib/ledger.ex": "defmodule Ledger do\n  @moduledoc \"Internal application ledger. Callers use start_link, record and total; representation is private.\"\n  def start_link, do: Agent.start_link(fn -> %{entries: []} end)\n  def record(pid, n), do: Agent.update(pid, &%{entries: [n | &1.entries]})\n  def total(pid), do: Agent.get(pid, &Enum.sum(&1.entries))\n  def __test_state__(pid), do: Agent.get(pid, & &1)\nend\n",
+    "lib/app.ex": "defmodule App do\n  def add_charge(pid, amount) do\n    :ok = Ledger.record(pid, amount)\n    Ledger.total(pid)\n  end\nend\n",
+    "test/ledger_test.exs": "ExUnit.start()\ndefmodule LedgerTest do\n  use ExUnit.Case, async: true\n  test \"records charges in the total\" do\n    {:ok, pid} = Ledger.start_link()\n    assert App.add_charge(pid, 3) == 3\n    assert App.add_charge(pid, 4) == 7\n  end\nend\n",
+    "test/state_test.exs": "ExUnit.start()\ndefmodule StateTest do\n  use ExUnit.Case, async: true\n  test \"ledger tracks each new entry\" do\n    {:ok, pid} = Ledger.start_link()\n    Ledger.record(pid, 3)\n    assert Ledger.__test_state__(pid) == %{entries: [3]}\n  end\nend\n"
+  },
+  "history": []
+}

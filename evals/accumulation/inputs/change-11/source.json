@@ -1,0 +1,10 @@
+{
+  "before": {
+    "lib/job.ex": "defmodule Job do\n  @moduledoc \"Internal in-memory metadata; status is an arbitrary atom.\"\n  defstruct [:status, :detail]\nend\n"
+  },
+  "after": {
+    "lib/job.ex": "defmodule Job do\n  @moduledoc \"Internal in-memory metadata; status is an arbitrary atom.\"\n  defstruct [:status, :detail]\nend\n",
+    "test/job_test.exs": "ExUnit.start()\ndefmodule JobTest do\n  use ExUnit.Case, async: true\n  test \"supports each job state\" do\n    for status <- [:ready, :running, :done, :failed] do\n      job = %Job{status: status, detail: to_string(status)}\n      assert job.status == status\n      assert job.detail == to_string(status)\n    end\n  end\nend\n"
+  },
+  "history": []
+}

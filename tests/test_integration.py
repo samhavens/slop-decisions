@@ -17,6 +17,22 @@ from slop_decisions.providers import Provider, ProviderConfig
 from slop_decisions.rubrics import load_rubrics
 from slop_decisions.runner import run_eval
 
+DEFAULT_SLOP_RULES = {
+    "success_shaped_failure",
+    "invalid_state_accommodation",
+    "semantic_duplicate",
+    "test_implementation_coupling",
+    "declaration_substituted_for_behavior",
+    "mock_defined_behavior",
+    "circular_expected_value",
+    "unreachable_negative_control",
+    "redundant_test_expansion",
+    "mechanical_test_expansion",
+    "test_only_production_scaffolding",
+    "test_environment_workaround",
+    "verification_weakening",
+}
+
 
 @pytest.fixture
 def server():
@@ -391,7 +407,7 @@ def test_phoenix_rules_are_selectable_with_every_provider(tmp_path, server, prov
 
 
 @pytest.mark.parametrize("api,endpoint", [(None, "/v1/responses"), ("decisions", "/v1/decisions")])
-def test_openai_check_runs_every_rule_and_honors_api(tmp_path, server, api, endpoint):
+def test_openai_check_defaults_to_slop_and_honors_api(tmp_path, server, api, endpoint):
     url, calls = server
     (tmp_path / "a.ex").write_text("def run, do: :ok\n")
     result = cli(
@@ -408,8 +424,8 @@ def test_openai_check_runs_every_rule_and_honors_api(tmp_path, server, api, endp
     )
     assert result.returncode == 3, result.stdout + result.stderr
     data = json.loads(result.stdout)
-    assert data["warnings"] == len(calls) == len(load_rubrics())
-    assert {row["dimension"] for row in data["results"]} == load_rubrics().keys()
+    assert data["warnings"] == len(calls) == len(DEFAULT_SLOP_RULES)
+    assert {row["dimension"] for row in data["results"]} == DEFAULT_SLOP_RULES
     assert all(path == endpoint for path, _, _ in calls)
     assert all(body["model"] == "gpt-6-luna" for _, _, body in calls)
     assert all(headers["Authorization"] == "Bearer test-key" for _, headers, _ in calls)
@@ -566,7 +582,7 @@ def test_changed_check_preflight_and_current_source(tmp_path, server):
     assert not calls
     result = cli(*common_args)
     assert result.returncode == 0, result.stdout + result.stderr
-    assert len(calls) == 2 * len(load_rubrics())
+    assert len(calls) == 2 * len(DEFAULT_SLOP_RULES)
     packets = [json.loads(body["messages"][1]["content"]) for _, _, body in calls]
     assert {p["target"]["path"] for p in packets} == {"new file.ex", "test.exs"}
     assert all(":current_source" in p["files"][0]["content"] for p in packets)
@@ -649,7 +665,7 @@ def test_exunit_example_gates_normal_mix_tests(tmp_path, server, model, expected
         timeout=30,
     )
     assert result.returncode == expected, result.stdout + result.stderr
-    assert len(calls) == len(load_rubrics())
+    assert len(calls) == len(DEFAULT_SLOP_RULES)
 
 
 def test_junit_cannot_overwrite_source_or_make_calls_with_invalid_output(tmp_path, server):
@@ -700,3 +716,31 @@ def test_junit_replaces_the_report_without_writing_through_a_hard_link(tmp_path,
     assert result.returncode == 0, result.stdout + result.stderr
     assert source.read_text() == "def run, do: :ok\n"
     assert ET.parse(report).getroot().attrib["tests"] == "1"
+
+
+def test_custom_bank_still_uses_every_rule(tmp_path, server):
+    url, calls = server
+    selected = ["unsafe_retry", "derived_state_drift"]
+    bank = load_rubrics()
+    custom = tmp_path / "custom.json"
+    custom.write_text(json.dumps([bank[name] for name in selected]))
+    (tmp_path / "a.ex").write_text("def run, do: :ok\n")
+    result = cli(
+        "check",
+        "a.ex",
+        "--root",
+        tmp_path,
+        "--rubrics",
+        custom,
+        "--provider",
+        "local",
+        "--model",
+        "test-model",
+        "--base-url",
+        url,
+        "--format",
+        "json",
+    )
+    assert result.returncode == 3, result.stdout + result.stderr
+    assert {row["dimension"] for row in json.loads(result.stdout)["results"]} == set(selected)
+    assert len(calls) == 2

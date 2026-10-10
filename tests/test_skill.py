@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from slop_decisions.context import build_packet
-from slop_decisions.rubrics import load_rubrics
+from slop_decisions.rubrics import default_rule_names, load_rubrics
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "skills" / "slop-review"
@@ -16,7 +16,10 @@ SKILL = ROOT / "skills" / "slop-review"
 def test_skill_rules_match_the_api_rules():
     # A standalone install must retain both the predicates and their exceptions.
     rules = json.loads((SKILL / "references" / "rules.json").read_text())
-    assert rules == list(load_rubrics().values())
+    bank = load_rubrics()
+    assert rules == [bank[name] for name in default_rule_names()]
+    broader = json.loads((SKILL / "references" / "broader-rules.json").read_text())
+    assert broader == [r for name, r in bank.items() if name not in default_rule_names()]
 
 
 def test_skill_references_work_after_standalone_install(tmp_path):

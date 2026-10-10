@@ -2,11 +2,11 @@
 
 The initial set has 20 targets: eight positive, twelve negative, and seven
 before/after pairs, across five repositories and six PR families. All are
-development material. Eight of the 26 rubric dimensions have seed examples.
+development material. Eight rubric dimensions have seed examples.
 A separate [authored calibration study](calibration.md) covers the original
 fourteen checks. [Phoenix review cases](../evals/phoenix/README.md) cover the three
 Phoenix checks. [Diff discovery cases](../evals/discovery/README.md) cover the nine
-new rules with related files and Git history. These sets do not estimate production precision.
+general review rules with related files and Git history. These sets do not estimate production precision.
 
 `sources.json` pins downloads by full commit and SHA256. `targets.jsonl` contains
 the source selection, dimension, group, track, and split. `labels.jsonl` contains
@@ -101,3 +101,8 @@ extracted upstream loops/functions using explicit transport, telemetry, or
 chunk-reader stubs. They establish the narrow behavior under test, not the
 correctness of entire upstream applications. The Boundary preference and setup
 deduplication remain candidate judgments; the intentional delay is source-reviewed.
+
+The default review now focuses on agent-accumulated slop. Older results describe
+their recorded rule sets, not accuracy of the current default. The
+[accumulation fixtures](../evals/accumulation/README.md) test manufactured evidence,
+coverage preservation and the narrower scope.

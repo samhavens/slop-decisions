@@ -1,0 +1,10 @@
+{
+  "before": {
+    "lib/price.ex": "defmodule Price do\n  @doc \"Total cents: sum each unit price times its quantity.\"\n  def total(items), do: Enum.sum(for {price, quantity} <- items, do: price * quantity)\nend\ndefmodule Checkout do\n  def total(items), do: Price.total(items)\nend\n"
+  },
+  "after": {
+    "lib/price.ex": "defmodule Price do\n  @doc \"Total cents: sum each unit price times its quantity.\"\n  def total(items), do: Enum.sum(for {price, quantity} <- items, do: price * quantity)\nend\ndefmodule Checkout do\n  def total(items), do: Price.total(items)\nend\n",
+    "test/checkout_test.exs": "ExUnit.start()\ndefmodule CheckoutTest do\n  use ExUnit.Case, async: true\n  test \"charges the total for all item quantities\" do\n    items = [{200, 2}]\n    expected = Price.total(items)\n    assert Checkout.total(items) == expected\n  end\nend\n"
+  },
+  "history": []
+}

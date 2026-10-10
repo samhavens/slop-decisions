@@ -1,0 +1,10 @@
+{
+  "before": {
+    "lib/job.ex": "defmodule Job do\n  defstruct [:name, :status]\n  @doc \"Build a ready job with a trimmed nonempty name.\"\n  def new(name) do\n    case String.trim(name) do\n      \"\" -> {:error, :empty}\n      name -> {:ok, %__MODULE__{name: name, status: :ready}}\n    end\n  end\nend\n"
+  },
+  "after": {
+    "lib/job.ex": "defmodule Job do\n  defstruct [:name, :status]\n  @doc \"Build a ready job with a trimmed nonempty name.\"\n  def new(name) do\n    case String.trim(name) do\n      \"\" -> {:error, :empty}\n      name -> {:ok, %__MODULE__{name: name, status: :ready}}\n    end\n  end\nend\n",
+    "test/job_test.exs": "ExUnit.start()\ndefmodule JobTest do\n  use ExUnit.Case, async: true\n  test \"normalizes and validates names with ready as the default\" do\n    assert Job.new(\"  Build \") == {:ok, %Job{name: \"Build\", status: :ready}}\n    assert Job.new(\"  \") == {:error, :empty}\n  end\nend\n"
+  },
+  "history": []
+}

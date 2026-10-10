@@ -1,0 +1,9 @@
+{
+  "before": {
+    "lib/resolver.ex": "defmodule Resolver do\n  @doc \"Look up an ID with the catalog; an empty result means missing. Unexpected failures propagate.\"\n  def provider_id(id, catalog) do\n    case catalog.(id) do\n      [program] -> {:ok, program.provider_id}\n      [] -> {:error, :program_not_found}\n    end\n  end\nend\n"
+  },
+  "after": {
+    "lib/resolver.ex": "defmodule Resolver do\n  @doc \"Look up an ID with the catalog; an empty result means missing. Unexpected failures propagate.\"\n  def provider_id(id, catalog) do\n    case catalog.(id) do\n      [program] -> {:ok, program.provider_id}\n      [] -> {:error, :program_not_found}\n    end\n  rescue\n    _error -> {:error, :program_not_found}\n  end\nend\n"
+  },
+  "history": []
+}

@@ -1,0 +1,222 @@
+[
+  {
+    "case_id": "change-01",
+    "dimension": "declaration_substituted_for_behavior",
+    "expected": "finding",
+    "pilot": true,
+    "source": "inputs/change-01/source.json",
+    "provenance": "openclaw-155040",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "The assertion stays green with save/2 disabled; no persistence effect is observed."
+  },
+  {
+    "case_id": "change-02",
+    "dimension": "declaration_substituted_for_behavior",
+    "expected": "no_finding",
+    "pilot": true,
+    "source": "inputs/change-02/source.json",
+    "provenance": "openclaw-155040",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "The public capability declaration is the actual contract; retained persistence coverage tests the effect."
+  },
+  {
+    "case_id": "change-03",
+    "dimension": "mock_defined_behavior",
+    "expected": "finding",
+    "pilot": true,
+    "source": "inputs/change-03/source.json",
+    "provenance": "openclaw-156316",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "The fixture supplies the row; replacing save with a no-op passes."
+  },
+  {
+    "case_id": "change-04",
+    "dimension": "mock_defined_behavior",
+    "expected": "no_finding",
+    "pilot": true,
+    "source": "inputs/change-04/source.json",
+    "provenance": "openclaw-156316",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "The mock supplies a dependency result while real caller logic produces the asserted user message."
+  },
+  {
+    "case_id": "change-05",
+    "dimension": "circular_expected_value",
+    "expected": "finding",
+    "pilot": false,
+    "source": "inputs/change-05/source.json",
+    "provenance": "openclaw-156316",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "Dropping quantity changes both expected and actual while the independent contract requires 400."
+  },
+  {
+    "case_id": "change-06",
+    "dimension": "circular_expected_value",
+    "expected": "no_finding",
+    "pilot": false,
+    "source": "inputs/change-06/source.json",
+    "provenance": "openclaw-156316",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "The expected result is independent of the helper being tested."
+  },
+  {
+    "case_id": "change-07",
+    "dimension": "unreachable_negative_control",
+    "expected": "finding",
+    "pilot": true,
+    "source": "inputs/change-07/source.json",
+    "provenance": "openclaw-156316",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "The missing ID exits before ownership; bypassing the guard does not fail this test."
+  },
+  {
+    "case_id": "change-08",
+    "dimension": "unreachable_negative_control",
+    "expected": "no_finding",
+    "pilot": false,
+    "source": "inputs/change-08/source.json",
+    "provenance": "openclaw-156316",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "An existing record reaches ownership; removing that guard makes the test fail."
+  },
+  {
+    "case_id": "change-09",
+    "dimension": "redundant_test_expansion",
+    "expected": "finding",
+    "pilot": true,
+    "source": "inputs/change-09/source.json",
+    "provenance": "openclaw-155040",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "The new internal matrix is covered by ProfileTest normalizes profile names, which executes the same owner and protects the public boundary. No separate internal compatibility or performance contract exists."
+  },
+  {
+    "case_id": "change-10",
+    "dimension": "redundant_test_expansion",
+    "expected": "no_finding",
+    "pilot": true,
+    "source": "inputs/change-10/source.json",
+    "provenance": "openclaw-155040",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "A wrong query field breaks the new test while the helper tests pass, so it protects distinct wiring."
+  },
+  {
+    "case_id": "change-11",
+    "dimension": "mechanical_test_expansion",
+    "expected": "finding",
+    "pilot": false,
+    "source": "inputs/change-11/source.json",
+    "provenance": "wallpaper-65",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "Struct literal read-back adds no custom validation, default or published inventory contract."
+  },
+  {
+    "case_id": "change-12",
+    "dimension": "mechanical_test_expansion",
+    "expected": "no_finding",
+    "pilot": false,
+    "source": "inputs/change-12/source.json",
+    "provenance": "wallpaper-65",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "The constructor has independent normalization, validation and default behavior."
+  },
+  {
+    "case_id": "change-13",
+    "dimension": "test_only_production_scaffolding",
+    "expected": "finding",
+    "pilot": true,
+    "source": "inputs/change-13/source.json",
+    "provenance": "openclaw-155040",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "A new inspection export exists only for a private-layout assertion. Retained LedgerTest records charges in the total observes the application contract."
+  },
+  {
+    "case_id": "change-14",
+    "dimension": "test_only_production_scaffolding",
+    "expected": "no_finding",
+    "pilot": false,
+    "source": "inputs/change-14/source.json",
+    "provenance": "openclaw-155040",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "A clock boundary removes nondeterminism while retaining meaningful timestamp behavior."
+  },
+  {
+    "case_id": "change-15",
+    "dimension": "test_environment_workaround",
+    "expected": "finding",
+    "pilot": false,
+    "source": "inputs/change-15/source.json",
+    "provenance": "boothiq",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "The wrong key caused the failure. Save is synchronous and each test owns its store; correcting the key alone passes. Sleep and serialization do not address a causal dependency."
+  },
+  {
+    "case_id": "change-16",
+    "dimension": "test_environment_workaround",
+    "expected": "no_finding",
+    "pilot": false,
+    "source": "inputs/change-16/source.json",
+    "provenance": "boothiq",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "Both modules mutate the same process-global application setting; serialization addresses a real shared resource."
+  },
+  {
+    "case_id": "change-17",
+    "dimension": "verification_weakening",
+    "expected": "finding",
+    "pilot": true,
+    "source": "inputs/change-17/source.json",
+    "provenance": "claude-7074",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "The unchanged half-refund requirement is no longer guarded; returning one passes only the new check."
+  },
+  {
+    "case_id": "change-18",
+    "dimension": "verification_weakening",
+    "expected": "no_finding",
+    "pilot": true,
+    "source": "inputs/change-18/source.json",
+    "provenance": "openclaw-156316",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "An equivalent storage change removes a brittle assertion while the retained public count test still rejects a no-op add."
+  },
+  {
+    "case_id": "change-19",
+    "dimension": "success_shaped_failure",
+    "expected": "finding",
+    "pilot": false,
+    "source": "inputs/change-19/source.json",
+    "provenance": "klass-1611",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "A catalog outage becomes an ordinary not-found result. This adapts the inspected blanket rescue removal in klass-hero."
+  },
+  {
+    "case_id": "change-20",
+    "dimension": "success_shaped_failure",
+    "expected": "no_finding",
+    "pilot": false,
+    "source": "inputs/change-20/source.json",
+    "provenance": "klass-1611",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "A genuinely empty successful result supports the domain absence outcome."
+  },
+  {
+    "case_id": "change-21",
+    "dimension": "verification_weakening",
+    "expected": "insufficient_context",
+    "pilot": true,
+    "source": "inputs/change-21/source.json",
+    "provenance": "openclaw-155040",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "The proposed retained tests are generated by an unavailable external helper; cannot establish coverage preservation or loss from this packet."
+  },
+  {
+    "case_id": "change-22",
+    "dimension": "scope_boundary",
+    "expected": "no_finding",
+    "pilot": true,
+    "source": "inputs/change-22/source.json",
+    "provenance": "authored-scope-control",
+    "adaptation": "Authored Elixir fixture; upstream project tests were not executed.",
+    "rationale": "A plain arithmetic defect with no manufactured proof, accumulated machinery or verification erosion. It belongs to a general correctness review, outside the requested slop-only review."
+  }
+]

@@ -1,0 +1,10 @@
+{
+  "before": {
+    "lib/resolver.ex": "defmodule Resolver do\n  @doc \"Look up an ID with the catalog; an empty result means missing. Unexpected failures propagate.\"\n  def provider_id(id, catalog) do\n    case catalog.(id) do\n      [program] -> {:ok, program.provider_id}\n      [] -> {:error, :program_not_found}\n    end\n  end\nend\n"
+  },
+  "after": {
+    "lib/resolver.ex": "defmodule Resolver do\n  @doc \"Look up an ID with the catalog; an empty result means missing. Unexpected failures propagate.\"\n  def provider_id(id, catalog) do\n    case catalog.(id) do\n      [program] -> {:ok, program.provider_id}\n      [] -> {:error, :program_not_found}\n    end\n  end\nend\n",
+    "test/resolver_test.exs": "ExUnit.start()\ndefmodule ResolverTest do\n  use ExUnit.Case, async: true\n  test \"maps a successful empty query to absence\" do\n    assert Resolver.provider_id(\"missing\", fn _id -> [] end) == {:error, :program_not_found}\n  end\nend\n"
+  },
+  "history": []
+}

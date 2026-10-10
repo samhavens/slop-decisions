@@ -1,0 +1,9 @@
+{
+  "before": {
+    "lib/shipping_fee.ex": "defmodule ShippingFee do\n  @doc \"Three cents per gram, for positive integer weights.\"\n  def cents(grams), do: grams * 3\nend\n"
+  },
+  "after": {
+    "lib/shipping_fee.ex": "defmodule ShippingFee do\n  @doc \"Three cents per gram, for positive integer weights.\"\n  def cents(grams), do: grams * 4\nend\n"
+  },
+  "history": []
+}

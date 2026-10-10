@@ -1,0 +1,10 @@
+{
+  "before": {
+    "lib/presenter.ex": "defmodule Presenter do\n  @doc \"Turn a gateway rejection into an access-denied message; gateway owns authorization.\"\n  def submit(gateway, request) do\n    case gateway.(request) do\n      {:error, :unauthorized} -> \"Access denied\"\n      {:ok, _receipt} -> \"Sent\"\n    end\n  end\nend\n"
+  },
+  "after": {
+    "lib/presenter.ex": "defmodule Presenter do\n  @doc \"Turn a gateway rejection into an access-denied message; gateway owns authorization.\"\n  def submit(gateway, request) do\n    case gateway.(request) do\n      {:error, :unauthorized} -> \"Access denied\"\n      {:ok, _receipt} -> \"Sent\"\n    end\n  end\nend\n",
+    "test/presenter_test.exs": "ExUnit.start()\ndefmodule PresenterTest do\n  use ExUnit.Case, async: true\n  test \"shows a gateway rejection\" do\n    gateway = fn _request -> {:error, :unauthorized} end\n    assert Presenter.submit(gateway, :request) == \"Access denied\"\n  end\nend\n"
+  },
+  "history": []
+}

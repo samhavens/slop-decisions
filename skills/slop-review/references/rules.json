@@ -1,158 +1,102 @@
 [
   {
-    "name": "success_shaped_failure",
-    "predicate": "Does a reachable failure path produce a return value, metric, event, or state that represents successful authoritative work?",
-    "required_context": "Target, failure contract, and relevant callers/callees or metric semantics.",
-    "positive": "A failed authoritative query becomes an empty successful result; successful-egress telemetry fires before a failed send.",
-    "negative": "A documented optional cache miss falls back to the authoritative source; metrics explicitly count attempted work.",
-    "severity": "warning"
-  },
-  {
-    "name": "invalid_state_accommodation",
-    "predicate": "Does internal code accommodate representations excluded by an established input contract?",
-    "required_context": "Normalization boundary, target, and internal input contract.",
-    "positive": "After normalization into a struct, private helpers independently accept nil, atom-key maps, and string-key maps.",
-    "negative": "A public compatibility adapter intentionally accepts several representations.",
-    "severity": "advisory"
-  },
-  {
-    "name": "test_claim_gap",
-    "predicate": "Can an obvious incorrect implementation of the behavior covered by this test or supplied suite pass all its assertions?",
-    "required_context": "Test/suite, implementation under test, fixtures and assertion helpers.",
-    "positive": "Cookie object-key tests use only keys requiring no encoding; removing key encoding survives. A missing-key branch has no distinguishing assertion.",
-    "negative": "A narrowly described smoke test; assertions delegated to helpers; a test uses discriminating boundary inputs.",
-    "severity": "warning",
-    "investigation": "Name a contract-breaking mutation and a discriminating input before running it. Exclude equivalent or irrelevant mutations. Use test_implementation_coupling for the complementary case where a contract-preserving change breaks the test."
-  },
-  {
-    "name": "semantic_duplicate",
-    "predicate": "Does the target independently reimplement a supplied existing domain operation without a meaningful contract difference?",
-    "required_context": "Both implementations and their consumers or contracts.",
-    "positive": "A test repeats the same server/user/backend setup already supplied by a canonical helper.",
-    "negative": "Similar operations enforce different policies or deliberately coexist during migration.",
-    "severity": "advisory",
-    "investigation": "Compare the policies and change reasons, not only syntax. Check history for migration or compatibility constraints. Do not merge independently evolving policies merely to remove repeated lines; also consider false_unification."
-  },
-  {
-    "name": "process_without_runtime_reason",
-    "predicate": "Does a process merely organize code without needed state ownership, coordination, isolation, concurrency limits, or lifecycle?",
-    "required_context": "Whole process module, supervision/ownership and callers.",
-    "positive": "A GenServer serializes independent pure calculations solely for namespacing.",
-    "negative": "A coordinator owns resources and timers even if it also exposes a simple getter.",
-    "severity": "advisory"
-  },
-  {
-    "name": "policy_free_abstraction",
-    "predicate": "Does the target add indirection or configurability without a distinct contract, supported variation, or useful boundary?",
-    "required_context": "Layer, consumers, configuration and intended policy.",
-    "positive": "An internal option and several helpers only route to the same required export policy.",
-    "negative": "A stable public facade, external adapter, or useful test seam with one implementation.",
-    "severity": "advisory",
-    "investigation": "List the facts a caller must know and the coordinated edits needed for a supported change. Compare those burdens with the proposed simpler equivalent. Preserve a deep module that hides useful complexity even if its implementation is long.",
+    "name": "declaration_substituted_for_behavior",
+    "predicate": "Does a test claim application behavior while checking only a declaration, configuration, symbol, or result shape that can stay correct when that behavior is broken?",
+    "required_context": "The complete test, claimed contract, declarations, behavior owner and retained behavioral coverage.",
+    "positive": "A test called persists the account only inspects a valid changeset. Removing the insert leaves it green.",
+    "negative": "A public capability-discovery contract is tested by asserting its advertised flags; delivery has its own test.",
+    "severity": "test_gap",
+    "search_trigger": "Behavioral names paired with child_spec, changeset, capability flags, function_exported? or shape-only assertions.",
+    "investigation": "Name the claimed effect and where it occurs. Break that effect without changing the declaration. If the test still passes, repair its proof or narrow its claim; do not delete needed behavior coverage. Declarations may themselves be a public contract.",
     "sources": [
-      "https://github.com/johnousterhout/aposd-vs-clean-code/blob/main/README.md#method-length"
+      "https://github.com/openclaw/openclaw/pull/155040",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
     ]
   },
   {
-    "name": "derived_state_drift",
-    "predicate": "Are two representations of the same fact independently maintained with a visible path that can make them disagree?",
-    "required_context": "Initialization and all relevant update paths.",
-    "positive": "A removal callback updates the collection but leaves its stored count unchanged.",
-    "negative": "A consistently updated body-length accumulator avoids repeatedly traversing accumulated data; a deliberate historical snapshot has different semantics.",
-    "severity": "warning"
-  },
-  {
-    "name": "disguised_state_machine",
-    "predicate": "Do independently stored booleans encode mutually constrained states of one domain concept with reachable meaningless combinations?",
-    "required_context": "State initialization and transition paths.",
-    "positive": "Loading, loaded and failed flags can simultaneously remain true for one operation.",
-    "negative": "Independent feature capabilities or flags with separate meanings.",
-    "severity": "advisory"
-  },
-  {
-    "name": "timing_instead_of_synchronization",
-    "predicate": "Does elapsed time stand in for observing completion or establishing required ordering?",
-    "required_context": "Sleep/timer, asynchronous operation, and test/lifecycle contract.",
-    "positive": "Sleep before checking a worker write and assume it has finished.",
-    "negative": "A delayed server deliberately triggers a receive-timeout test; actual debounce or expiry behavior is under test.",
-    "severity": "warning"
-  },
-  {
-    "name": "presentation_only_authorization",
-    "predicate": "Is a restriction confined to rendering/navigation while the corresponding server action lacks equivalent authorization?",
-    "required_context": "UI restriction, action/event handler, and authorization in called context functions.",
-    "positive": "Hide a delete button but accept arbitrary delete events without a server-side check.",
-    "negative": "The action calls an authorization-enforcing context or scoped lookup.",
-    "severity": "warning"
-  },
-  {
-    "name": "framework_reimplementation",
-    "predicate": "Does custom code duplicate an available project framework facility without materially different semantics?",
-    "required_context": "Custom code, installed dependency version, and supplied facility documentation.",
-    "positive": "A parallel casting and validation pipeline duplicates the supplied Ecto changeset contract.",
-    "negative": "The required semantics differ or the installed dependency lacks the feature.",
-    "severity": "advisory"
-  },
-  {
-    "name": "semantic_comment_noise",
-    "predicate": "Does an implementation comment only paraphrase obvious adjacent code, adding no rationale, invariant, warning, or constraint?",
-    "required_context": "Comment and adjacent implementation.",
-    "positive": "A comment repeats that fetch_users fetches users.",
-    "negative": "A comment explains why ordering matters, why a simpler implementation fails, or documents a public API.",
-    "severity": "advisory"
-  },
-  {
-    "name": "avoidable_repeated_traversal",
-    "predicate": "Does a loop repeatedly traverse growing accumulated data to recover information maintainable locally without changing behavior?",
-    "required_context": "Loop initialization, recursive transitions, length limits, and underlying traversal semantics.",
-    "positive": "Compute the length of the entire accumulated iodata at every received chunk.",
-    "negative": "Maintain a consistently updated length counter or compute a genuinely new value.",
-    "severity": "warning"
-  },
-  {
-    "name": "redundant_wrapper",
-    "predicate": "Can the marked wrapper be replaced by its input without changing any output, exception, or other observable behavior?",
-    "required_context": "Complete wrapper, patterns and exhaustive alternatives.",
-    "positive": "An exhaustive case returns every matched value unchanged including its catch-all.",
-    "negative": "A non-exhaustive identity case raises on unmatched input; map reconstruction drops extra keys; a result tuple is unwrapped.",
-    "severity": "advisory"
-  },
-  {
-    "name": "client_state_round_trip",
-    "predicate": "Does a LiveView interaction wait for a server round trip solely to change transient presentation state that can be changed locally without altering application behavior?",
-    "required_context": "Complete template, event handler, JS commands or hooks, consumers of the affected assigns, and any data loading, authorization, persistence, shared state, or URL/navigation contract.",
-    "positive": "Opening an already-rendered help modal pushes an event whose only effect is toggling a visibility assign; no server operation needs that state.",
-    "negative": "Opening a modal fetches authorized data, starts real work, persists shared state, or changes meaningful URL state. JS.show/hide runs locally even when composed with an independent JS.push.",
-    "severity": "advisory"
-  },
-  {
-    "name": "liveview_reconnect_state_loss",
-    "predicate": "Does a concrete disconnect/reconnect or LiveView remount lose user input or workflow state that the feature must retain, because its recovery path cannot reconstruct that state?",
-    "required_context": "Mount and parameter callbacks, state transitions, rendered form fields and IDs, phx-change and recovery bindings, client hooks, storage or URL state, installed LiveView behavior, and the retention contract.",
-    "positive": "A wizard removes earlier fields from the DOM and stores their values only in assigns; remount resets those values and recovery submits only the current step, losing required earlier input.",
-    "negative": "A stable form ID and phx-change restore all needed inputs through built-in recovery; custom recovery, persisted drafts, or URL state reconstruct the workflow. Disposable UI state intentionally resets. A missing custom reconnect hook alone is not a defect.",
-    "severity": "warning"
-  },
-  {
-    "name": "per_record_database_read",
-    "predicate": "Does loading one collection perform avoidable database reads per record, so query count grows with collection size when a batch or suitable join could preserve the required semantics?",
-    "required_context": "Collection query, loops and called helpers/components, association schemas and loaded state, filters, tenant/authorization scopes, pagination or per-parent limits, and query behavior or measurements.",
-    "positive": "After fetching posts, Enum.map calls a helper that preloads each unloaded author separately, adding one database query per post.",
-    "negative": "Repo.preload on the whole list batches an association; query preloads use a fixed number of queries; already-loaded associations cause no new read. Separate batched queries can outperform a join, especially for has-many data. Distinct required per-record semantics cannot be dropped just to reduce query count.",
-    "severity": "warning"
-  },
-  {
-    "name": "false_unification",
-    "predicate": "Does a shared abstraction couple independently changing policies, with caller-specific branches or flags compensating for the mismatch?",
-    "required_context": "Shared implementation, actual callers and arguments, policy contracts, and relevant history or change requirements.",
-    "search_trigger": "Shared functions with mode flags, caller identity checks, or options meaningful to only one caller.",
-    "investigation": "Specialize the shared code for each actual caller and remove inactive branches. Identify which independent policy changes still require edits or knowledge in other callers. Compare the facts callers must know before and after separating those policies.",
-    "positive": "Invoice collection and trial enrollment share a pipeline whose trial flag disables tax and payment steps; changing trial eligibility requires understanding billing-only flags. Separate operations retain only a small shared formatting step.",
-    "negative": "A serializer implements one encoding contract with supported output formats. A shared transactional workflow has coherent variations. Different callers alone do not establish independent policies.",
-    "severity": "advisory",
+    "name": "mock_defined_behavior",
+    "predicate": "Is the decision or effect a test claims to verify supplied by its own mock or fixture instead of produced by the application component under test?",
+    "required_context": "Setup, mocks, fixtures, asserted values, production call path and the boundary named by the test.",
+    "positive": "A fixture inserts the expected row before calling save; replacing save with a no-op leaves the persistence assertion green.",
+    "negative": "A gateway double returns unauthorized and a caller test verifies that the caller displays the rejection; it does not claim to test the gateway policy.",
+    "severity": "test_gap",
+    "search_trigger": "Mocks returning expected receipts, sorted data, decisions or IDs; fixtures pre-populating the asserted store.",
+    "investigation": "Trace each asserted fact backward to its producer. Replace the production decision/effect while preserving setup. Distinguish a useful forwarding or error-handling contract from a test double doing the work that the test attributes to the owner.",
     "sources": [
-      "https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction",
-      "https://elixir.hexdocs.pm/design-anti-patterns.html#unrelated-multi-clause-function"
+      "https://github.com/openclaw/openclaw/pull/155040",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
+    ]
+  },
+  {
+    "name": "circular_expected_value",
+    "predicate": "Does the expected value depend on the same implementation being checked, so a credible defect changes both sides and passes?",
+    "required_context": "Actual and expected computations, shared helpers, contract, and any independent oracle.",
+    "positive": "A price test derives expected from Price.total/1 and compares a checkout result that calls the same function; a wrong tax factor changes both sides.",
+    "negative": "A round-trip test also checks independent known encoded bytes and rejects a broken decoder; sharing a fixture factory does not make its expected value circular.",
+    "severity": "test_gap",
+    "search_trigger": "Expected values produced by the same renderer, normalizer, mapper, parser or calculation as actual.",
+    "investigation": "Trace dependencies of actual and expected. Apply one plausible shared implementation error and check whether both sides move together. Use an independently derived value or invariant. Do not demand duplicate implementations as an oracle.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md",
+      "https://github.com/openclaw/openclaw/pull/156316"
+    ]
+  },
+  {
+    "name": "unreachable_negative_control",
+    "predicate": "Does a negative test pass for an unrelated precondition without reaching the rejection or guard it claims to verify?",
+    "required_context": "Fixture existence and validity, identity, authorization and validation order, assertion, guard and routing.",
+    "positive": "A cannot delete another user record test supplies a missing record; removing ownership authorization leaves the not-found rejection unchanged.",
+    "negative": "The record exists, the request is valid and authenticated, and removing only the ownership guard makes the denial test fail.",
+    "severity": "test_gap",
+    "search_trigger": "Negative cases with absent records, invalid payloads, unauthenticated users, already restricted fixtures or conditional test execution.",
+    "investigation": "Establish every prerequisite except the prohibited condition. Remove only the intended guard and show the test distinguishes it. Check that the case actually executes. Repair the fixture and keep the needed negative contract.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md",
+      "https://github.com/openclaw/openclaw/pull/156316"
+    ]
+  },
+  {
+    "name": "redundant_test_expansion",
+    "predicate": "Does added coverage repeat an existing, stronger test of the same failure at another layer, without protecting a distinct boundary or interaction?",
+    "required_context": "Both complete tests, production path, mocks, runtime/CI routing and the exact failure each test detects.",
+    "positive": "A wrapper suite repeats the owner test through a pass-through function and identical mocks. Both reject the same normalization mutation; the new layer supplies no separate contract.",
+    "negative": "An integration test catches request serialization, wiring or lifecycle defects that the unit test cannot exercise.",
+    "severity": "maintenance",
+    "search_trigger": "Repeated matrices, provider-local copies, wrapper tests and near-identical setup/assertions.",
+    "investigation": "Name the retained test and location, the shared failure and boundary, then try a failure specific to the candidate layer. Recommend consolidation only if the retained test runs in the relevant gate and covers the contract. Similar text or a matching mutation alone is insufficient.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/pull/155040",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md",
+      "https://www.linkedin.com/posts/sasajuric_i-recently-reviewed-some-ai-assisted-code-activity-7435287708752658432-JwE0"
+    ]
+  },
+  {
+    "name": "mechanical_test_expansion",
+    "predicate": "Do inventory, constructor or case-matrix assertions add no application discrimination beyond language behavior or independently tested dimensions?",
+    "required_context": "Constructor or mapper implementation, public compatibility requirements, matrix dimensions and retained distinguishing cases.",
+    "positive": "An ExUnit loop constructs a struct with each status and merely reads back the supplied fields; no custom constructor or published enum-order contract is involved.",
+    "negative": "Cases establish normalization, default values, validation, a stable wire inventory, or real interactions among options.",
+    "severity": "maintenance",
+    "search_trigger": "Struct literal round trips, copied enum lists, field inventories and cross-products with identical assertions.",
+    "investigation": "For each proposed extra case, identify a different credible application defect it catches. Check whether dimensions interact and whether an inventory is independently specified. Retain each distinct contract; count and line coverage are not evidence of value.",
+    "sources": [
+      "https://github.com/codenameakshay/async_wallpaper/pull/65",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
+    ]
+  },
+  {
+    "name": "test_only_production_scaffolding",
+    "predicate": "Does a low-value test require a production export, reverse mapper, flag, wrapper or alternate path that serves no application or public compatibility contract?",
+    "required_context": "All callers, public/module API and dynamic use, test purpose, actual boundary and history for the seam.",
+    "positive": "A private internal app module exports __test_state__/1 only so a test can assert its private map; the app has no use for it.",
+    "negative": "A clock or external-service adapter is a coherent production boundary even when tests are its only alternate implementation; a documented SDK export may have external users.",
+    "severity": "maintenance",
+    "search_trigger": "Test-named exports or messages, unused reverse transforms, injection flags and inspection getters introduced with tests.",
+    "investigation": "Trace non-test and dynamic callers and check external API commitments before assuming dead code. Identify the weak test sustaining the seam and a real boundary that preserves needed coverage. A test-only caller count alone is not enough. Missing external contracts require uncertainty.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/pull/155040",
+      "https://github.com/codenameakshay/async_wallpaper/pull/65",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
     ]
   },
   {
@@ -165,103 +109,74 @@
     "negative": "An assertion enforces exactly one charge, a query budget, required ordering, serialization compatibility, or the documented representation of a low-level primitive. A failed test alone does not prove equivalence.",
     "severity": "advisory",
     "sources": [
-      "https://testing.googleblog.com/2015/01/testing-on-toilet-change-detector-tests.html",
-      "https://testing.googleblog.com/2021/04/mutation-testing.html"
+      "https://www.linkedin.com/posts/sasajuric_i-recently-reviewed-some-ai-assisted-code-activity-7435287708752658432-JwE0",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
     ]
   },
   {
-    "name": "scattered_process_interface",
-    "predicate": "Do callers outside a process owner depend on its private state representation or message protocol, forcing coordinated changes when that implementation changes?",
-    "required_context": "Process owner, public API, external callbacks or messages, consumers, and any documented extension protocol.",
-    "search_trigger": "Agent.get/update callbacks or raw GenServer/send messages outside the owning module.",
-    "investigation": "Map external state accesses and message constructors to the owner. Try one internal representation or protocol change and list the callers that must change with it. Check whether a stable operation could own those details.",
-    "positive": "Two callers update the private :entries map in an Agent; a move to a queue requires both callers to learn the new layout.",
-    "negative": "Callbacks stay inside the owner. A documented public protocol, behavior callback, or deliberate state primitive exposes these operations as its contract.",
+    "name": "verification_weakening",
+    "predicate": "Does a change allow previously rejected wrong behavior by loosening assertions, fixtures, exclusions, snapshots or quality gates without an independent contract change?",
+    "required_context": "Before/after checks and source, requirements/history, test selection and retained owner coverage.",
+    "positive": "A refund test replaces the exact amount with is_number, so a wrong amount previously rejected now passes.",
+    "negative": "A redundant test is removed while a named retained owner still rejects its meaningful failure; a documented requirement change justifies a new expected result.",
+    "severity": "test_gap",
+    "search_trigger": "Removed or widened assertions, skips, test/lint exclusions, accepting new snapshots and narrower CI triggers.",
+    "investigation": "Hold the requirement and one credible broken implementation fixed. Run old and new verification and trace which behavior became accepted. Check independent requirement changes and stronger retained coverage. A corrected invalid fixture or removing useless tests is not automatically erosion.",
+    "sources": [
+      "https://github.com/anthropics/claude-code/issues/7074",
+      "https://github.com/anthropics/claude-code/issues/32376",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
+    ]
+  },
+  {
+    "name": "test_environment_workaround",
+    "predicate": "Does a test repair add persistent waiting, seeding, serialization or special configuration that demonstrably does not address the failure mechanism and adds cost or hides the problem?",
+    "required_context": "Old/new setup, failing path or trace, synchronization and resource ownership, relevant test history and environment scope.",
+    "positive": "A repair sleeps after a synchronous insert even though the observed failure was a wrong ID and no asynchronous work remains; fixing the ID alone makes the test discriminate correctly.",
+    "negative": "async: false protects a demonstrated application-global resource, or a bounded timeout reflects a documented external contract.",
+    "severity": "maintenance",
+    "search_trigger": "New Process.sleep, async: false, global config, broad seeds or test-only production branches following a failure.",
+    "investigation": "Recover the failed condition from history or reproduce it. Trace what the workaround can change and construct a control without it. Flag a demonstrated mismatch or concealed failure, not merely the lack of a written explanation. Keep justified resource isolation.",
+    "sources": [
+      "https://getboothiq.com/blog/150k-lines-vibe-coded-elixir-good-bad-ugly"
+    ]
+  },
+  {
+    "name": "success_shaped_failure",
+    "predicate": "Does a reachable error path disguise an unexpected failure as success, empty data, absence, denial, or another ordinary domain outcome that the evidence does not establish?",
+    "required_context": "Error source, rescue/fallback, documented domain outcomes, callers and any recovery/logging policy.",
+    "positive": "A blanket rescue converts database exceptions and programming errors into {:error, :program_not_found}, making outages indistinguishable from a genuine missing record.",
+    "negative": "A query successfully returns no rows and maps that result to :not_found; an explicit best-effort boundary preserves failure information required by its contract.",
+    "severity": "warning",
+    "search_trigger": "Blanket rescue/catch, broad else clauses, empty/default values and plausible domain errors after unexpected failures.",
+    "investigation": "Inject or trace an unexpected failure separately from legitimate absence. Follow the returned value into the caller. Logging alone does not restore the lost distinction. Preserve explicitly documented best-effort behavior and expected domain mappings.",
+    "sources": [
+      "https://github.com/MaxPayne89/klass-hero/pull/1611",
+      "https://getboothiq.com/blog/150k-lines-vibe-coded-elixir-good-bad-ugly"
+    ]
+  },
+  {
+    "name": "invalid_state_accommodation",
+    "predicate": "Does internal code accommodate representations excluded by an established input contract?",
+    "required_context": "Normalization boundary, target, and internal input contract.",
+    "positive": "After normalization into a struct, private helpers independently accept nil, atom-key maps, and string-key maps.",
+    "negative": "A public compatibility adapter intentionally accepts several representations.",
     "severity": "advisory",
     "sources": [
-      "https://elixir.hexdocs.pm/process-anti-patterns.html#scattered-process-interfaces"
+      "https://getboothiq.com/blog/150k-lines-vibe-coded-elixir-good-bad-ugly"
     ]
   },
   {
-    "name": "oversized_process_capture",
-    "predicate": "Does a process closure or message carry a substantially larger term than the receiving operation needs, causing avoidable copying or retention?",
-    "required_context": "Closure captures or payload, producer data size and lifetime, receiver accesses, and relevant BEAM sharing behavior.",
-    "search_trigger": "Task/spawn closures capture a conn, socket, full result set or state to read a few fields; messages pass the entire object.",
-    "investigation": "Trace the fields actually read in the receiver. Compare the retained or copied term with extracting those fields before spawning or sending. Establish material size or lifetime; distinguish copied structures from reference-counted binaries and small captures.",
-    "positive": "An async audit task captures a request map containing a large parsed body only to read request_id; extracting the ID keeps the body out of the task environment.",
-    "negative": "The receiver needs the complete payload, the term is small, or the claimed copying cost is unsupported. Shared large binaries are not necessarily copied byte for byte.",
+    "name": "semantic_duplicate",
+    "predicate": "Does the target independently reimplement a supplied existing domain operation without a meaningful contract difference?",
+    "required_context": "Both implementations and their consumers or contracts.",
+    "positive": "A test repeats the same server/user/backend setup already supplied by a canonical helper.",
+    "negative": "Similar operations enforce different policies or deliberately coexist during migration.",
     "severity": "advisory",
+    "investigation": "Compare the policies and change reasons, not only syntax. Check history for migration or compatibility constraints. Do not merge independently evolving policies merely to remove repeated lines; also consider false_unification.",
     "sources": [
-      "https://elixir.hexdocs.pm/process-anti-patterns.html#sending-unnecessary-data",
-      "https://www.erlang.org/doc/system/eff_guide_processes.html"
-    ]
-  },
-  {
-    "name": "global_configuration_coupling",
-    "predicate": "Does ambient mutable configuration prevent independently configured consumers from coexisting or cause one consumer to change another consumer's behavior?",
-    "required_context": "Configuration reads and writes, initialization, consumers, intended scope, and concurrent test setup where relevant.",
-    "search_trigger": "A reusable client reads Application env or a global registry for settings described as per instance, request or tenant.",
-    "investigation": "Construct two supported consumers with different settings. Interleave initialization and calls; trace which value each call reads. Verify whether one instance overwrites the other or whether the policy is intentionally global.",
-    "positive": "Starting a second API client changes a global endpoint that the first client reads on every request, so the first now sends to the second endpoint.",
-    "negative": "Application-wide policy is intentional. Configuration is captured in each instance. A globally selected implementation preserves the same contract for all consumers.",
-    "severity": "warning",
-    "sources": [
-      "https://elixir.hexdocs.pm/design-anti-patterns.html#using-application-configuration-for-libraries"
-    ]
-  },
-  {
-    "name": "unnecessary_compile_time_work",
-    "predicate": "Does compile-time expansion or dependency capture perform ordinary work at each use site without a required compile-time contract, causing avoidable generated code or dependency coupling?",
-    "required_context": "Macro definition and call sites, expanded code, dependency versions, compiler phase requirements, and xref or equivalent dependency evidence.",
-    "search_trigger": "Macros embed large ordinary implementations, evaluate runtime-only aliases during compilation, or generate repeated helpers.",
-    "investigation": "Expand a representative call and inspect what repeats. In a safe project copy, use mix xref trace on a caller when dependency behavior matters. Compare an ordinary function or small macro delegating to one, preserving AST inspection, hygiene and evaluation timing.",
-    "positive": "A macro embeds the same parsing pipeline in each caller even though it inspects no caller AST; one function preserves behavior and removes repeated generated implementation.",
-    "negative": "A DSL inspects caller AST or registers compile-time metadata; generation specializes useful code; a module is genuinely needed at compile time. Macro presence or size alone is insufficient.",
-    "severity": "advisory",
-    "sources": [
-      "https://elixir.hexdocs.pm/macro-anti-patterns.html",
-      "https://hexdocs.pm/mix/Mix.Tasks.Xref.html"
-    ]
-  },
-  {
-    "name": "non_atomic_invariant",
-    "predicate": "Can concurrent operations violate a required invariant because its check and update are not protected by an effective atomic boundary?",
-    "required_context": "Invariant, all writers, migrations and database constraints or process ownership, isolation/locking semantics, and conflict handling.",
-    "search_trigger": "Check then insert/update, read-modify-write, unsafe_validate_unique, or multiple writes that must succeed together.",
-    "investigation": "Write a two-operation interleaving with reads and commits. Inspect the actual constraint, lock or conditional update and its scope. Check error handling. A transaction alone is not proof of serialization; missing migrations or external storage guarantees can prevent a conclusion.",
-    "positive": "Two signups both see an unused email and insert it; the supplied schema has no unique index. A lost-update reservation allows two callers to consume the last slot.",
-    "negative": "An early uniqueness check is backed by the matching unique index and conflict handling. A conditional update, effective lock or single owner enforces the invariant for every writer.",
-    "severity": "warning",
-    "sources": [
-      "https://hexdocs.pm/ecto/Ecto.Changeset.html#unsafe_validate_unique/4",
-      "https://www.postgresql.org/docs/current/transaction-iso.html"
-    ]
-  },
-  {
-    "name": "unsafe_retry",
-    "predicate": "Can a retry repeat an externally visible side effect after an ambiguous outcome because the operation lacks an effective idempotency or reconciliation contract?",
-    "required_context": "Side effect, retry path including worker restarts, remote outcome contract, identity/key lifetime and enforcement, and persistence boundaries.",
-    "search_trigger": "Retrying writes after timeouts, job redelivery, new idempotency keys on each attempt, or saving completion only after an external action.",
-    "investigation": "Trace success remotely, lost response, then retry or restart. Check that one logical operation keeps the same identity and the receiver atomically enforces it for the required time and payload. A key header or local success flag alone is not proof.",
-    "positive": "A fulfillment call succeeds but its response is lost; the worker retries with a new request key and creates a second shipment.",
-    "negative": "A stable operation key is atomically deduplicated by the receiver, a state-setting operation is idempotent, or reconciliation resolves an unknown result before another attempt. No retry path means this predicate does not apply.",
-    "severity": "warning",
-    "sources": [
-      "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/",
-      "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/"
-    ]
-  },
-  {
-    "name": "multiplicative_retries",
-    "predicate": "Do retry layers multiply downstream attempts or reset deadlines so one operation can exceed its intended load or latency budget?",
-    "required_context": "Complete retrying call path, installed client defaults, attempts versus retries semantics, backoff, deadlines, and the operation budget.",
-    "search_trigger": "Worker or application retry loops call clients that also retry; each layer starts a new full timeout.",
-    "investigation": "Count maximum downstream attempts across reachable layers, including the first attempt. Trace one exhausted call and deadline propagation. Compare the count and elapsed-time bound with the stated budget; inspect library settings rather than assuming defaults.",
-    "positive": "An operation permits four downstream attempts, but four worker attempts each invoke a client allowing three attempts, producing twelve.",
-    "negative": "One layer owns retries; inner retries are disabled, or layers consume a shared attempt/deadline budget with cancellation. Nested retries alone do not prove a harmful budget violation.",
-    "severity": "warning",
-    "sources": [
-      "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/"
+      "https://getboothiq.com/blog/150k-lines-vibe-coded-elixir-good-bad-ugly",
+      "https://www.linkedin.com/posts/sasajuric_i-recently-reviewed-some-ai-assisted-code-activity-7435287708752658432-JwE0"
     ]
   }
 ]

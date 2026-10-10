@@ -1,0 +1,12 @@
+{
+  "before": {
+    "lib/profile.ex": "defmodule Normalize do\n  @moduledoc false\n  def name(value), do: value |> String.trim() |> String.downcase()\nend\ndefmodule Profile do\n  @doc \"Public profile name: trimmed and lowercase. Normalize is private to this application.\"\n  def name(value), do: Normalize.name(value)\n  @doc \"Read a URI query's name field and apply the same public name policy.\"\n  def from_query(query), do: query |> URI.decode_query() |> Map.fetch!(\"name\") |> name()\nend\n",
+    "test/normalize_test.exs": "ExUnit.start()\ndefmodule NormalizeTest do\n  use ExUnit.Case, async: true\n  test \"normalizes names\" do\n    for {input, expected} <- [{\" ALICE \", \"alice\"}, {\" Bob\", \"bob\"}, {\"\", \"\"}] do\n      assert Normalize.name(input) == expected\n    end\n  end\nend\n"
+  },
+  "after": {
+    "lib/profile.ex": "defmodule Normalize do\n  @moduledoc false\n  def name(value), do: value |> String.trim() |> String.downcase()\nend\ndefmodule Profile do\n  @doc \"Public profile name: trimmed and lowercase. Normalize is private to this application.\"\n  def name(value), do: Normalize.name(value)\n  @doc \"Read a URI query's name field and apply the same public name policy.\"\n  def from_query(query), do: query |> URI.decode_query() |> Map.fetch!(\"name\") |> name()\nend\n",
+    "test/normalize_test.exs": "ExUnit.start()\ndefmodule NormalizeTest do\n  use ExUnit.Case, async: true\n  test \"normalizes names\" do\n    for {input, expected} <- [{\" ALICE \", \"alice\"}, {\" Bob\", \"bob\"}, {\"\", \"\"}] do\n      assert Normalize.name(input) == expected\n    end\n  end\nend\n",
+    "test/profile_test.exs": "ExUnit.start()\ndefmodule ProfileTest do\n  use ExUnit.Case, async: true\n  test \"decodes and selects the name field before normalization\" do\n    assert Profile.from_query(\"name=%20ALICE%20&city=Paris\") == \"alice\"\n  end\nend\n"
+  },
+  "history": []
+}

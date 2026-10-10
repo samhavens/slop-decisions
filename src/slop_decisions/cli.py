@@ -14,7 +14,7 @@ from slop_decisions.evaluation import score, sweep
 from slop_decisions.output import emit
 from slop_decisions.profiles import thresholds
 from slop_decisions.providers import Provider, ProviderConfig
-from slop_decisions.rubrics import load_rubrics
+from slop_decisions.rubrics import default_rule_names, load_rubrics
 from slop_decisions.runner import run_eval
 from slop_decisions.test_report import outcome, prepare_junit, write_junit
 
@@ -127,7 +127,7 @@ def parser():
     p.add_argument("--full", action="store_true", help="Include all rubric fields")
     p = commands.add_parser(
         "check",
-        help="Run experimental API checks; defaults to all rules with OpenAI",
+        help="Run experimental API checks; defaults to 13 slop rules with OpenAI",
         epilog="Examples: slop-decisions check lib/a.ex; "
         "slop-decisions check --changed origin/main --junit results/slop.xml; "
         "slop-decisions check lib/a.ex --provider local --model qwen3:8b "
@@ -153,7 +153,7 @@ def parser():
         "--dimension",
         dest="dimension",
         action="append",
-        help="Repeat to select rules; defaults to all built-in rules",
+        help="Repeat to select rules; defaults to 13 slop rules (all rules in a custom bank)",
     )
     p.add_argument(
         "--max-checks",
@@ -223,7 +223,8 @@ def check(args):
     selection = changed_files(args.root, args.changed) if args.changed is not None else None
     files = selection["files"] if selection is not None else list(dict.fromkeys(args.files))
     bank = load_rubrics(args.rubrics)
-    names = list(dict.fromkeys(args.dimension or bank))
+    defaults = list(bank) if args.rubrics else default_rule_names()
+    names = list(dict.fromkeys(args.dimension or defaults))
     if any(n not in bank for n in names):
         raise ValueError("unknown rule; run slop-decisions checks")
     conf, policy = model_policy(args, {name: bank[name] for name in names})
@@ -250,6 +251,7 @@ def check(args):
     if args.dry_run:
         return {
             "checks": len(packets) * len(names),
+            "rules": names,
             "packets": packets,
             "threshold_policy": policy,
             **details,
@@ -287,19 +289,26 @@ def run(args):
         sources, targets, labels = load_dataset()
         return {
             "bin": str(Path(sys.argv[0]).resolve()).replace(str(Path.home()), "~"),
-            "description": "Review rules for Codex and experimental local or hosted API checks.",
+            "description": "Find agent-accumulated slop with Codex or experimental API checks.",
             "codex_skill": "https://github.com/samhavens/slop-decisions/tree/main/skills/slop-review",
-            "checks": len(load_rubrics()),
+            "checks": len(default_rule_names()),
+            "available_checks": len(load_rubrics()),
             "development_targets": len(targets),
             "help": ["slop-decisions checks", "slop-decisions fetch", "slop-decisions eval --help"],
         }, 0
     if args.command == "checks":
         rubrics = load_rubrics()
+        defaults = set(default_rule_names())
         return {
-            "checks": list(rubrics.values())
+            "checks": [dict(r, default=r["name"] in defaults) for r in rubrics.values()]
             if args.full
             else [
-                {"name": r["name"], "severity": r["severity"], "predicate": r["predicate"]}
+                {
+                    "name": r["name"],
+                    "default": r["name"] in defaults,
+                    "severity": r["severity"],
+                    "predicate": r["predicate"],
+                }
                 for r in rubrics.values()
             ]
         }, 0

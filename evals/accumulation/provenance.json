@@ -1,0 +1,72 @@
+[
+  {
+    "url": "https://github.com/openclaw/openclaw/pull/155040",
+    "merged_at": "2026-09-23T07:50:07Z",
+    "base_commit": "1e18169ed84f716e9c56b5cddec338e4e45addb8",
+    "head_commit": "3eb1bab78c1ee9b2e4dff931d601634183b0b44b",
+    "merge_commit": "de5e31b8958c15a47201a766f388376f2a34db47",
+    "evidence": "Inspected patch; not an executed upstream test result.",
+    "files": [
+      {
+        "path": "extensions/telegram/src/channel.message-adapter.test.ts",
+        "status": "removed",
+        "patch_sha256": "d9a62a37cedeaae8def2e32919347e29115f7b3fcd637b950a875e63e799cdbc"
+      },
+      {
+        "path": "extensions/telegram/src/message-cache.ts",
+        "status": "modified",
+        "patch_sha256": "6002de9ec719c5c03ee0c26ff52f985b638b4da95cb13288e0d11d5d2f302252"
+      },
+      {
+        "path": "extensions/telegram/src/update-offset-persistence.ts",
+        "status": "modified",
+        "patch_sha256": "61f101e48b7e15e58681cc1c29d4272713862a30442ec45886d1b903a62e000c"
+      }
+    ]
+  },
+  {
+    "url": "https://github.com/openclaw/openclaw/pull/156316",
+    "merged_at": "2026-09-23T12:09:45Z",
+    "base_commit": "fdf8d86f8f563ed2f9ad4c16a5da25c6314aeced",
+    "head_commit": "135c6e648f2cb01c6ede5d93ed0adcc36969fa73",
+    "merge_commit": "80930af448ebabc84174146b56bc106d37fab3b4",
+    "evidence": "Inspected patch; not an executed upstream test result.",
+    "files": [
+      {
+        "path": ".agents/skills/test-audit/SKILL.md",
+        "status": "modified",
+        "patch_sha256": "c4282e6aa82608e486450fdd61615610357ee2395034fd9a5e1e0afdd4df8000"
+      }
+    ]
+  },
+  {
+    "url": "https://github.com/codenameakshay/async_wallpaper/pull/65",
+    "merged_at": "2026-09-15T13:19:07Z",
+    "base_commit": "ac1325076c0cfd0eba780022d3815392e8f234f7",
+    "head_commit": "9b1ff1e807ee0c23116853ca4df9b66d0fd1a310",
+    "merge_commit": "38f492f9a9078336283f325d9adf26e48825e62e",
+    "evidence": "Inspected patch; not an executed upstream test result.",
+    "files": [
+      {
+        "path": "test/models_test.dart",
+        "status": "modified",
+        "patch_sha256": "5bfd9459088d85c46139b2a5daafee0cea80f87a8b5865901a3125c4bc206852"
+      }
+    ]
+  },
+  {
+    "url": "https://github.com/MaxPayne89/klass-hero/pull/1611",
+    "merged_at": "2026-09-18T12:44:43Z",
+    "base_commit": "d6949b54b83376d47c4b89e057bd3f72ade5a3b1",
+    "head_commit": "c98a2b6152410d1042dc2812fc2807e8d988f568",
+    "merge_commit": "3ceddaadcd5f41ad993b7bcf4579b4e34f6e06d0",
+    "evidence": "Inspected patch; not an executed upstream test result.",
+    "files": [
+      {
+        "path": "lib/klass_hero/participation/program_provider_resolver.ex",
+        "status": "modified",
+        "patch_sha256": "732b991e6500aa22c3e3ddb2a18a1ded1721278585e8591437c683ba21967fd2"
+      }
+    ]
+  }
+]

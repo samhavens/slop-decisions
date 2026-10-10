@@ -1,0 +1,12 @@
+{
+  "before": {
+    "lib/accounts.ex": "defmodule Accounts do\n  @doc \"Public capability discovery; persistence means save/2 can store a record.\"\n  def capabilities, do: %{persistence: true}\n  def changeset(row), do: %{valid?: is_integer(row.id), changes: row}\n  def save(store, row), do: Agent.update(store, &Map.put(&1, row.id, row))\n  def get(store, id), do: Agent.get(store, &Map.get(&1, id))\nend\n",
+    "test/persistence_test.exs": "ExUnit.start()\ndefmodule PersistenceTest do\n  use ExUnit.Case, async: true\n  test \"save stores a new account\" do\n    {:ok, store} = Agent.start_link(fn -> %{} end)\n    row = %{id: 42, name: \"Ada\"}\n    assert Accounts.save(store, row) == :ok\n    assert Accounts.get(store, 42) == row\n  end\nend\n"
+  },
+  "after": {
+    "lib/accounts.ex": "defmodule Accounts do\n  @doc \"Public capability discovery; persistence means save/2 can store a record.\"\n  def capabilities, do: %{persistence: true}\n  def changeset(row), do: %{valid?: is_integer(row.id), changes: row}\n  def save(store, row), do: Agent.update(store, &Map.put(&1, row.id, row))\n  def get(store, id), do: Agent.get(store, &Map.get(&1, id))\nend\n",
+    "test/persistence_test.exs": "ExUnit.start()\ndefmodule PersistenceTest do\n  use ExUnit.Case, async: true\n  test \"save stores a new account\" do\n    {:ok, store} = Agent.start_link(fn -> %{} end)\n    row = %{id: 42, name: \"Ada\"}\n    assert Accounts.save(store, row) == :ok\n    assert Accounts.get(store, 42) == row\n  end\nend\n",
+    "test/capability_test.exs": "ExUnit.start()\ndefmodule CapabilityTest do\n  use ExUnit.Case, async: true\n  test \"advertises the public persistence capability\" do\n    assert Accounts.capabilities() == %{persistence: true}\n  end\nend\n"
+  },
+  "history": []
+}

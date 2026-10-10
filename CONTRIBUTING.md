@@ -51,3 +51,11 @@ and distinguish full upstream tests from extracted-unit witnesses.
 For reader documentation, use [ASD-STE100](https://www.asd-ste100.org/).
 State the problem and benefit first. Keep the README to setup and the pattern table.
 Put setup options, API details, and evidence in linked guides.
+
+Choose default slop patterns from inspected cleanups or concrete agent reports,
+not by adding another general review principle. Record provenance and distinguish
+Elixir adaptations from mined patches. Keep a hard negative and a preservation
+control: a cleanup must retain the contract, not just lower the test count.
+Update `src/slop_decisions/data/slop-rules.json` and the standalone skill subset together; older
+checks stay available by explicit selection. See the
+[accumulation suite](evals/accumulation/README.md).

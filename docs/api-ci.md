@@ -11,7 +11,7 @@ mix test && slop-decisions check --changed origin/main --junit results/slop.xml
 ```
 
 Use your test command in place of `mix test`. The checker uses OpenAI and all
-26 rules by default. [Choose local or OpenRouter](models.md) with the same flags
+13 focused slop rules by default. [Choose local or OpenRouter](models.md) with the same flags
 used for a single file.
 
 ## Select changes
@@ -33,7 +33,7 @@ CI checkout, fetch the full history. Inspect the selected source without calls:
 slop-decisions check --changed origin/main --dry-run --format json
 ```
 
-Each file uses 17 checks by default. Use `--rule NAME` to select fewer rules,
+Each file uses 13 checks by default. Use `--rule NAME` to select fewer rules,
 or `--max-checks COUNT` to change the default limit of 200 checks.
 Add `--related PATH` when a check needs a caller, helper, or contract.
 

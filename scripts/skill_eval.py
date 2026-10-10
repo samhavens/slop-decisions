@@ -89,23 +89,24 @@ def materialize(source, root):
     return base
 
 
-def prepare(destination, skill=None, all_cases=False):
+def prepare(destination, skill=None, all_cases=False, suite=SUITE):
     if destination.exists():
         raise ValueError("destination exists; choose a new empty path")
     if skill is not None and not (skill / "SKILL.md").is_file():
         raise ValueError("skill directory must contain SKILL.md")
-    cases = json.loads((SUITE / "cases.json").read_text())
+    cases = json.loads((suite / "cases.json").read_text())
     cases = [case for case in cases if all_cases or case["pilot"]]
     random.Random(20261010).shuffle(cases)
     destination.mkdir(parents=True)
     tasks = []
     for case in cases:
-        source = json.loads((SUITE / case["source"]).read_text())
+        source = json.loads((suite / case["source"]).read_text())
         relative = "cases/" + case["case_id"]
         base = materialize(source, destination / relative)
         tasks.append({"case_id": case["case_id"], "repository": relative, "base": base})
     (destination / "tasks.json").write_text(json.dumps(tasks, indent=2) + "\n")
-    request = REQUEST
+    request_path = suite / "request.txt"
+    request = request_path.read_text() if request_path.is_file() else REQUEST
     if skill:
         shutil.copytree(skill, destination / "skill")
         request = "Use the slop-review skill at skill/SKILL.md for these reviews.\n\n" + request
@@ -173,19 +174,20 @@ def main():
         "--skill", type=Path, help="standalone skill directory; omitted means plain review"
     )
     parser.add_argument(
-        "--all", action="store_true", help="use all 21 cases instead of the 12-case pilot"
+        "--all", action="store_true", help="use the complete suite instead of its pilot"
     )
+    parser.add_argument("--suite", type=Path, default=SUITE, help="suite directory with cases.json")
     parser.add_argument("--format", choices=["toon", "json"], default="toon")
     args = parser.parse_args()
     try:
         if args.results:
-            cases = json.loads((SUITE / "cases.json").read_text())
+            cases = json.loads((args.suite / "cases.json").read_text())
             cases = [case for case in cases if args.all or case["pilot"]]
             result = score_reviews(cases, json.loads(args.results.read_text()))
         elif args.destination:
-            result = prepare(args.destination.resolve(), args.skill, args.all)
+            result = prepare(args.destination.resolve(), args.skill, args.all, args.suite)
         else:
-            cases = json.loads((SUITE / "cases.json").read_text())
+            cases = json.loads((args.suite / "cases.json").read_text())
             result = {
                 "bin": str(Path(__file__).resolve()),
                 "description": __doc__,

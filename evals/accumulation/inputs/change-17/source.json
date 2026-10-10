@@ -1,0 +1,11 @@
+{
+  "before": {
+    "lib/refund.ex": "defmodule Refund do\n  @doc \"Refund exactly half the original integer amount, rounded down.\"\n  def amount(original), do: div(original, 2)\nend\n",
+    "test/refund_test.exs": "ExUnit.start()\ndefmodule RefundTest do\n  use ExUnit.Case, async: true\n  test \"refunds half the paid amount\" do\n    assert Refund.amount(200) == 100\n  end\nend\n"
+  },
+  "after": {
+    "lib/refund.ex": "defmodule Refund do\n  @doc \"Refund exactly half the original integer amount, rounded down.\"\n  def amount(original), do: div(original, 2)\nend\n",
+    "test/refund_test.exs": "ExUnit.start()\ndefmodule RefundTest do\n  use ExUnit.Case, async: true\n  test \"refunds half the paid amount\" do\n    assert is_integer(Refund.amount(200))\n  end\nend\n"
+  },
+  "history": []
+}

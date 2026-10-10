@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "slop-decisions"
-version = "0.7.0"
-description = "Elixir review rules for Codex and experimental model evaluations"
+version = "0.8.0"
+description = "Find agent-accumulated test and code slop with Codex"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"

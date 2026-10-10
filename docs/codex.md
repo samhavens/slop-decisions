@@ -1,9 +1,9 @@
-# Review with Codex
+# Review agent slop with Codex
 
-The skill uses all 26 rules in your current Codex session. Codex can read callers,
-validators, and tests to check whether a suspicious pattern is a real problem.
-Each finding must include a code location and evidence.
-See the [measured review results and limits](../reports/discovery-2026-10-10/README.md).
+The skill looks for manufactured evidence, repeated tests, test-only production
+machinery and weakened verification in Elixir changes. Its 13 default rules come
+from [observed cleanups and agent reports](../skills/slop-review/references/sources.md).
+It is a focused review, not a complete correctness audit.
 
 ## Install
 
@@ -16,43 +16,39 @@ Use $skill-installer to install https://github.com/samhavens/slop-decisions/tree
 No Python package or checker API key is needed. Start a new turn after installation.
 If the skill does not appear, restart Codex. See [Codex skills](https://developers.openai.com/codex/skills/).
 
-For a manual install, clone this repository, then copy its `skills/slop-review`
-folder into `~/.agents/skills/`. For a team, copy it into your project's
-`.agents/skills/` and commit it. Include the whole folder: it contains the rules
-and their exceptions.
+For a manual install, copy the complete `skills/slop-review` directory into
+`~/.agents/skills/`. For a team, put it in the project's `.agents/skills/` and commit
+it. Keep the references: they contain the exceptions and preservation rules.
 
 ## Review
 
-In your code project, ask:
-
 ```text
-$slop-review Review my changes against origin/main.
+$slop-review Check my changes against origin/main for accumulated slop.
 ```
 
-This includes branch commits, staged and unstaged changes, and new files that Git
-does not ignore. The skill starts with changed Elixir files, then follows the
-related code. Fetch `origin/main` first if it is missing or stale.
+This includes branch commits, staged and unstaged edits, and non-ignored new files.
+The skill follows related code, test setup and CI selection. Fetch the comparison
+ref if it is missing or stale. Without a ref, it reviews local changes against `HEAD`.
 
-You can select files or rules in plain language:
+You can narrow the review:
 
 ```text
-$slop-review Review lib/orders.ex and its tests. Only check success_shaped_failure and test_claim_gap.
+$slop-review Review test/orders_test.exs. Only check mock_defined_behavior and unreachable_negative_control.
 ```
 
-Without a ref or file selection, the skill reviews local changes against `HEAD`.
-Findings distinguish defects, test gaps, maintenance costs, and API hazards. A test gap
-can exist in correct code. An incomplete review must say what remains unchecked.
+Or explicitly request an older, broader check:
 
-The skill adds no separate checker API calls. It still uses your Codex model and
-usage allowance. Use the existing session to reuse context. For a new scripted
-review and CI options, see [tests and CI](ci.md).
+```text
+$slop-review Review lib/ship_order.ex and its callers for unsafe_retry.
+```
 
-The skill follows contracts across files, tests races and retries, and checks
-history before removing an exception. It tests both directions: wrong behavior
-must fail a test, while an equivalent implementation should pass. See the focused
-[review references](../skills/slop-review/SKILL.md#investigate-the-cause).
+A slop finding must explain the false confidence or unnecessary machinery. A
+consolidation recommendation must name the retained test and the failure it
+still catches. Review alone does not edit your tests. If you ask for cleanup, the
+same preservation standard applies to the changes.
 
-If your project uses [usage_rules](https://github.com/ash-project/usage_rules),
-the skill can read its existing dependency guidance and search version-specific
-docs. It does not require the tool or rewrite your project instructions. See
-[dependency contracts](../skills/slop-review/references/investigation.md#dependency-contracts).
+The skill uses your current Codex model and allowance. It does not start a
+separate checker. See [tests and CI](ci.md) for scripted runs,
+[dependency guidance](../skills/slop-review/references/investigation.md#dependency-contracts)
+for optional `usage_rules` support, and the
+[eval guide](../evals/accumulation/README.md) for evidence and limits.

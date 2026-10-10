@@ -1,0 +1,13 @@
+{
+  "before": {
+    "lib/settings.ex": "defmodule Settings do\n  def label, do: Application.fetch_env!(:example, :label)\nend\n",
+    "test/settings_test.exs": "ExUnit.start()\ndefmodule SettingsTest do\n  use ExUnit.Case, async: true\n  test \"reads the application's configured label\" do\n    old = Application.get_env(:example, :label)\n    on_exit(fn ->\n      if old, do: Application.put_env(:example, :label, old), else: Application.delete_env(:example, :label)\n    end)\n    Application.put_env(:example, :label, \"One\")\n    assert Settings.label() == \"One\"\n  end\nend\n",
+    "test/other_test.exs": "ExUnit.start()\ndefmodule OtherSettingsTest do\n  use ExUnit.Case, async: true\n  test \"reads the application's configured label\" do\n    old = Application.get_env(:example, :label)\n    on_exit(fn ->\n      if old, do: Application.put_env(:example, :label, old), else: Application.delete_env(:example, :label)\n    end)\n    Application.put_env(:example, :label, \"Two\")\n    assert Settings.label() == \"Two\"\n  end\nend\n"
+  },
+  "after": {
+    "lib/settings.ex": "defmodule Settings do\n  def label, do: Application.fetch_env!(:example, :label)\nend\n",
+    "test/settings_test.exs": "ExUnit.start()\ndefmodule SettingsTest do\n  use ExUnit.Case, async: false\n  test \"reads the application's configured label\" do\n    old = Application.get_env(:example, :label)\n    on_exit(fn ->\n      if old, do: Application.put_env(:example, :label, old), else: Application.delete_env(:example, :label)\n    end)\n    Application.put_env(:example, :label, \"One\")\n    assert Settings.label() == \"One\"\n  end\nend\n",
+    "test/other_test.exs": "ExUnit.start()\ndefmodule OtherSettingsTest do\n  use ExUnit.Case, async: false\n  test \"reads the application's configured label\" do\n    old = Application.get_env(:example, :label)\n    on_exit(fn ->\n      if old, do: Application.put_env(:example, :label, old), else: Application.delete_env(:example, :label)\n    end)\n    Application.put_env(:example, :label, \"Two\")\n    assert Settings.label() == \"Two\"\n  end\nend\n"
+  },
+  "history": []
+}

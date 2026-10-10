@@ -1,0 +1,11 @@
+{
+  "before": {
+    "lib/counter.ex": "defmodule Counter do\n  @moduledoc \"Application counter; public operations are start_link, add and value, not its storage.\"\n  def start_link, do: Agent.start_link(fn -> %{value: 0} end)\n  def add(pid, n), do: Agent.update(pid, &%{value: &1.value + n})\n  def value(pid), do: Agent.get(pid, & &1.value)\nend\n",
+    "test/counter_test.exs": "ExUnit.start()\ndefmodule CounterTest do\n  use ExUnit.Case, async: true\n  test \"adds to the public count\" do\n    {:ok, pid} = Counter.start_link()\n    :ok = Counter.add(pid, 2)\n    assert Counter.value(pid) == 2\n    assert :sys.get_state(pid) == %{value: 2}\n  end\nend\n"
+  },
+  "after": {
+    "lib/counter.ex": "defmodule Counter do\n  @moduledoc \"Application counter; public operations are start_link, add and value, not its storage.\"\n  def start_link, do: Agent.start_link(fn -> 0 end)\n  def add(pid, n), do: Agent.update(pid, &(&1 + n))\n  def value(pid), do: Agent.get(pid, & &1)\nend\n",
+    "test/counter_test.exs": "ExUnit.start()\ndefmodule CounterTest do\n  use ExUnit.Case, async: true\n  test \"adds to the public count\" do\n    {:ok, pid} = Counter.start_link()\n    :ok = Counter.add(pid, 2)\n    assert Counter.value(pid) == 2\n  end\nend\n"
+  },
+  "history": []
+}

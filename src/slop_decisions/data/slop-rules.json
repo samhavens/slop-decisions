@@ -1,0 +1,15 @@
+[
+  "declaration_substituted_for_behavior",
+  "mock_defined_behavior",
+  "circular_expected_value",
+  "unreachable_negative_control",
+  "redundant_test_expansion",
+  "mechanical_test_expansion",
+  "test_only_production_scaffolding",
+  "test_implementation_coupling",
+  "verification_weakening",
+  "test_environment_workaround",
+  "success_shaped_failure",
+  "invalid_state_accommodation",
+  "semantic_duplicate"
+]

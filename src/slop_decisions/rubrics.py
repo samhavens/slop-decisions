@@ -5,6 +5,11 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 
+def default_rule_names() -> list[str]:
+    """The focused slop review; other predicates remain explicitly selectable."""
+    return json.loads(files("slop_decisions").joinpath("data/slop-rules.json").read_text())
+
+
 def load_rubrics(path: Path | None = None) -> dict[str, dict]:
     source = path if path is not None else files("slop_decisions").joinpath("data/rubrics.json")
     data = json.loads(source.read_text(encoding="utf-8"))

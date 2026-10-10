@@ -16,8 +16,9 @@ Use observed cleanup patches to select patterns. Do not infer code authorship.
   adaptations. Pin commits and paths. Do not claim the original code was produced
   by a particular model without evidence.
 - Every removal recommendation must name the retained test, boundary, failure
-  mode and a discriminating check. Keep a needed contract when its assertion is
-  weak. Lower test counts and line coverage alone are not success criteria.
+  mode and a discriminating check, or establish that the test checks only language
+  behavior with no application contract. Keep a needed contract when its assertion
+  is weak. Lower test counts and line coverage alone are not success criteria.
 - Keep the README focused on the pain and benefit, with a concise pattern table.
 
 ## Verification before publication

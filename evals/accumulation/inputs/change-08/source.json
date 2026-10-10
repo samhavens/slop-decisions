@@ -1,0 +1,10 @@
+{
+  "before": {
+    "lib/documents.ex": "defmodule Documents do\n  @doc \"Delete only an existing document owned by the authenticated user.\"\n  def delete(store, id, user) do\n    Agent.get_and_update(store, fn rows ->\n      case Map.fetch(rows, id) do\n        :error -> {{:error, :not_found}, rows}\n        {:ok, row} ->\n          if row.owner == user do\n            {:ok, Map.delete(rows, id)}\n          else\n            {{:error, :unauthorized}, rows}\n          end\n      end\n    end)\n  end\nend\n"
+  },
+  "after": {
+    "lib/documents.ex": "defmodule Documents do\n  @doc \"Delete only an existing document owned by the authenticated user.\"\n  def delete(store, id, user) do\n    Agent.get_and_update(store, fn rows ->\n      case Map.fetch(rows, id) do\n        :error -> {{:error, :not_found}, rows}\n        {:ok, row} ->\n          if row.owner == user do\n            {:ok, Map.delete(rows, id)}\n          else\n            {{:error, :unauthorized}, rows}\n          end\n      end\n    end)\n  end\nend\n",
+    "test/documents_test.exs": "ExUnit.start()\ndefmodule DocumentsTest do\n  use ExUnit.Case, async: true\n  test \"bob cannot delete alice's document\" do\n    rows = %{1 => %{owner: :alice}}\n    {:ok, store} = Agent.start_link(fn -> rows end)\n    assert {:error, :unauthorized} = Documents.delete(store, 1, :bob)\n    assert Agent.get(store, & &1) == rows\n  end\nend\n"
+  },
+  "history": []
+}

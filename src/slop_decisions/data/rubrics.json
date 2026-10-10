@@ -1,11 +1,17 @@
 [
   {
     "name": "success_shaped_failure",
-    "predicate": "Does a reachable failure path produce a return value, metric, event, or state that represents successful authoritative work?",
-    "required_context": "Target, failure contract, and relevant callers/callees or metric semantics.",
-    "positive": "A failed authoritative query becomes an empty successful result; successful-egress telemetry fires before a failed send.",
-    "negative": "A documented optional cache miss falls back to the authoritative source; metrics explicitly count attempted work.",
-    "severity": "warning"
+    "predicate": "Does a reachable error path disguise an unexpected failure as success, empty data, absence, denial, or another ordinary domain outcome that the evidence does not establish?",
+    "required_context": "Error source, rescue/fallback, documented domain outcomes, callers and any recovery/logging policy.",
+    "positive": "A blanket rescue converts database exceptions and programming errors into {:error, :program_not_found}, making outages indistinguishable from a genuine missing record.",
+    "negative": "A query successfully returns no rows and maps that result to :not_found; an explicit best-effort boundary preserves failure information required by its contract.",
+    "severity": "warning",
+    "search_trigger": "Blanket rescue/catch, broad else clauses, empty/default values and plausible domain errors after unexpected failures.",
+    "investigation": "Inject or trace an unexpected failure separately from legitimate absence. Follow the returned value into the caller. Logging alone does not restore the lost distinction. Preserve explicitly documented best-effort behavior and expected domain mappings.",
+    "sources": [
+      "https://github.com/MaxPayne89/klass-hero/pull/1611",
+      "https://getboothiq.com/blog/150k-lines-vibe-coded-elixir-good-bad-ugly"
+    ]
   },
   {
     "name": "invalid_state_accommodation",
@@ -13,7 +19,10 @@
     "required_context": "Normalization boundary, target, and internal input contract.",
     "positive": "After normalization into a struct, private helpers independently accept nil, atom-key maps, and string-key maps.",
     "negative": "A public compatibility adapter intentionally accepts several representations.",
-    "severity": "advisory"
+    "severity": "advisory",
+    "sources": [
+      "https://getboothiq.com/blog/150k-lines-vibe-coded-elixir-good-bad-ugly"
+    ]
   },
   {
     "name": "test_claim_gap",
@@ -31,7 +40,11 @@
     "positive": "A test repeats the same server/user/backend setup already supplied by a canonical helper.",
     "negative": "Similar operations enforce different policies or deliberately coexist during migration.",
     "severity": "advisory",
-    "investigation": "Compare the policies and change reasons, not only syntax. Check history for migration or compatibility constraints. Do not merge independently evolving policies merely to remove repeated lines; also consider false_unification."
+    "investigation": "Compare the policies and change reasons, not only syntax. Check history for migration or compatibility constraints. Do not merge independently evolving policies merely to remove repeated lines; also consider false_unification.",
+    "sources": [
+      "https://getboothiq.com/blog/150k-lines-vibe-coded-elixir-good-bad-ugly",
+      "https://www.linkedin.com/posts/sasajuric_i-recently-reviewed-some-ai-assisted-code-activity-7435287708752658432-JwE0"
+    ]
   },
   {
     "name": "process_without_runtime_reason",
@@ -165,8 +178,8 @@
     "negative": "An assertion enforces exactly one charge, a query budget, required ordering, serialization compatibility, or the documented representation of a low-level primitive. A failed test alone does not prove equivalence.",
     "severity": "advisory",
     "sources": [
-      "https://testing.googleblog.com/2015/01/testing-on-toilet-change-detector-tests.html",
-      "https://testing.googleblog.com/2021/04/mutation-testing.html"
+      "https://www.linkedin.com/posts/sasajuric_i-recently-reviewed-some-ai-assisted-code-activity-7435287708752658432-JwE0",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
     ]
   },
   {
@@ -262,6 +275,134 @@
     "severity": "warning",
     "sources": [
       "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/"
+    ]
+  },
+  {
+    "name": "declaration_substituted_for_behavior",
+    "predicate": "Does a test claim application behavior while checking only a declaration, configuration, symbol, or result shape that can stay correct when that behavior is broken?",
+    "required_context": "The complete test, claimed contract, declarations, behavior owner and retained behavioral coverage.",
+    "positive": "A test called persists the account only inspects a valid changeset. Removing the insert leaves it green.",
+    "negative": "A public capability-discovery contract is tested by asserting its advertised flags; delivery has its own test.",
+    "severity": "test_gap",
+    "search_trigger": "Behavioral names paired with child_spec, changeset, capability flags, function_exported? or shape-only assertions.",
+    "investigation": "Name the claimed effect and where it occurs. Break that effect without changing the declaration. If the test still passes, repair its proof or narrow its claim; do not delete needed behavior coverage. Declarations may themselves be a public contract.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/pull/155040",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
+    ]
+  },
+  {
+    "name": "mock_defined_behavior",
+    "predicate": "Is the decision or effect a test claims to verify supplied by its own mock or fixture instead of produced by the application component under test?",
+    "required_context": "Setup, mocks, fixtures, asserted values, production call path and the boundary named by the test.",
+    "positive": "A fixture inserts the expected row before calling save; replacing save with a no-op leaves the persistence assertion green.",
+    "negative": "A gateway double returns unauthorized and a caller test verifies that the caller displays the rejection; it does not claim to test the gateway policy.",
+    "severity": "test_gap",
+    "search_trigger": "Mocks returning expected receipts, sorted data, decisions or IDs; fixtures pre-populating the asserted store.",
+    "investigation": "Trace each asserted fact backward to its producer. Replace the production decision/effect while preserving setup. Distinguish a useful forwarding or error-handling contract from a test double doing the work that the test attributes to the owner.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/pull/155040",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
+    ]
+  },
+  {
+    "name": "circular_expected_value",
+    "predicate": "Does the expected value depend on the same implementation being checked, so a credible defect changes both sides and passes?",
+    "required_context": "Actual and expected computations, shared helpers, contract, and any independent oracle.",
+    "positive": "A price test derives expected from Price.total/1 and compares a checkout result that calls the same function; a wrong tax factor changes both sides.",
+    "negative": "A round-trip test also checks independent known encoded bytes and rejects a broken decoder; sharing a fixture factory does not make its expected value circular.",
+    "severity": "test_gap",
+    "search_trigger": "Expected values produced by the same renderer, normalizer, mapper, parser or calculation as actual.",
+    "investigation": "Trace dependencies of actual and expected. Apply one plausible shared implementation error and check whether both sides move together. Use an independently derived value or invariant. Do not demand duplicate implementations as an oracle.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md",
+      "https://github.com/openclaw/openclaw/pull/156316"
+    ]
+  },
+  {
+    "name": "unreachable_negative_control",
+    "predicate": "Does a negative test pass for an unrelated precondition without reaching the rejection or guard it claims to verify?",
+    "required_context": "Fixture existence and validity, identity, authorization and validation order, assertion, guard and routing.",
+    "positive": "A cannot delete another user record test supplies a missing record; removing ownership authorization leaves the not-found rejection unchanged.",
+    "negative": "The record exists, the request is valid and authenticated, and removing only the ownership guard makes the denial test fail.",
+    "severity": "test_gap",
+    "search_trigger": "Negative cases with absent records, invalid payloads, unauthenticated users, already restricted fixtures or conditional test execution.",
+    "investigation": "Establish every prerequisite except the prohibited condition. Remove only the intended guard and show the test distinguishes it. Check that the case actually executes. Repair the fixture and keep the needed negative contract.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md",
+      "https://github.com/openclaw/openclaw/pull/156316"
+    ]
+  },
+  {
+    "name": "redundant_test_expansion",
+    "predicate": "Does added coverage repeat an existing, stronger test of the same failure at another layer, without protecting a distinct boundary or interaction?",
+    "required_context": "Both complete tests, production path, mocks, runtime/CI routing and the exact failure each test detects.",
+    "positive": "A wrapper suite repeats the owner test through a pass-through function and identical mocks. Both reject the same normalization mutation; the new layer supplies no separate contract.",
+    "negative": "An integration test catches request serialization, wiring or lifecycle defects that the unit test cannot exercise.",
+    "severity": "maintenance",
+    "search_trigger": "Repeated matrices, provider-local copies, wrapper tests and near-identical setup/assertions.",
+    "investigation": "Name the retained test and location, the shared failure and boundary, then try a failure specific to the candidate layer. Recommend consolidation only if the retained test runs in the relevant gate and covers the contract. Similar text or a matching mutation alone is insufficient.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/pull/155040",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md",
+      "https://www.linkedin.com/posts/sasajuric_i-recently-reviewed-some-ai-assisted-code-activity-7435287708752658432-JwE0"
+    ]
+  },
+  {
+    "name": "mechanical_test_expansion",
+    "predicate": "Do inventory, constructor or case-matrix assertions add no application discrimination beyond language behavior or independently tested dimensions?",
+    "required_context": "Constructor or mapper implementation, public compatibility requirements, matrix dimensions and retained distinguishing cases.",
+    "positive": "An ExUnit loop constructs a struct with each status and merely reads back the supplied fields; no custom constructor or published enum-order contract is involved.",
+    "negative": "Cases establish normalization, default values, validation, a stable wire inventory, or real interactions among options.",
+    "severity": "maintenance",
+    "search_trigger": "Struct literal round trips, copied enum lists, field inventories and cross-products with identical assertions.",
+    "investigation": "For each proposed extra case, identify a different credible application defect it catches. Check whether dimensions interact and whether an inventory is independently specified. Retain each distinct contract; count and line coverage are not evidence of value.",
+    "sources": [
+      "https://github.com/codenameakshay/async_wallpaper/pull/65",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
+    ]
+  },
+  {
+    "name": "test_only_production_scaffolding",
+    "predicate": "Does a low-value test require a production export, reverse mapper, flag, wrapper or alternate path that serves no application or public compatibility contract?",
+    "required_context": "All callers, public/module API and dynamic use, test purpose, actual boundary and history for the seam.",
+    "positive": "A private internal app module exports __test_state__/1 only so a test can assert its private map; the app has no use for it.",
+    "negative": "A clock or external-service adapter is a coherent production boundary even when tests are its only alternate implementation; a documented SDK export may have external users.",
+    "severity": "maintenance",
+    "search_trigger": "Test-named exports or messages, unused reverse transforms, injection flags and inspection getters introduced with tests.",
+    "investigation": "Trace non-test and dynamic callers and check external API commitments before assuming dead code. Identify the weak test sustaining the seam and a real boundary that preserves needed coverage. A test-only caller count alone is not enough. Missing external contracts require uncertainty.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/pull/155040",
+      "https://github.com/codenameakshay/async_wallpaper/pull/65",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
+    ]
+  },
+  {
+    "name": "test_environment_workaround",
+    "predicate": "Does a test repair add persistent waiting, seeding, serialization or special configuration that demonstrably does not address the failure mechanism and adds cost or hides the problem?",
+    "required_context": "Old/new setup, failing path or trace, synchronization and resource ownership, relevant test history and environment scope.",
+    "positive": "A repair sleeps after a synchronous insert even though the observed failure was a wrong ID and no asynchronous work remains; fixing the ID alone makes the test discriminate correctly.",
+    "negative": "async: false protects a demonstrated application-global resource, or a bounded timeout reflects a documented external contract.",
+    "severity": "maintenance",
+    "search_trigger": "New Process.sleep, async: false, global config, broad seeds or test-only production branches following a failure.",
+    "investigation": "Recover the failed condition from history or reproduce it. Trace what the workaround can change and construct a control without it. Flag a demonstrated mismatch or concealed failure, not merely the lack of a written explanation. Keep justified resource isolation.",
+    "sources": [
+      "https://getboothiq.com/blog/150k-lines-vibe-coded-elixir-good-bad-ugly"
+    ]
+  },
+  {
+    "name": "verification_weakening",
+    "predicate": "Does a change allow previously rejected wrong behavior by loosening assertions, fixtures, exclusions, snapshots or quality gates without an independent contract change?",
+    "required_context": "Before/after checks and source, requirements/history, test selection and retained owner coverage.",
+    "positive": "A refund test replaces the exact amount with is_number, so a wrong amount previously rejected now passes.",
+    "negative": "A redundant test is removed while a named retained owner still rejects its meaningful failure; a documented requirement change justifies a new expected result.",
+    "severity": "test_gap",
+    "search_trigger": "Removed or widened assertions, skips, test/lint exclusions, accepting new snapshots and narrower CI triggers.",
+    "investigation": "Hold the requirement and one credible broken implementation fixed. Run old and new verification and trace which behavior became accepted. Check independent requirement changes and stronger retained coverage. A corrected invalid fixture or removing useless tests is not automatically erosion.",
+    "sources": [
+      "https://github.com/anthropics/claude-code/issues/7074",
+      "https://github.com/anthropics/claude-code/issues/32376",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
     ]
   }
 ]

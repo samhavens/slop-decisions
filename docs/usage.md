@@ -16,7 +16,7 @@ Set `OPENAI_API_KEY` in your environment, then check a file:
 slop-decisions check lib/orders.ex
 ```
 
-This uses all 26 rules with OpenAI `gpt-6-luna` through the Responses API.
+This uses all 13 focused slop rules with OpenAI `gpt-6-luna` through the Responses API.
 For [a local model](models.md#local-models), start Ollama, then run:
 
 ```sh
@@ -48,9 +48,11 @@ This command examines lines 20–60. The model also receives the full target fil
 Supply the called function when its behavior could change the result.
 For a test check, supply the test and the code under test.
 
-Repeat `--rule` to select more checks. Omit it to use [all 26 rules](../README.md#patterns).
+Repeat `--rule` to select more checks. Omit it to use [all 13 focused slop rules](../README.md#patterns).
 `--dimension` is an alias for `--rule`.
-With `--rubrics FILE`, the default is every rule in that file.
+The 22 broader rules remain available through explicit `--rule NAME` selection.
+`checks` marks which rules run by default. With `--rubrics FILE`, the default is
+every rule in that file.
 
 Pass more than one input file to examine several files. Use `--lines` with one input file only.
 Use `--root PATH` if your files are in a different directory.

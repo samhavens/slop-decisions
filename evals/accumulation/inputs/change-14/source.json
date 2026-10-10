@@ -1,0 +1,10 @@
+{
+  "before": {
+    "lib/receipt.ex": "defmodule SystemClock do\n  def now, do: System.system_time(:second)\nend\ndefmodule Receipt do\n  @doc \"Stamp a receipt with the selected clock; the system clock is the application default.\"\n  def stamp(id, clock \\\\ SystemClock), do: %{id: id, issued_at: clock.now()}\nend\n"
+  },
+  "after": {
+    "lib/receipt.ex": "defmodule SystemClock do\n  def now, do: System.system_time(:second)\nend\ndefmodule Receipt do\n  @doc \"Stamp a receipt with the selected clock; the system clock is the application default.\"\n  def stamp(id, clock \\\\ SystemClock), do: %{id: id, issued_at: clock.now()}\nend\n",
+    "test/receipt_test.exs": "ExUnit.start()\ndefmodule ReceiptTest do\n  use ExUnit.Case, async: true\n  defmodule FixedClock do\n    def now, do: 123\n  end\n  test \"uses the selected clock for issue time\" do\n    assert Receipt.stamp(42, FixedClock) == %{id: 42, issued_at: 123}\n  end\nend\n"
+  },
+  "history": []
+}
