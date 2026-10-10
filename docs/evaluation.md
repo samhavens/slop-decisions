@@ -41,7 +41,8 @@ A prediction is positive when `probability >= threshold`. The probability from
 generative models is self-reported, and need not be calibrated or interchangeable
 with a Decisions probability. Thresholds need validation for the model, prompts, and source selection in use.
 The published calibration study tested one shared pair of thresholds across fourteen
-checks. The fitted pair failed its held-out test; it did not validate individual checks.
+checks. It does not establish accuracy for an individual check on your project.
+See the [full measurements](../reports/calibration-2026-10-10/README.md).
 
 Primary macro balanced accuracy averages `(TP / P + TN / N) / 2` over dimensions
 with both labels. `P` and `N` include unassessed targets, so missing assessments

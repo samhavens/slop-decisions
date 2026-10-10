@@ -38,7 +38,7 @@ The framework fixtures refer to
 [Plug 1.16 header access](https://github.com/elixir-plug/plug/blob/v1.16.0/lib/plug/conn.ex#L661)
 and [Elixir 1.18 regular expressions](https://hexdocs.pm/elixir/1.18.4/Regex.html).
 
-Commit your labels and [selection policy](../docs/calibration-plan.md) before model calls.
+Commit your labels and [selection policy](../reports/calibration-2026-10-10/plan.md) before model calls.
 Keep labels, witnesses, case names, and split names out of `packet`.
 The loader rejects duplicate IDs, identical source across splits, and families that cross splits.
 The fitter accepts complete calibration runs only. Refusals and failed requests stay unassessed.

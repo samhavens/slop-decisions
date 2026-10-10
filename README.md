@@ -17,7 +17,7 @@ slop-decisions check lib/orders.ex
 ```
 
 This runs **all 14 rules** with OpenAI `gpt-6-luna` through the Decisions API.
-Review the results before you change code. See the [measured limits](docs/results.md).
+Review the results before you change code. See the [model comparison](docs/results.md).
 
 Use a local model with [Ollama running](docs/models.md#local-models):
 

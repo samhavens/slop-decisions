@@ -58,7 +58,7 @@ Git comparison rules, JUnit reports, and an ExUnit example.
 
 An `assessed` result includes the model's estimate of the defect probability.
 A probability at or above `--threshold` produces a warning. The fallback is 0.8.
-This value is experimental; the [fitted profile failed validation](calibration.md).
+This value is experimental. [Validate a profile](calibration.md) before using it as a required CI check.
 `threshold_policy` shows where each threshold came from. Use `--calibration FILE`
 to apply a passing profile, or supply explicit threshold values.
 
