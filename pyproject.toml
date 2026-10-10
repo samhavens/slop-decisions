@@ -22,6 +22,10 @@ slop-decisions = "slop_decisions.cli:main"
 [dependency-groups]
 dev = ["pytest>=8,<10", "ruff>=0.12,<1"]
 
+[tool.uv]
+# Preserve the dependency environment used for the published evaluation.
+exclude-newer = "2026-03-22T07:59:37Z"
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/slop_decisions"]
 
