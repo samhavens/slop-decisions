@@ -3,6 +3,7 @@
 The skill uses all 17 rules in your current Codex session. Codex can read callers,
 validators, and tests to check whether a suspicious pattern is a real problem.
 Each finding must include a code location and evidence.
+See the [measured review results and limits](../reports/skill-2026-10-10/README.md).
 
 ## Install
 

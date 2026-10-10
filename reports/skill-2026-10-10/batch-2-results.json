@@ -1,0 +1,217 @@
+[
+  {
+    "case_id": "item-072",
+    "dimension": "invalid_state_accommodation",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "The supplied module delegates normalization and delivery. Envelope.make/1's output contract and Transport.deliver/1's implementation are needed to determine whether delivery accepts representations excluded by normalization.",
+    "evidence": [
+      {"path": "sample.ex", "start_line": 2, "end_line": 2, "detail": "submit/1 only calls Transport.deliver(Envelope.make(text)); neither callee is supplied."}
+    ],
+    "verification": "Inspected the complete supplied packet; no unsupported callee behavior was assumed."
+  },
+  {
+    "case_id": "item-075",
+    "dimension": "test_claim_gap",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The unsorted input and exact sorted-result match distinguish sorting from identity. Replacing sort/1 with identity fails the supplied test.",
+    "evidence": [
+      {"path": "sample.ex", "start_line": 2, "end_line": 5, "detail": "test/0 passes [3, 1, 2] to sort/1 and matches the result against [1, 2, 3]."}
+    ],
+    "verification": "Executed Sample.test/0 unchanged successfully. In an isolated copy, replaced Enum.sort(xs) with xs; the unchanged test raised MatchError at line 5."
+  },
+  {
+    "case_id": "item-001",
+    "dimension": "semantic_comment_noise",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The comment explains the priority-order invariant and why sorting would change the recipient; List.first/1 alone does not communicate that rationale.",
+    "evidence": [
+      {"path": "sample.ex", "start_line": 3, "end_line": 4, "detail": "The comment connects database ordering to recipient selection before List.first(users)."}
+    ],
+    "verification": "Inspected the complete function and comment; no runtime probe was needed for the selected dimension."
+  },
+  {
+    "case_id": "item-009",
+    "dimension": "presentation_only_authorization",
+    "verdict": "finding",
+    "kind": "defect",
+    "reason": "A user from another team can call event/3 and update the document even though editable?/2 rejects that user. Enforce the team restriction in Documents.update/3 or the server event before updating.",
+    "evidence": [
+      {"path": "sample.ex", "start_line": 2, "end_line": 3, "detail": "editable?/2 requires matching teams, but event/3 forwards directly to Documents.update/3."},
+      {"path": "sample.ex", "start_line": 5, "end_line": 6, "detail": "Documents.update/3 ignores the user and unconditionally returns the modified document."}
+    ],
+    "verification": "Executed the supplied modules with user.team=:outside and doc.team=:inside. editable?/2 returned false, while event/3 returned {:ok, %{team: :inside, title: \"new\"}}."
+  },
+  {
+    "case_id": "item-002",
+    "dimension": "timing_instead_of_synchronization",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "Task.await/2 observes the asynchronous task's reply. Its 5000 ms timeout bounds that wait rather than treating elapsed time as evidence of completion.",
+    "evidence": [
+      {"path": "sample.ex", "start_line": 3, "end_line": 4, "detail": "The task returned by Task.async/1 is passed directly to Task.await/2 before its result is returned."}
+    ],
+    "verification": "Inspected the complete lifecycle; no fixed sleep or completion assumption is present."
+  },
+  {
+    "case_id": "item-016",
+    "dimension": "success_shaped_failure",
+    "verdict": "finding",
+    "kind": "defect",
+    "reason": "A send callback returning {:error, :closed} still produces delivered: 1, contradicting the stated completed-send metric contract. Set delivered only for a successful callback result.",
+    "evidence": [
+      {"path": "sample.ex", "start_line": 3, "end_line": 4, "detail": "The callback result is stored, but delivered is unconditionally set to 1 without checking success."}
+    ],
+    "verification": "Executed send_message/2 with a callback returning {:error, :closed}; it returned %{result: {:error, :closed}, delivered: 1}."
+  },
+  {
+    "case_id": "item-015",
+    "dimension": "derived_state_drift",
+    "verdict": "finding",
+    "kind": "defect",
+    "reason": "After pushing a nonempty chunk, reset/1 clears chunks but preserves their byte count. Reset bytes to zero alongside chunks so the stored count continues to describe the buffer.",
+    "evidence": [
+      {"path": "sample.ex", "start_line": 2, "end_line": 4, "detail": "new/0 initializes both representations, push/2 updates both, and reset/1 updates only chunks."}
+    ],
+    "verification": "Executed new() |> push(\"abc\") |> reset(); the result was %{chunks: [], bytes: 3}, while the empty buffer has zero bytes."
+  },
+  {
+    "case_id": "item-023",
+    "dimension": "framework_reimplementation",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "Scanner.decimal?/1 is not supplied, so there is no custom scanner implementation to compare with Elixir 1.18 facilities. Its handling of empty input and invalid characters, plus an equivalent facility's documented behavior, is essential to this decision.",
+    "evidence": [
+      {"path": "sample.ex", "start_line": 2, "end_line": 2, "detail": "digits?/1 only delegates to the absent Scanner.decimal?/1 implementation."}
+    ],
+    "verification": "Inspected the complete packet. The local runtime is Elixir 1.20.2, not the specified 1.18; no replacement equivalence was asserted."
+  },
+  {
+    "case_id": "item-057",
+    "dimension": "redundant_wrapper",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The success clause unwraps {:ok, value}; replacing the case with its input would return a tuple instead of the value.",
+    "evidence": [
+      {"path": "fixture.ex", "start_line": 3, "end_line": 5, "detail": "The {:ok, value} branch returns value, while the catch-all preserves other inputs."}
+    ],
+    "verification": "Executed foo({:ok, 7}) and observed 7; foo({:error, :closed}) preserved the error tuple."
+  },
+  {
+    "case_id": "item-003",
+    "dimension": "process_without_runtime_reason",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The complete supplied implementation converts the integer directly and creates no Agent or other process.",
+    "evidence": [
+      {"path": "sample.ex", "start_line": 1, "end_line": 3, "detail": "The module's sole function is format/1 calling Integer.to_string/1."}
+    ],
+    "verification": "Inspected the full supplied module; the process mentioned in the focus description is absent from this snapshot."
+  },
+  {
+    "case_id": "item-042",
+    "dimension": "test_claim_gap",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The test uses the discriminating key \"a/b name\" with allow_reserved false and true, requiring both slash and space encoding in either case. It rejects removing key encoding and incorrectly applying the value's reserved-character policy to keys.",
+    "evidence": [
+      {"path": "test/tesla/open_api/cookie_params_test.exs", "start_line": 141, "end_line": 158, "detail": "The loop tests both allow_reserved settings and explicitly expects a%2Fb%20name as the object key."},
+      {"path": "lib/tesla/open_api/cookie_param.ex", "start_line": 210, "end_line": 211, "detail": "serialize_form_pair/2 independently applies Param.encode_unreserved/1 to keys."},
+      {"path": "lib/tesla/param.ex", "start_line": 125, "end_line": 129, "detail": "The key encoder calls URI.encode/2 after string conversion."}
+    ],
+    "verification": "Ran all 17 supplied tests with the supplied implementation: 17 passed. In separate copies, replaced key encoding with to_string/1 and with encode_form_value/2; each mutation failed the unchanged test at line 155 (16 of 17 passed)."
+  },
+  {
+    "case_id": "item-033",
+    "dimension": "disguised_state_machine",
+    "verdict": "finding",
+    "kind": "defect",
+    "reason": "start(new()) leaves queued and running true, and finish/1 leaves queued and done true, violating the stated mutually exclusive phases. Use one phase value or update every phase flag consistently on each transition.",
+    "evidence": [
+      {"path": "sample.ex", "start_line": 2, "end_line": 4, "detail": "Initialization sets queued true; neither start/1 nor finish/1 clears it."}
+    ],
+    "verification": "Executed initialization, start, and finish. Observed %{queued: true, running: true, done: false}, then %{queued: true, running: false, done: true}."
+  },
+  {
+    "case_id": "item-076",
+    "dimension": "avoidable_repeated_traversal",
+    "verdict": "finding",
+    "kind": "defect",
+    "reason": "Each chunk recomputes IO.iodata_length(body) over the growing nested body, making many small chunks consume quadratic traversal work before the read limit. Carry the accumulated byte count or remaining allowance through recursion and update it from the new chunk.",
+    "evidence": [
+      {"path": "lib/bandit/http1/socket.ex", "start_line": 226, "end_line": 232, "detail": "Chunked reads initialize the accumulated body to an empty binary and convert it only after the loop completes."},
+      {"path": "lib/bandit/http1/socket.ex", "start_line": 255, "end_line": 266, "detail": "Every recursive call measures the entire body at line 256, then nests the old body inside [body | chunk] at line 264."},
+      {"path": "lib/bandit/http1/socket.ex", "start_line": 292, "end_line": 310, "detail": "Small complete chunks return individually, and oversized chunks preserve the unread remainder; a local byte counter can retain these boundaries."}
+    ],
+    "verification": "Executed the full supplied socket source on fully buffered chunked requests using local protocol/exception stand-ins; no external socket dependency was exercised. Baseline times for 2000/4000/8000 one-byte chunks were 11.6/45.0/165.5 ms. An isolated accumulated-count version took 2.0/3.7/6.5 ms and produced matching body partitions, read states, and buffers for 24 boundary cases. These are local probes, not integration tests."
+  },
+  {
+    "case_id": "item-037",
+    "dimension": "timing_instead_of_synchronization",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The targeted 1000 ms sleep deliberately withholds the next chunk beyond the configured 200 ms receive timeout. The test asserts the resulting timeout rather than assuming asynchronous work has completed after a delay.",
+    "evidence": [
+      {"path": "test/tesla/adapter/finch_test.exs", "start_line": 78, "end_line": 85, "detail": "The test is explicitly for a slow next chunk and asserts Tesla.Error with :timeout while enumerating the body."},
+      {"path": "test/tesla/adapter/finch_test.exs", "start_line": 99, "end_line": 121, "detail": "The helper sends headers and the first hello chunk before invoking the delayed after_chunk callback."}
+    ],
+    "verification": "Read the complete supplied test module and helper. Did not run the network suite because its Tesla/Finch dependencies and setup modules are not supplied; the targeted delay's role is explicit in the source."
+  },
+  {
+    "case_id": "item-061",
+    "dimension": "semantic_duplicate",
+    "verdict": "finding",
+    "kind": "maintenance",
+    "reason": "poll/2 independently repeats the retry policy already exposed by retryable?/1 under the same stated contract. Future policy changes require synchronized edits; use remaining > 0 and retryable?(status) in poll/2.",
+    "evidence": [
+      {"path": "sample.ex", "start_line": 2, "end_line": 4, "detail": "Both paths separately spell status == 429 or status >= 500; poll/2 additionally checks the retry budget."}
+    ],
+    "verification": "Inspected both complete implementations and the supplied same-contract focus. Replacing the duplicated predicate with retryable?/1 retains the existing short-circuit order."
+  },
+  {
+    "case_id": "item-071",
+    "dimension": "policy_free_abstraction",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "The snapshot contains only a call to Serializers.stringify/1. Its implementation, serialization contract, supported variation, and consumers are missing, so the purported abstraction cannot be judged policy-free.",
+    "evidence": [
+      {"path": "sample.ex", "start_line": 1, "end_line": 3, "detail": "No private stringify/1 or serialize/1 implementation is present; label/1 delegates to another module."}
+    ],
+    "verification": "Inspected the full supplied packet and did not infer the absent serializer's behavior."
+  },
+  {
+    "case_id": "item-027",
+    "dimension": "redundant_wrapper",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "The marked expression has become Mapper.project(x), but Mapper.project/1 is absent. Its return values, exceptions, and side effects are needed to determine whether replacing it with x preserves behavior.",
+    "evidence": [
+      {"path": "sample.ex", "start_line": 2, "end_line": 2, "detail": "run/1 contains only the external Mapper.project/1 call; there are no supplied branches to establish identity."}
+    ],
+    "verification": "Inspected the complete supplied wrapper; no assumption was made about the missing projection implementation."
+  },
+  {
+    "case_id": "item-005",
+    "dimension": "redundant_wrapper",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The case reconstructs smaller maps and rejects unmatched inputs. Returning value directly would preserve extra keys and stop raising CaseClauseError, changing observable behavior.",
+    "evidence": [
+      {"path": "fixture.ex", "start_line": 3, "end_line": 6, "detail": "The map patterns accept extra keys but return only a or b, and no catch-all branch is present."}
+    ],
+    "verification": "Executed foo(%{a: 1, extra: 2}) and observed %{a: 1}; foo(:unexpected) raised CaseClauseError."
+  },
+  {
+    "case_id": "item-073",
+    "dimension": "avoidable_repeated_traversal",
+    "verdict": "finding",
+    "kind": "defect",
+    "reason": "Every accepted chunk causes iolist_size/1 to revisit the entire accumulated list. For n small chunks below the limit, the length checks traverse 1+2+...+n list cells. Maintain a byte count alongside acc and add only the new chunk's size.",
+    "evidence": [
+      {"path": "sample.ex", "start_line": 3, "end_line": 5, "detail": "The reducer starts with [], prepends each chunk, and measures all of next on every iteration."}
+    ],
+    "verification": "Executed the supplied function and a local-count comparison on 50 combinations of chunk shapes and limits, preserving results. For 2000/4000/8000 one-byte chunks, baseline times were 5.7/22.9/91.0 ms versus 0.06/0.23/0.23 ms with the counter. Timings are single local probes; the traversal pattern establishes the complexity."
+  }
+]

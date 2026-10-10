@@ -1,0 +1,175 @@
+{
+  "source_commit": "5529f963d1ae444df0e8a7d182e86e7a494a2ca6",
+  "skill_version": "0.6.0",
+  "started_at": "2026-10-10T19:56:10.718683+00:00",
+  "seed": 20261010,
+  "skill_hashes": {
+    "LICENSE": "754e4c4017eb3435e00ca886c2b2b6c72eaf8d85bdc238754f48e4c76ca903c8",
+    "SKILL.md": "a983817b6fbde7206a378c1acf6925da68e4a4bd45bd2e0b8fdb425bf3deb0fc",
+    "agents/openai.yaml": "789a62d0c60628badefda4a3b50aff27569c4db0a44d17ae4e51873e3a5b2d60",
+    "references/phoenix.md": "e569e1cbf4796b5f801ab086d8b2c34ee0f3b270b7bdbbd3f52b2dd6542926c9",
+    "references/rules.json": "dc413537261b26ce553cace9cbe93986ac64d93e23239afbb346a377d50a29bd"
+  },
+  "case_counts": [
+    19,
+    19,
+    19,
+    19
+  ],
+  "provider_checker_calls": 0,
+  "reviewers": [
+    {
+      "reviewer": "skill_eval_a",
+      "model": "gpt-6-astra",
+      "reasoning_effort": "max",
+      "usage": {
+        "input_tokens": 729303,
+        "cached_input_tokens": 661632,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 9023,
+        "reasoning_output_tokens": 2610,
+        "total_tokens": 738326
+      }
+    },
+    {
+      "reviewer": "skill_eval_b",
+      "model": "gpt-6-astra",
+      "reasoning_effort": "max",
+      "usage": {
+        "input_tokens": 828676,
+        "cached_input_tokens": 782720,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 12687,
+        "reasoning_output_tokens": 2966,
+        "total_tokens": 841363
+      }
+    },
+    {
+      "reviewer": "skill_eval_c",
+      "model": "gpt-6-astra",
+      "reasoning_effort": "max",
+      "usage": {
+        "input_tokens": 962366,
+        "cached_input_tokens": 905984,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 14641,
+        "reasoning_output_tokens": 5592,
+        "total_tokens": 977007
+      }
+    },
+    {
+      "reviewer": "skill_eval_d",
+      "model": "gpt-6-astra",
+      "reasoning_effort": "max",
+      "usage": {
+        "input_tokens": 740706,
+        "cached_input_tokens": 692480,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 10823,
+        "reasoning_output_tokens": 4286,
+        "total_tokens": 751529
+      }
+    }
+  ],
+  "review_mode": "one selected rule per source packet, file context",
+  "trials": 1,
+  "prior_history_given_to_reviewers": false,
+  "labels_given_to_reviewers": false,
+  "sources_available": "supplied packets only; no repository or network lookup",
+  "usage_scope": "four reviewers only; excludes parent orchestration; cached input is a subset of input tokens; no dollar cost returned",
+  "batch_order": {
+    "1": [
+      "item-034",
+      "item-041",
+      "item-004",
+      "item-024",
+      "item-051",
+      "item-031",
+      "item-030",
+      "item-059",
+      "item-063",
+      "item-053",
+      "item-026",
+      "item-010",
+      "item-060",
+      "item-007",
+      "item-025",
+      "item-039",
+      "item-040",
+      "item-047",
+      "item-070"
+    ],
+    "2": [
+      "item-072",
+      "item-075",
+      "item-001",
+      "item-009",
+      "item-002",
+      "item-016",
+      "item-015",
+      "item-023",
+      "item-057",
+      "item-003",
+      "item-042",
+      "item-033",
+      "item-076",
+      "item-037",
+      "item-061",
+      "item-071",
+      "item-027",
+      "item-005",
+      "item-073"
+    ],
+    "3": [
+      "item-043",
+      "item-044",
+      "item-006",
+      "item-050",
+      "item-018",
+      "item-022",
+      "item-049",
+      "item-048",
+      "item-046",
+      "item-045",
+      "item-013",
+      "item-052",
+      "item-020",
+      "item-067",
+      "item-021",
+      "item-017",
+      "item-028",
+      "item-058",
+      "item-066"
+    ],
+    "4": [
+      "item-019",
+      "item-065",
+      "item-012",
+      "item-074",
+      "item-008",
+      "item-056",
+      "item-011",
+      "item-035",
+      "item-014",
+      "item-055",
+      "item-032",
+      "item-069",
+      "item-036",
+      "item-064",
+      "item-038",
+      "item-054",
+      "item-029",
+      "item-062",
+      "item-068"
+    ]
+  },
+  "usage_total": {
+    "input_tokens": 3261051,
+    "cached_input_tokens": 3042816,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 47174,
+    "reasoning_output_tokens": 15454,
+    "total_tokens": 3308225
+  },
+  "inputs_hash": "55a9c7d03e4ce3c10715f53e28379017b057e8d0314a1f667d34ff4c2ff8ee0b"
+}

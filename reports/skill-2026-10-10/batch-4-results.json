@@ -1,0 +1,360 @@
+[
+  {
+    "case_id": "item-019",
+    "dimension": "semantic_duplicate",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The telemetry test already calls the shared start_syslog/2 and ingest_syslog/2 helpers. Its metadata override and telemetry assertions are specific to this test; it does not independently recreate the setup operation.",
+    "evidence": [
+      {
+        "path": "test/logflare/backends/adaptor/syslog_adaptor_test.exs",
+        "start_line": 209,
+        "end_line": 229,
+        "detail": "The target reuses setup and ingestion helpers and adds a telemetry handler."
+      },
+      {
+        "path": "test/logflare/backends/adaptor/syslog_adaptor_test.exs",
+        "start_line": 343,
+        "end_line": 360,
+        "detail": "start_syslog/2 owns user/source/backend creation and supervised startup, with backend attribute overrides."
+      }
+    ],
+    "verification": "Inspected the entire 582-line test module and its helper consumers. No integration tests were run."
+  },
+  {
+    "case_id": "item-065",
+    "dimension": "disguised_state_machine",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "A job is represented by one phase atom, with queued-to-running and running-to-done transitions. There are no independently stored lifecycle flags or reachable combinations of flags.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 4,
+        "detail": "Initialization and both transitions return one mutually exclusive phase."
+      }
+    ],
+    "verification": "Inspected the complete initialization and transition functions."
+  },
+  {
+    "case_id": "item-012",
+    "dimension": "derived_state_drift",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "Both initialization and reset set an empty buffer and zero bytes; every push adds exactly the new chunk byte size while adding that chunk. All supplied update paths preserve the sum invariant.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 4,
+        "detail": "Every buffer update also updates or resets its byte count."
+      }
+    ],
+    "verification": "Inspected all updates and ran an Elixir 1.20.2 probe covering initialization, four pushes including Unicode and an empty chunk, and reset after every state; the byte-sum invariant held."
+  },
+  {
+    "case_id": "item-074",
+    "dimension": "policy_free_abstraction",
+    "verdict": "finding",
+    "kind": "maintenance",
+    "reason": "label/1 traverses two private pass-through helpers with no validation, policy, alternate implementation, or separate consumer. Calling Integer.to_string/1 directly removes two definitions and two navigation steps without changing integer conversion.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 4,
+        "detail": "The complete module contains only label -> stringify -> serialize -> Integer.to_string."
+      }
+    ],
+    "verification": "Inspected the complete module and compared label/1 with direct conversion on negative, zero, positive, and large integers using Elixir 1.20.2; outputs matched."
+  },
+  {
+    "case_id": "item-008",
+    "dimension": "semantic_duplicate",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The supplied retry functions have different provider policies: legacy retries 403, while current retries 429. Treating them as the same operation would change behavior for both statuses.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 4,
+        "detail": "The comment documents distinct rate-limit statuses, and the predicates implement that distinction."
+      }
+    ],
+    "verification": "Inspected the complete module and executed both predicates: 403 produced true/false, 429 false/true, and 500 true/true."
+  },
+  {
+    "case_id": "item-056",
+    "dimension": "process_without_runtime_reason",
+    "verdict": "finding",
+    "kind": "maintenance",
+    "reason": "Every integer conversion starts a linked Agent, performs one synchronous read, and stops it. No state is shared or retained and no coordination or isolation contract is supplied. Direct Integer.to_string/1 removes this process and message lifecycle.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 6,
+        "detail": "The sole consumer creates, reads, and terminates an Agent solely to call Integer.to_string/1."
+      }
+    ],
+    "verification": "Inspected the full lifecycle and sole consumer; compared Agent-backed and direct conversion on four representative integers in Elixir 1.20.2, with matching outputs."
+  },
+  {
+    "case_id": "item-011",
+    "dimension": "presentation_only_authorization",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The server event checks the same team-based edit predicate before calling Documents.update/2 and returns forbidden otherwise. The restriction is enforced in the action itself.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 5,
+        "detail": "event/3 gates the mutation on editable?/2."
+      },
+      {
+        "path": "sample.ex",
+        "start_line": 7,
+        "end_line": 9,
+        "detail": "The update function is reached only from the authorized event branch in the supplied flow."
+      }
+    ],
+    "verification": "Inspected the complete event, authorization predicate, and called update function; no runtime probe was needed."
+  },
+  {
+    "case_id": "item-035",
+    "dimension": "redundant_wrapper",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "run/1 returns its input directly. The selected scope excludes the public function boundary, and there is no remaining cond or identity wrapper inside it.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 2,
+        "detail": "The body is only value."
+      }
+    ],
+    "verification": "Inspected the complete replacement expression."
+  },
+  {
+    "case_id": "item-014",
+    "dimension": "timing_instead_of_synchronization",
+    "verdict": "finding",
+    "kind": "defect",
+    "reason": "If the asynchronous callback is still running after 20 ms, run/1 returns nil from the zero-timeout yield instead of waiting for its result, and discards the task handle. Replace the fixed sleep with a completion wait and an explicit timeout policy.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 3,
+        "end_line": 5,
+        "detail": "A fixed sleep precedes Task.yield(task, 0), which does not wait for unfinished work."
+      }
+    ],
+    "verification": "Ran the supplied function in Elixir 1.20.2 with a worker blocked on an explicit message. run/1 returned nil before release; the result arrived only after the worker received the completion signal."
+  },
+  {
+    "case_id": "item-055",
+    "dimension": "success_shaped_failure",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "The packet supplies only a delegation to Delivery.send/2. Its implementation, failure return path, and delivered-counter writes are missing, so it is impossible to determine whether a failed send is recorded as delivered.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 2,
+        "detail": "All send and metric behavior is delegated to an absent module."
+      }
+    ],
+    "verification": "Inspected the entire supplied module; did not invent or stub the missing Delivery implementation."
+  },
+  {
+    "case_id": "item-032",
+    "dimension": "semantic_comment_noise",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The comment explains why inactive records remain stored and why they must be excluded from email recipients. That domain rationale is not evident from the filter alone.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 3,
+        "end_line": 4,
+        "detail": "The comment supplies audit-retention and email-eligibility rationale alongside the active filter."
+      }
+    ],
+    "verification": "Inspected the comment and complete adjacent function."
+  },
+  {
+    "case_id": "item-069",
+    "dimension": "framework_reimplementation",
+    "verdict": "finding",
+    "kind": "maintenance",
+    "reason": "The empty-string case and recursive byte walker implement exactly the supplied ASCII-digit language. Regex.match?(~r/\\A[0-9]+\\z/, text) preserves that string contract and removes the custom recursive parser.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 7,
+        "detail": "The available standard-library predicate is documented in the packet, while digits?/1 and walk/1 duplicate its empty and byte-range checks."
+      }
+    ],
+    "verification": "Inspected the complete predicate and compared it with the stated Regex alternative on 65,801 binary inputs, including all one- and two-byte values plus signs, Unicode, newline, and long digits. All matched on local Elixir 1.20.2; the packet names Elixir 1.18, which was not run."
+  },
+  {
+    "case_id": "item-036",
+    "dimension": "avoidable_repeated_traversal",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The reducer carries the byte total and measures each new chunk once. It never traverses previously accumulated chunks to recover their size.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 3,
+        "end_line": 7,
+        "detail": "The accumulator is an integer; iolist_size/1 receives only the current chunk."
+      }
+    ],
+    "verification": "Inspected the full reduction, accumulator initialization, and halt condition."
+  },
+  {
+    "case_id": "item-064",
+    "dimension": "policy_free_abstraction",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "The include_sub_boundaries option visibly selects between direct exports and recursive export checks. Boundary definition/configuration validation, supported option documentation, and consumer tests are absent, so the packet cannot establish whether this policy variation is supported or unnecessary.",
+    "evidence": [
+      {
+        "path": "lib/boundary/checker.ex",
+        "start_line": 105,
+        "end_line": 112,
+        "detail": "Export options originate in boundary.exports, whose construction and accepted options are not supplied."
+      },
+      {
+        "path": "lib/boundary/checker.ex",
+        "start_line": 147,
+        "end_line": 154,
+        "detail": "The option conditionally broadens a child-subboundary export check."
+      },
+      {
+        "path": "lib/boundary/checker.ex",
+        "start_line": 350,
+        "end_line": 361,
+        "detail": "exported?/3 handles implicit exports and root/except export tuples, giving the conditional branch distinct behavior."
+      }
+    ],
+    "verification": "Read the entire checker and traced options through validation and reference checking. No Boundary definition/configuration source or runnable project was supplied."
+  },
+  {
+    "case_id": "item-038",
+    "dimension": "success_shaped_failure",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "Egress telemetry fires before Pool.send/2 can fail, but the packet does not define whether that event measures attempted or successful egress. The event contract or metric consumers are essential before calling this success-shaped failure.",
+    "evidence": [
+      {
+        "path": "lib/logflare/backends/adaptor/syslog_adaptor/pipeline.ex",
+        "start_line": 63,
+        "end_line": 78,
+        "detail": "Telemetry is unconditional and precedes the send result; failures are separately marked on messages."
+      },
+      {
+        "path": "lib/logflare/backends/adaptor/syslog_adaptor/pool.ex",
+        "start_line": 29,
+        "end_line": 39,
+        "detail": "The pool exposes connection/send failures as error tuples."
+      }
+    ],
+    "verification": "Read the complete pipeline and pool and traced the failure return. No telemetry semantics were imported from another packet, and no integration test was run."
+  },
+  {
+    "case_id": "item-054",
+    "dimension": "test_claim_gap",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The test includes an unsorted input and requires sorted output, so replacing sort/1 with identity is detected by the second assertion.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 5,
+        "detail": "sort([3, 1, 2]) must equal [1, 2, 3]."
+      }
+    ],
+    "verification": "Ran the unchanged Sample.test/0 successfully, then ran an isolated identity mutation. It returned [3, 1, 2] for the discriminating input and failed the unchanged assertion at line 5."
+  },
+  {
+    "case_id": "item-029",
+    "dimension": "invalid_state_accommodation",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "submit/1 accepts binary text and constructs the tagged message consumed by deliver/1. The private helper accepts only that normalized shape; no excluded representations are accommodated.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 3,
+        "detail": "The binary guard and tagged construction establish exactly the representation matched by the private helper."
+      }
+    ],
+    "verification": "Inspected the complete public normalization boundary and sole private consumer."
+  },
+  {
+    "case_id": "item-062",
+    "dimension": "success_shaped_failure",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The documented streaming contract returns after headers, then raises Tesla.Error for body failures or receive timeouts. The code implements those branches and emits normal EOF only for a successful Finch completion, so it does not silently accept a reported stream failure.",
+    "evidence": [
+      {
+        "path": "lib/tesla/adapter/finch.ex",
+        "start_line": 49,
+        "end_line": 69,
+        "detail": "The contract explicitly distinguishes header success from later body-consumption failures."
+      },
+      {
+        "path": "lib/tesla/adapter/finch.ex",
+        "start_line": 187,
+        "end_line": 209,
+        "detail": "Post-header errors/timeouts raise; pre-header errors/timeouts return error tuples."
+      },
+      {
+        "path": "lib/tesla/adapter/finch.ex",
+        "start_line": 213,
+        "end_line": 225,
+        "detail": "Successful completion emits EOF; both version-dependent error shapes are forwarded as errors."
+      },
+      {
+        "path": "lib/tesla/error.ex",
+        "start_line": 1,
+        "end_line": 6,
+        "detail": "Tesla.Error carries the environment and failure reason."
+      }
+    ],
+    "verification": "Read the full adapter and exception module and traced callback errors, terminal errors, EOF, and timeout handling. Finch/Tesla integration tests were not available or run."
+  },
+  {
+    "case_id": "item-068",
+    "dimension": "test_claim_gap",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The selected behavior is rejecting absent and invalid private data. The test asserts both outcomes directly, and incorrect implementations that accept either case are rejected.",
+    "evidence": [
+      {
+        "path": "test/tesla/open_api/path_template_test.exs",
+        "start_line": 71,
+        "end_line": 74,
+        "detail": "There are distinct assertions for an invalid stored value and a missing key."
+      },
+      {
+        "path": "lib/tesla/open_api/path_template.ex",
+        "start_line": 83,
+        "end_line": 93,
+        "detail": "Separate invalid-value and absent-key branches both return error."
+      }
+    ],
+    "verification": "Ran all 21 supplied tests unchanged: all passed. In isolated copies, changed the missing-key branch to {:ok, nil}, then the invalid-value branch to {:ok, value}; each mutation failed its corresponding unchanged assertion, with 20/21 tests passing."
+  }
+]

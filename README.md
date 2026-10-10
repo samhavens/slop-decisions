@@ -24,7 +24,8 @@ Codex reviews all 17 rules in the current session. It reads related code and tes
 then gives findings with evidence. There are no separate checker API calls;
 normal Codex usage still applies.
 
-[Install and select rules](docs/codex.md) · [Use with tests and CI](docs/ci.md)
+[Install and select rules](docs/codex.md) · [Use with tests and CI](docs/ci.md) ·
+[Review results](reports/skill-2026-10-10/README.md)
 
 The experimental API checker and eval suite support **OpenAI, OpenRouter, and
 local models**. See [API setup](docs/usage.md), [model options](docs/models.md),

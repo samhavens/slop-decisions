@@ -1,0 +1,336 @@
+[
+  {
+    "case_id": "item-034",
+    "dimension": "test_claim_gap",
+    "verdict": "finding",
+    "kind": "test_gap",
+    "reason": "The exploded-object tests use only unreserved keys. Removing object-key encoding still passes all 16 supplied tests, but emits a/b c instead of a%2Fb%20c under both allow_reserved settings. Add an exploded object with a reserved character and space in its key for each setting.",
+    "evidence": [
+      {
+        "path": "test/tesla/open_api/cookie_params_test.exs",
+        "start_line": 47,
+        "end_line": 49,
+        "detail": "The form exploded-object assertion uses only R, G, and B as keys."
+      },
+      {
+        "path": "test/tesla/open_api/cookie_params_test.exs",
+        "start_line": 133,
+        "end_line": 149,
+        "detail": "Encoding assertions cover the parameter name and primitive values, not exploded object keys."
+      },
+      {
+        "path": "lib/tesla/open_api/cookie_param.ex",
+        "start_line": 210,
+        "end_line": 212,
+        "detail": "serialize_form_pair/2 applies encode_unreserved to the object key independently of allow_reserved."
+      }
+    ],
+    "verification": "Executed the unchanged supplied ExUnit suite in an isolated packet copy: 16 passed. Replaced only Param.encode_unreserved(key) with to_string(key): all 16 still passed. With object {\"a/b c\": \"x/y\"}, the original encoded the key for false and true; the mutant did not. Logs are in probes/item-034. Runtime: Elixir 1.20.2 / OTP 29."
+  },
+  {
+    "case_id": "item-041",
+    "dimension": "policy_free_abstraction",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The supplied module exposes a useful filesystem/test boundary through the injected reader and trims successful bytes. It does not contain the private stringify/serialize routing named in the focus.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 5,
+        "detail": "The reader is explicitly the filesystem test seam; load/2 invokes it and transforms only successful bytes."
+      }
+    ],
+    "verification": "Inspected the complete supplied module; no execution needed to establish the boundary."
+  },
+  {
+    "case_id": "item-004",
+    "dimension": "derived_state_drift",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The chunked-body accumulator and byte count are initialized together and updated together on every recursive transition. Terminal branches do not retain a separate count, so no path makes these two representations disagree.",
+    "evidence": [
+      {
+        "path": "lib/bandit/http1/socket.ex",
+        "start_line": 226,
+        "end_line": 232,
+        "detail": "Each read starts with an empty body and zero length; only body and remaining wire buffer are returned."
+      },
+      {
+        "path": "lib/bandit/http1/socket.ex",
+        "start_line": 255,
+        "end_line": 268,
+        "detail": "The loop appends chunk and adds exactly IO.iodata_length(chunk) to body_length in the same recursive call."
+      }
+    ],
+    "verification": "Inspected the full 603-line packet, including chunk splitting and both read_data branches. Verified the accumulator invariant by tracing initialization, recursion, and terminal returns; no runtime probe."
+  },
+  {
+    "case_id": "item-024",
+    "dimension": "timing_instead_of_synchronization",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "The packet only calls Jobs.join/1. Its implementation and asynchronous completion contract are needed to determine whether it waits for completion or merely delays for a fixed time.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 1,
+        "end_line": 3,
+        "detail": "No sleep, timer, worker implementation, or completion check is supplied; the entire operation is delegated to Jobs.join/1."
+      }
+    ],
+    "verification": "Read the complete packet. Did not invent or execute a replacement for the missing Jobs implementation."
+  },
+  {
+    "case_id": "item-051",
+    "dimension": "avoidable_repeated_traversal",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The marked chunked-body loop subtracts a maintained body_length and measures only the newly returned chunk. It does not traverse the growing body to recover its size on each iteration.",
+    "evidence": [
+      {
+        "path": "lib/bandit/http1/socket.ex",
+        "start_line": 255,
+        "end_line": 268,
+        "detail": "The size check uses body_length; only chunk is passed to IO.iodata_length before the accumulator and counter advance together."
+      },
+      {
+        "path": "lib/bandit/http1/socket.ex",
+        "start_line": 226,
+        "end_line": 232,
+        "detail": "The accumulated body is converted to a binary only when the chunked loop returns."
+      }
+    ],
+    "verification": "Read the complete packet and traced the marked loop, its initialization, chunk reader, and final conversion. The distinct read_exactly!/5 buffer loop lies outside the marked scope; no performance probe was run."
+  },
+  {
+    "case_id": "item-031",
+    "dimension": "disguised_state_machine",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "Visibility and edit permission have separate stated meanings. The supplied transitions enable them independently; no lifecycle invariant makes any reachable combination meaningless.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 5,
+        "detail": "The contract names independent meanings, and show/1 and allow_edit/1 each update the corresponding capability."
+      }
+    ],
+    "verification": "Inspected complete initialization and both transitions. No mutually exclusive phase contract is present in the code."
+  },
+  {
+    "case_id": "item-030",
+    "dimension": "success_shaped_failure",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The send runs before the delivered count is determined. Only :ok produces delivered: 1; failure results remain failures and produce delivered: 0.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 5,
+        "detail": "The original result is retained, and delivered is conditional on result == :ok."
+      }
+    ],
+    "verification": "Executed isolated success and {:error, :closed} probes: outputs retained their results with delivered counts one and zero respectively. Log: probes/item-030/baseline.log."
+  },
+  {
+    "case_id": "item-059",
+    "dimension": "derived_state_drift",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "Initialization agrees, but every update delegates to missing Buffer.push/2 or Buffer.reset/1. Those implementations are essential to determine whether chunks and bytes can diverge.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 4,
+        "detail": "The packet initializes empty chunks and zero bytes, then delegates both update paths without showing their implementations."
+      }
+    ],
+    "verification": "Read the complete packet; the missing mutation logic prevents an invariant or counterexample from being established."
+  },
+  {
+    "case_id": "item-063",
+    "dimension": "invalid_state_accommodation",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "submit/1 is a documented public compatibility adapter accepting a wire tuple or legacy string. There is no normalized internal deliver/1 boundary here that excludes either representation.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 4,
+        "detail": "The public documentation explicitly accepts both forms, and each corresponding clause calculates the text byte size."
+      }
+    ],
+    "verification": "Inspected the complete supplied module and its public input contract; no execution needed."
+  },
+  {
+    "case_id": "item-053",
+    "dimension": "framework_reimplementation",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "digits?/1 already uses the standard Regex.match?/2 facility directly. Its anchored ASCII character class implements the supplied whole-string, unsigned decimal-digit contract without a separate validation engine.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 3,
+        "detail": "The implementation uses Regex.match? with \\A[0-9]+\\z, matching the stated library facility and contract."
+      }
+    ],
+    "verification": "Inspection of the complete code and supplied Elixir 1.18 facility description; no external documentation or runtime-version substitution used for this decision."
+  },
+  {
+    "case_id": "item-026",
+    "dimension": "redundant_wrapper",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "Reconstructing the map removes extra keys. Replacing the marked expression with its input would preserve those keys and change observable output.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 2,
+        "detail": "run/1 accepts a map containing id/name but constructs a new map containing only those two keys."
+      }
+    ],
+    "verification": "Executed run/1 with %{id: 1, name: \"A\", extra: true}; the output lacked extra. Log: probes/item-026/baseline.log."
+  },
+  {
+    "case_id": "item-010",
+    "dimension": "presentation_only_authorization",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The server event delegates to Documents.update/3, which enforces the same-team restriction and rejects other users. The restriction is not confined to presentation.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 3,
+        "detail": "The UI predicate compares teams, and the event passes user and document to the context operation."
+      },
+      {
+        "path": "sample.ex",
+        "start_line": 5,
+        "end_line": 8,
+        "detail": "The update clause requires the same team value in both arguments; its fallback returns {:error, :forbidden}."
+      }
+    ],
+    "verification": "Executed server events with matching and mismatching teams: the first updated the title; the second returned {:error, :forbidden}. Log: probes/item-010/baseline.log."
+  },
+  {
+    "case_id": "item-060",
+    "dimension": "redundant_wrapper",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The case is not exhaustive. An input other than an ok/error two-tuple raises CaseClauseError; replacing it with the input would return that value instead.",
+    "evidence": [
+      {
+        "path": "fixture.ex",
+        "start_line": 3,
+        "end_line": 6,
+        "detail": "Only {:ok, value} and {:error, reason} have branches; there is no catch-all."
+      }
+    ],
+    "verification": "Executed both handled tuple forms and Test.foo(:other); :other raised CaseClauseError. Log: probes/item-060/baseline.log."
+  },
+  {
+    "case_id": "item-007",
+    "dimension": "semantic_comment_noise",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "Only a standalone comment is supplied, with no function body or adjacent filtering code. The implementation it supposedly paraphrases is needed to decide whether the comment merely repeats obvious code.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 1,
+        "end_line": 3,
+        "detail": "The module contains the comment but no implementation for comparison."
+      }
+    ],
+    "verification": "Read the complete packet. No absent implementation was inferred from the comment."
+  },
+  {
+    "case_id": "item-025",
+    "dimension": "avoidable_repeated_traversal",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "Each iteration measures only the incoming chunk and adds its size to the maintained count. The growing accumulator is never traversed for a repeated byte-limit check.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 9,
+        "detail": "The reducer starts at {[], 0}, adds iolist_size(chunk), and prepends the chunk without measuring acc."
+      }
+    ],
+    "verification": "Inspected all reducer branches and executed exact-limit, exceeded-limit, nested-iodata, and empty-chunk probes. Log: probes/item-025/baseline.log."
+  },
+  {
+    "case_id": "item-039",
+    "dimension": "test_claim_gap",
+    "verdict": "finding",
+    "kind": "test_gap",
+    "reason": "The only supplied test sorts an already sorted list. Replacing sort/1 with identity passes that test while leaving [3, 1, 2] unsorted. Add an assertion using an unsorted list.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 3,
+        "detail": "The implementation calls Enum.sort/1, but the test input and expected output are both [1, 2, 3]."
+      }
+    ],
+    "verification": "Ran Sample.test/0 unchanged, then replaced Enum.sort(xs) with xs in an isolated copy and reran it successfully. The discriminating input [3, 1, 2] produced [1, 2, 3] before and [3, 1, 2] after. Logs: probes/item-039/baseline.log and mutation.log."
+  },
+  {
+    "case_id": "item-040",
+    "dimension": "process_without_runtime_reason",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "The packet only reads an existing Agent pid. Its creation, state writers, ownership, supervision, and lifetime are missing, so it cannot establish that the process exists merely to format a string.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 1,
+        "end_line": 3,
+        "detail": "Agent.get/2 is shown, but no process creation or lifecycle appears in the supplied module."
+      }
+    ],
+    "verification": "Read the complete packet; no runtime reason or unnecessary per-conversion process was inferred from an isolated getter."
+  },
+  {
+    "case_id": "item-047",
+    "dimension": "redundant_wrapper",
+    "verdict": "finding",
+    "kind": "maintenance",
+    "reason": "Both exhaustive case branches return the input unchanged. The special ok branch adds a branch to maintain without changing output or exceptions; replace the case with result.",
+    "evidence": [
+      {
+        "path": "fixture.ex",
+        "start_line": 3,
+        "end_line": 6,
+        "detail": "The ok tuple is reconstructed unchanged and the catch-all returns every other value unchanged."
+      }
+    ],
+    "verification": "Inspected exhaustive alternatives and ran eight representative values, including ok/error tuples, atom, nil, number, map, list, and string; each was preserved. Log: probes/item-047/baseline.log."
+  },
+  {
+    "case_id": "item-070",
+    "dimension": "semantic_duplicate",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "poll/2 reuses the existing retryable?/1 policy rather than reimplementing it. The remaining-attempt check is the caller-specific condition, not a second copy of the retry policy.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 4,
+        "detail": "retryable?/1 owns status classification; poll/2 invokes it and separately requires remaining > 0."
+      }
+    ],
+    "verification": "Inspected both implementations and their supplied shared retry contract; no execution needed."
+  }
+]

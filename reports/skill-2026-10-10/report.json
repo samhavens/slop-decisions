@@ -1,0 +1,340 @@
+{
+  "public": {
+    "cases": 20,
+    "correct": 18,
+    "agreement": 0.9,
+    "dimensions_covered": 8,
+    "confusion": {
+      "defect": {
+        "defect": 6,
+        "clean": 0,
+        "unassessable": 2
+      },
+      "clean": {
+        "defect": 0,
+        "clean": 12,
+        "unassessable": 0
+      },
+      "unassessable": {
+        "defect": 0,
+        "clean": 0,
+        "unassessable": 0
+      }
+    },
+    "findings_correct": 6,
+    "defects": 8,
+    "false_warnings_clean": 0,
+    "clean_cases": 12,
+    "missing_context_correct": 0,
+    "missing_context_cases": 0,
+    "abstentions_on_labeled_cases": 2,
+    "pair_count": 7,
+    "pairs_correct": 5,
+    "by_dimension": {
+      "derived_state_drift": {
+        "correct": 1,
+        "cases": 1
+      },
+      "redundant_wrapper": {
+        "correct": 4,
+        "cases": 4
+      },
+      "semantic_duplicate": {
+        "correct": 2,
+        "cases": 2
+      },
+      "policy_free_abstraction": {
+        "correct": 1,
+        "cases": 2
+      },
+      "test_claim_gap": {
+        "correct": 4,
+        "cases": 4
+      },
+      "timing_instead_of_synchronization": {
+        "correct": 1,
+        "cases": 1
+      },
+      "success_shaped_failure": {
+        "correct": 3,
+        "cases": 4
+      },
+      "avoidable_repeated_traversal": {
+        "correct": 2,
+        "cases": 2
+      }
+    },
+    "disagreements": [
+      {
+        "case_id": "item-038",
+        "original_case_id": "logflare-egress-before",
+        "dimension": "success_shaped_failure",
+        "expected": "defect",
+        "predicted": "unassessable",
+        "reason": "Egress telemetry fires before Pool.send/2 can fail, but the packet does not define whether that event measures attempted or successful egress. The event contract or metric consumers are essential before calling this success-shaped failure."
+      },
+      {
+        "case_id": "item-064",
+        "original_case_id": "boundary-option-before",
+        "dimension": "policy_free_abstraction",
+        "expected": "defect",
+        "predicted": "unassessable",
+        "reason": "The include_sub_boundaries option visibly selects between direct exports and recursive export checks. Boundary definition/configuration validation, supported option documentation, and consumer tests are absent, so the packet cannot establish whether this policy variation is supported or unnecessary."
+      }
+    ],
+    "by_track": {
+      "deterministic_baseline": {
+        "cases": 2,
+        "correct": 2,
+        "agreement": 1.0,
+        "dimensions_covered": 1,
+        "confusion": {
+          "defect": {
+            "defect": 1,
+            "clean": 0,
+            "unassessable": 0
+          },
+          "clean": {
+            "defect": 0,
+            "clean": 1,
+            "unassessable": 0
+          },
+          "unassessable": {
+            "defect": 0,
+            "clean": 0,
+            "unassessable": 0
+          }
+        },
+        "findings_correct": 1,
+        "defects": 1,
+        "false_warnings_clean": 0,
+        "clean_cases": 1,
+        "missing_context_correct": 0,
+        "missing_context_cases": 0,
+        "abstentions_on_labeled_cases": 0,
+        "pair_count": 1,
+        "pairs_correct": 1,
+        "by_dimension": {
+          "semantic_duplicate": {
+            "correct": 2,
+            "cases": 2
+          }
+        },
+        "disagreements": []
+      },
+      "preference": {
+        "cases": 2,
+        "correct": 1,
+        "agreement": 0.5,
+        "dimensions_covered": 1,
+        "confusion": {
+          "defect": {
+            "defect": 0,
+            "clean": 0,
+            "unassessable": 1
+          },
+          "clean": {
+            "defect": 0,
+            "clean": 1,
+            "unassessable": 0
+          },
+          "unassessable": {
+            "defect": 0,
+            "clean": 0,
+            "unassessable": 0
+          }
+        },
+        "findings_correct": 0,
+        "defects": 1,
+        "false_warnings_clean": 0,
+        "clean_cases": 1,
+        "missing_context_correct": 0,
+        "missing_context_cases": 0,
+        "abstentions_on_labeled_cases": 1,
+        "pair_count": 1,
+        "pairs_correct": 0,
+        "by_dimension": {
+          "policy_free_abstraction": {
+            "correct": 1,
+            "cases": 2
+          }
+        },
+        "disagreements": [
+          {
+            "case_id": "item-064",
+            "original_case_id": "boundary-option-before",
+            "dimension": "policy_free_abstraction",
+            "expected": "defect",
+            "predicted": "unassessable",
+            "reason": "The include_sub_boundaries option visibly selects between direct exports and recursive export checks. Boundary definition/configuration validation, supported option documentation, and consumer tests are absent, so the packet cannot establish whether this policy variation is supported or unnecessary."
+          }
+        ]
+      },
+      "semantic": {
+        "cases": 16,
+        "correct": 15,
+        "agreement": 0.9375,
+        "dimensions_covered": 6,
+        "confusion": {
+          "defect": {
+            "defect": 5,
+            "clean": 0,
+            "unassessable": 1
+          },
+          "clean": {
+            "defect": 0,
+            "clean": 10,
+            "unassessable": 0
+          },
+          "unassessable": {
+            "defect": 0,
+            "clean": 0,
+            "unassessable": 0
+          }
+        },
+        "findings_correct": 5,
+        "defects": 6,
+        "false_warnings_clean": 0,
+        "clean_cases": 10,
+        "missing_context_correct": 0,
+        "missing_context_cases": 0,
+        "abstentions_on_labeled_cases": 1,
+        "pair_count": 5,
+        "pairs_correct": 4,
+        "by_dimension": {
+          "derived_state_drift": {
+            "correct": 1,
+            "cases": 1
+          },
+          "redundant_wrapper": {
+            "correct": 4,
+            "cases": 4
+          },
+          "test_claim_gap": {
+            "correct": 4,
+            "cases": 4
+          },
+          "timing_instead_of_synchronization": {
+            "correct": 1,
+            "cases": 1
+          },
+          "success_shaped_failure": {
+            "correct": 3,
+            "cases": 4
+          },
+          "avoidable_repeated_traversal": {
+            "correct": 2,
+            "cases": 2
+          }
+        },
+        "disagreements": [
+          {
+            "case_id": "item-038",
+            "original_case_id": "logflare-egress-before",
+            "dimension": "success_shaped_failure",
+            "expected": "defect",
+            "predicted": "unassessable",
+            "reason": "Egress telemetry fires before Pool.send/2 can fail, but the packet does not define whether that event measures attempted or successful egress. The event contract or metric consumers are essential before calling this success-shaped failure."
+          }
+        ]
+      }
+    }
+  },
+  "calibration_holdout": {
+    "cases": 56,
+    "correct": 56,
+    "agreement": 1.0,
+    "dimensions_covered": 14,
+    "confusion": {
+      "defect": {
+        "defect": 14,
+        "clean": 0,
+        "unassessable": 0
+      },
+      "clean": {
+        "defect": 0,
+        "clean": 28,
+        "unassessable": 0
+      },
+      "unassessable": {
+        "defect": 0,
+        "clean": 0,
+        "unassessable": 14
+      }
+    },
+    "findings_correct": 14,
+    "defects": 14,
+    "false_warnings_clean": 0,
+    "clean_cases": 28,
+    "missing_context_correct": 14,
+    "missing_context_cases": 14,
+    "abstentions_on_labeled_cases": 0,
+    "pair_count": 14,
+    "pairs_correct": 14,
+    "by_dimension": {
+      "semantic_comment_noise": {
+        "correct": 4,
+        "cases": 4
+      },
+      "timing_instead_of_synchronization": {
+        "correct": 4,
+        "cases": 4
+      },
+      "process_without_runtime_reason": {
+        "correct": 4,
+        "cases": 4
+      },
+      "presentation_only_authorization": {
+        "correct": 4,
+        "cases": 4
+      },
+      "semantic_duplicate": {
+        "correct": 4,
+        "cases": 4
+      },
+      "derived_state_drift": {
+        "correct": 4,
+        "cases": 4
+      },
+      "success_shaped_failure": {
+        "correct": 4,
+        "cases": 4
+      },
+      "framework_reimplementation": {
+        "correct": 4,
+        "cases": 4
+      },
+      "avoidable_repeated_traversal": {
+        "correct": 4,
+        "cases": 4
+      },
+      "redundant_wrapper": {
+        "correct": 4,
+        "cases": 4
+      },
+      "invalid_state_accommodation": {
+        "correct": 4,
+        "cases": 4
+      },
+      "disguised_state_machine": {
+        "correct": 4,
+        "cases": 4
+      },
+      "test_claim_gap": {
+        "correct": 4,
+        "cases": 4
+      },
+      "policy_free_abstraction": {
+        "correct": 4,
+        "cases": 4
+      }
+    },
+    "disagreements": []
+  },
+  "prediction_hashes": {
+    "batch-1-results.json": "d6b12deddf171f2934ff01643bd2b7bcd26d92704506ad931b9346bb93bbf0f5",
+    "batch-2-results.json": "26621686b47e083f7755066417e8b82a2f34b4b108cdff19e992a0523049d277",
+    "batch-3-results.json": "6732c93c286108f942db10b33b417ed256dd3584ff5dc9d38c5bd7ca975d2cc7",
+    "batch-4-results.json": "57930c286dfe45c3128b84f989d546b854c4da399fd125baa63d11b760ba62d2"
+  }
+}

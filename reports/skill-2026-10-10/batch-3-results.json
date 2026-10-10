@@ -1,0 +1,366 @@
+[
+  {
+    "case_id": "item-043",
+    "dimension": "policy_free_abstraction",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The complete module calls Integer.to_string/1 directly. There is no private stringify/serialize layer or configurable policy to remove.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 1,
+        "end_line": 3,
+        "detail": "label/1 directly performs the conversion; the private helpers named in the focus are absent."
+      }
+    ],
+    "verification": "Inspected the complete supplied module; no execution was needed for this abstraction check."
+  },
+  {
+    "case_id": "item-044",
+    "dimension": "semantic_duplicate",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "Need Retry.decide/2 and the referenced retryable?/1 implementation and contract. The supplied delegation exposes no retry decisions to compare.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 2,
+        "detail": "poll/2 delegates all retry behavior to the unsupplied Retry.decide/2."
+      }
+    ],
+    "verification": "Read the complete packet. No second implementation or retry-policy consumer was supplied; no probe can establish duplication from this wrapper."
+  },
+  {
+    "case_id": "item-006",
+    "dimension": "presentation_only_authorization",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "Need Documents.update/3 and any authorization it invokes. Passing user and doc into that operation may enforce the team restriction, so the event wrapper alone does not establish an authorization bypass.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 3,
+        "detail": "editable?/2 compares teams, while event/3 passes both principals to an unsupplied server operation."
+      }
+    ],
+    "verification": "Inspected all supplied server and predicate code. The authorization-enforcing or authorization-missing operation is outside the packet; no bypass was asserted or executed."
+  },
+  {
+    "case_id": "item-050",
+    "dimension": "framework_reimplementation",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The actual digits/1 operation is a prefix parser returning the original digit text and remaining suffix. That differs from the described whole-string predicate and from numeric parsing, which loses leading zeros; an equivalent framework facility was not established.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 5,
+        "detail": "The recursive scanner stops at the first non-ASCII digit and returns {prefix, rest}, preserving lexical digits."
+      }
+    ],
+    "verification": "Inspected the complete parser. On local Elixir 1.20.2, probes confirmed digits(\"001x\") == {\"001\", \"x\"}, digits(\"+123\") == {\"\", \"+123\"}, and digits(\"\") == {\"\", \"\"}; Integer.parse(\"001x\") instead returns {1, \"x\"}. No claim of testing Elixir 1.18 was made."
+  },
+  {
+    "case_id": "item-018",
+    "dimension": "policy_free_abstraction",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "These helpers carry distinct export policies: expand explicit exports and exclusions, validate ownership, and allow descendant re-exports only through the immediate child boundary. The descendant check is shared with export matching, so removing the boundaries is not a supported simplification.",
+    "evidence": [
+      {
+        "path": "lib/boundary/checker.ex",
+        "start_line": 97,
+        "end_line": 129,
+        "detail": "Export selection handles atoms versus subtree exclusions, while validation distinguishes unknown modules, permitted re-exports, and wrong ownership."
+      },
+      {
+        "path": "lib/boundary/checker.ex",
+        "start_line": 132,
+        "end_line": 148,
+        "detail": "The ancestor walk finds the immediate child and checks its export interface."
+      },
+      {
+        "path": "lib/boundary/checker.ex",
+        "start_line": 341,
+        "end_line": 354,
+        "detail": "Subtree export matching reuses the descendant policy while also applying root and exclusion constraints."
+      }
+    ],
+    "verification": "Read all 377 supplied lines and traced both callers of exported_by_child_subboundary?/3. Inspection only; no Boundary runtime or tests were supplied."
+  },
+  {
+    "case_id": "item-022",
+    "dimension": "timing_instead_of_synchronization",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The sleep deliberately keeps work unfinished while the test exercises Task.yield/2 with a zero timeout. It is not a delay used to assume the task has completed; shutdown explicitly ends the task.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 6,
+        "detail": "The stated behavior is timeout on unfinished work, tested by matching nil from Task.yield(task, 0), followed by Task.shutdown."
+      }
+    ],
+    "verification": "Read the complete task lifecycle and executed Sample.test() on local Elixir 1.20.2; it completed with nil and the zero-timeout assertion held."
+  },
+  {
+    "case_id": "item-049",
+    "dimension": "disguised_state_machine",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "Need JobState initialization and the start/finish transition implementations. No state fields or transitions are visible, so mutually inconsistent lifecycle flags cannot be established.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 3,
+        "detail": "Both exported functions delegate directly to the unsupplied JobState module."
+      }
+    ],
+    "verification": "Read the complete packet; no lifecycle state representation was provided and no transitions were invented for a probe."
+  },
+  {
+    "case_id": "item-048",
+    "dimension": "redundant_wrapper",
+    "verdict": "finding",
+    "kind": "maintenance",
+    "reason": "All cond branches return x unchanged, including the exhaustive catch-all. The total, side-effect-free type predicates add three branches without changing results or exceptions; replace the cond expression with x.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 3,
+        "end_line": 7,
+        "detail": "Both type-specific branches and the final true branch return the same input."
+      }
+    ],
+    "verification": "Checked exhaustiveness and the predicates by inspection. A local Elixir probe also confirmed strict identity for 13 representative terms, including numbers, binaries, collections, booleans, a pid, a reference, and a function."
+  },
+  {
+    "case_id": "item-046",
+    "dimension": "process_without_runtime_reason",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The Agent owns a shared set and atomically combines the membership check with insertion. This coordinates concurrent claims of the same ID; replacing it with an independent pure calculation would lose the at-most-once contract.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 7,
+        "detail": "The shared state is initialized once per Agent and Agent.get_and_update/2 performs an atomic claim."
+      }
+    ],
+    "verification": "Read the complete supplied process and API. A local Elixir probe ran 50 concurrent claims for one ID against one Agent: exactly one returned true and 49 returned false, then the Agent was stopped."
+  },
+  {
+    "case_id": "item-045",
+    "dimension": "invalid_state_accommodation",
+    "verdict": "finding",
+    "kind": "maintenance",
+    "reason": "submit/1 is the only caller and always normalizes a binary into {:message, text}. The private binary and empty-list deliver/1 clauses are unreachable and add unsupported internal representations; remove those two clauses.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 3,
+        "detail": "The public guard establishes a binary input and the sole call to deliver/1 wraps it in the supported tagged tuple."
+      },
+      {
+        "path": "sample.ex",
+        "start_line": 4,
+        "end_line": 5,
+        "detail": "These private alternatives cannot be reached through any function in the complete module."
+      }
+    ],
+    "verification": "Inspected the entire module and all deliver/1 call sites. This is unreachable accommodation, not an observed production failure; no runtime probe was necessary."
+  },
+  {
+    "case_id": "item-013",
+    "dimension": "semantic_comment_noise",
+    "verdict": "finding",
+    "kind": "maintenance",
+    "reason": "The body comment merely restates Enum.filter(users, & &1.active). It adds no rationale, invariant, or warning and creates a second description to maintain; delete it.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 3,
+        "end_line": 4,
+        "detail": "The comment says to filter users by active status immediately above that exact operation."
+      }
+    ],
+    "verification": "Read the comment and complete adjacent function. Inspection only; this does not allege a behavior defect."
+  },
+  {
+    "case_id": "item-052",
+    "dimension": "success_shaped_failure",
+    "verdict": "finding",
+    "kind": "defect",
+    "reason": "After headers and a body chunk, a Finch error or receive timeout returns nil from Stream.unfold, exactly like normal EOF. A caller therefore enumerates a truncated body normally inside an {:ok, response} result instead of observing failure. Propagate the error or timeout from body enumeration.",
+    "evidence": [
+      {
+        "path": "lib/tesla/adapter/finch.ex",
+        "start_line": 62,
+        "end_line": 63,
+        "detail": "The documented receive_timeout contract says waiting too long for a chunk returns an error."
+      },
+      {
+        "path": "lib/tesla/adapter/finch.ex",
+        "start_line": 158,
+        "end_line": 179,
+        "detail": "After accepting status and headers, normal EOF, a body error, and a receive timeout all end the stream with nil; the response is wrapped in {:ok, ...}."
+      },
+      {
+        "path": "lib/tesla/adapter/finch.ex",
+        "start_line": 191,
+        "end_line": 203,
+        "detail": "Successful Finch completion sends :eof, while both supported Finch error tuple shapes are forwarded into the body error branch."
+      }
+    ],
+    "verification": "Compiled the supplied adapter unchanged on local Elixir 1.20.2 with isolated Finch/Tesla dependency doubles. Status 200 plus \"partial\" followed by :closed, or by no further callbacks, both enumerated normally as [\"partial\"]. A success control produced [\"partial\", \" complete\"], and an error before headers remained {:error, :closed}. This was a callback/control-flow probe, not a real Finch/network integration test."
+  },
+  {
+    "case_id": "item-020",
+    "dimension": "success_shaped_failure",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "The metric is explicitly attempted, not delivered, and the actual send result is preserved. A failed call can legitimately count as one attempt without representing successful delivery.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 5,
+        "detail": "The documented attempt count accompanies the unchanged result from send_fn/1."
+      }
+    ],
+    "verification": "Read all send and metric paths. A local Elixir probe confirmed a send returning {:error, :closed} yields %{result: {:error, :closed}, attempted: 1}."
+  },
+  {
+    "case_id": "item-067",
+    "dimension": "derived_state_drift",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "lifetime_bytes measures cumulative traffic, while chunks contains only currently buffered data. Clearing chunks while retaining the lifetime total preserves their distinct documented meanings; these are not duplicate representations of one fact.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 5,
+        "detail": "Initialization starts both empty, push accumulates lifetime bytes, and reset clears only the current buffer as the comment specifies."
+      }
+    ],
+    "verification": "Inspected every supplied update. A local Elixir probe pushed 3 bytes and reset to %{chunks: [], lifetime_bytes: 3}, then pushed 2 bytes and obtained a lifetime count of 5."
+  },
+  {
+    "case_id": "item-021",
+    "dimension": "test_claim_gap",
+    "verdict": "finding",
+    "kind": "test_gap",
+    "reason": "The supplied suite checks a present invalid value but never an absent private key. Changing only the missing-key branch from :error to {:ok, nil} passes all 21 tests. Add an assertion that fetch_private(%{}) == :error to distinguish the required absent-key behavior.",
+    "evidence": [
+      {
+        "path": "test/tesla/open_api/path_template_test.exs",
+        "start_line": 71,
+        "end_line": 73,
+        "detail": "The only fetch_private assertion provides the key with :invalid, so it exercises the present-invalid branch only."
+      },
+      {
+        "path": "lib/tesla/open_api/path_template.ex",
+        "start_line": 81,
+        "end_line": 94,
+        "detail": "The implementation has separate present-valid, present-invalid, and missing-key branches; the missing-key branch returns :error."
+      }
+    ],
+    "verification": "Ran all 21 unchanged supplied ExUnit tests against an isolated original copy: 21 passed. In a separate copy, changed only the missing-key branch to {:ok, nil}; the same 21 tests passed. A direct discriminating call confirmed fetch_private(%{}) changed from :error to {:ok, nil}. Original packet source was not modified."
+  },
+  {
+    "case_id": "item-017",
+    "dimension": "semantic_duplicate",
+    "verdict": "finding",
+    "kind": "maintenance",
+    "reason": "The telemetry test independently repeats the metrics/plan/user/source/backend/supervisor setup already implemented by start_syslog/1. Only backend metadata varies. Extend the helper to accept that metadata and reuse it so fixture startup changes need one implementation.",
+    "evidence": [
+      {
+        "path": "test/logflare/backends/adaptor/syslog_adaptor_test.exs",
+        "start_line": 209,
+        "end_line": 225,
+        "detail": "The target test manually constructs and starts the same syslog fixture, adding environment/region backend metadata."
+      },
+      {
+        "path": "test/logflare/backends/adaptor/syslog_adaptor_test.exs",
+        "start_line": 355,
+        "end_line": 368,
+        "detail": "start_syslog/1 already performs the same metrics startup, plan insertion, user/source/backend creation, and adaptor startup."
+      },
+      {
+        "path": "test/logflare/backends/adaptor/syslog_adaptor_test.exs",
+        "start_line": 241,
+        "end_line": 255,
+        "detail": "The test consumes source/backend in the same way as the helper callers; metadata is the additional fixture input needed for its assertions."
+      }
+    ],
+    "verification": "Read all 589 supplied lines, compared both setup sequences, and traced fixture consumers. Inspection only; the Logflare database/Telegraf dependencies were not supplied, so the integration test was not run."
+  },
+  {
+    "case_id": "item-028",
+    "dimension": "avoidable_repeated_traversal",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "Need Collector.consume/2, including accumulator initialization, recursive updates, and byte-limit checks. The supplied wrapper contains no loop or traversal from which repeated work can be established.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 2,
+        "detail": "receive_chunks/2 delegates the complete operation to the unsupplied Collector module."
+      }
+    ],
+    "verification": "Read the complete packet; no collector implementation or traversal contract was available, so no performance probe was invented."
+  },
+  {
+    "case_id": "item-058",
+    "dimension": "success_shaped_failure",
+    "verdict": "no_finding",
+    "kind": null,
+    "reason": "Egress telemetry and unchanged successful messages occur only after Pool.send/2 returns :ok. Connection/send errors are returned by the pool and converted into failed Broadway messages, so the supplied failure path does not represent success.",
+    "evidence": [
+      {
+        "path": "lib/logflare/backends/adaptor/syslog_adaptor/pipeline.ex",
+        "start_line": 63,
+        "end_line": 88,
+        "detail": "The :ok branch emits telemetry; the error branch applies Broadway.Message.failed/2 to every message."
+      },
+      {
+        "path": "lib/logflare/backends/adaptor/syslog_adaptor/pool.ex",
+        "start_line": 29,
+        "end_line": 39,
+        "detail": "Pool.send/2 preserves errors from ensure_connected/2 or Socket.send/2 and removes the failed connection."
+      },
+      {
+        "path": "lib/logflare/backends/adaptor/syslog_adaptor/pool.ex",
+        "start_line": 57,
+        "end_line": 69,
+        "detail": "Connection and ownership-transfer errors are not turned into successful sends."
+      }
+    ],
+    "verification": "Read both complete supplied modules and traced connection/send errors through the pipeline result and telemetry branches. Inspection only; no Broadway, NimblePool, or socket integration test was run."
+  },
+  {
+    "case_id": "item-066",
+    "dimension": "test_claim_gap",
+    "verdict": "insufficient_context",
+    "kind": null,
+    "reason": "Need Checks.sorted_examples/1 with its fixtures and assertion helpers, and Ordering.sort/1. The wrapper reveals neither test inputs nor assertions, so it cannot establish whether an identity mutation would survive.",
+    "evidence": [
+      {
+        "path": "sample.ex",
+        "start_line": 2,
+        "end_line": 2,
+        "detail": "The only supplied test delegates all checks to an unsupplied helper and supplies an unsupplied sorting function."
+      }
+    ],
+    "verification": "Read the complete packet. No assertions or fixtures were supplied, so an unchanged-suite or mutation run was not possible within scope."
+  }
+]
