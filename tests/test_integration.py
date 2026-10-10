@@ -1,10 +1,13 @@
 import hashlib
 import json
 import os
+import shutil
 import subprocess
 import sys
 import threading
+import xml.etree.ElementTree as ET
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 
 import httpx
 import pytest
@@ -24,10 +27,21 @@ def server():
             body = json.loads(self.rfile.read(int(self.headers["Content-Length"])))
             calls.append((self.path, dict(self.headers), body))
             verdict = {"status": "assessed", "probability": 0.95, "reason": "visible failure path"}
+            if body["model"] == "clean":
+                verdict["probability"] = 0.1
+            elif body["model"] == "unknown":
+                verdict = {"status": "unassessed", "probability": None, "reason": "need <callee>"}
             data = {
                 "choices": [{"finish_reason": "stop", "message": {"content": json.dumps(verdict)}}],
                 "usage": {"prompt_tokens": 10, "completion_tokens": 20},
             }
+            if self.path == "/v1/decisions":
+                data = {
+                    "answers": [
+                        {"name": q["name"], "type": "predicate", "probability": 0.95}
+                        for q in body["questions"]
+                    ]
+                }
             payload = json.dumps(data).encode()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -336,3 +350,313 @@ def test_global_json_option_survives_subcommand_defaults():
     result = cli("--format", "json", "dataset")
     assert result.returncode == 0
     assert json.loads(result.stdout)["targets"] == 20
+
+
+def test_default_check_runs_every_rule_with_openai(tmp_path, server):
+    url, calls = server
+    (tmp_path / "a.ex").write_text("def run, do: :ok\n")
+    result = cli(
+        "check",
+        "a.ex",
+        "--root",
+        tmp_path,
+        "--base-url",
+        url,
+        "--format",
+        "json",
+        env={**os.environ, "OPENAI_API_KEY": "test-key"},
+    )
+    assert result.returncode == 3, result.stdout + result.stderr
+    data = json.loads(result.stdout)
+    assert data["warnings"] == len(calls) == len(load_rubrics()) == 14
+    assert {row["dimension"] for row in data["results"]} == load_rubrics().keys()
+    assert all(path == "/v1/decisions" for path, _, _ in calls)
+    assert all(body["model"] == "gpt-6-luna" for _, _, body in calls)
+    assert all(headers["Authorization"] == "Bearer test-key" for _, headers, _ in calls)
+
+
+@pytest.mark.parametrize("provider", ["local", "openrouter"])
+def test_nondefault_provider_requires_its_own_model(tmp_path, provider, server):
+    url, calls = server
+    (tmp_path / "a.ex").write_text("def run, do: :ok\n")
+    result = cli(
+        "check",
+        "a.ex",
+        "--root",
+        tmp_path,
+        "--provider",
+        provider,
+        "--base-url",
+        url,
+        "--format",
+        "json",
+    )
+    assert result.returncode == 2
+    assert "--model" in json.loads(result.stdout)["error"]
+    assert not calls
+
+
+@pytest.mark.parametrize(
+    "model,code,failures,errors",
+    [
+        ("clean", 0, 0, 0),
+        ("warning", 3, 1, 0),
+        ("unknown", 1, 0, 1),
+    ],
+)
+def test_rule_selection_and_junit_match_cli_outcome(
+    tmp_path, server, model, code, failures, errors
+):
+    url, calls = server
+    (tmp_path / "a & b.ex").write_text("def run, do: :ok\n")
+    report = tmp_path / "results" / "slop.xml"
+    result = cli(
+        "check",
+        "a & b.ex",
+        "--root",
+        tmp_path,
+        "--provider",
+        "local",
+        "--model",
+        model,
+        "--base-url",
+        url,
+        "--rule",
+        "success_shaped_failure",
+        "--dimension",
+        "success_shaped_failure",
+        "--junit",
+        report,
+        "--format",
+        "json",
+    )
+    assert result.returncode == code, result.stdout + result.stderr
+    assert len(calls) == 1
+    suite = ET.parse(report).getroot()
+    assert suite.attrib["tests"] == "1"
+    assert suite.attrib["failures"] == str(failures)
+    assert suite.attrib["errors"] == str(errors)
+    case = suite.find("testcase")
+    assert case.attrib["file"] == "a & b.ex"
+    assert case.attrib["line"] == "1"
+    assert len(case.findall("failure")) == failures
+    assert len(case.findall("error")) == errors
+    assert json.loads(result.stdout)["checks"] == 1
+
+
+def test_empty_changed_selection_needs_no_key_and_writes_empty_junit(tmp_path):
+    subprocess.run(["git", "init", "-q", tmp_path], check=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            tmp_path,
+            "-c",
+            "user.name=Test",
+            "-c",
+            "user.email=test@example.com",
+            "commit",
+            "-q",
+            "--allow-empty",
+            "-m",
+            "base",
+        ],
+        check=True,
+    )
+    (tmp_path / "README.md").write_text("Only documentation changed.\n")
+    env = dict(os.environ)
+    env.pop("OPENAI_API_KEY", None)
+    result = cli(
+        "check",
+        "--changed",
+        "--root",
+        tmp_path,
+        "--junit",
+        tmp_path / "slop.xml",
+        "--format",
+        "json",
+        env=env,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    data = json.loads(result.stdout)
+    assert data["checks"] == data["warnings"] == data["unassessed"] == 0
+    assert "No changed Elixir files" in data["note"]
+    assert ET.parse(tmp_path / "slop.xml").getroot().attrib["tests"] == "0"
+
+
+def test_changed_check_preflight_and_current_source(tmp_path, server):
+    url, calls = server
+    subprocess.run(["git", "init", "-q", tmp_path], check=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            tmp_path,
+            "-c",
+            "user.name=Test",
+            "-c",
+            "user.email=test@example.com",
+            "commit",
+            "-q",
+            "--allow-empty",
+            "-m",
+            "base",
+        ],
+        check=True,
+    )
+    (tmp_path / "new file.ex").write_text("def changed, do: :current_source\n")
+    (tmp_path / "test.exs").write_text("assert :current_source\n")
+    common_args = (
+        "check",
+        "--changed",
+        "--root",
+        tmp_path,
+        "--provider",
+        "local",
+        "--model",
+        "clean",
+        "--base-url",
+        url,
+        "--format",
+        "json",
+    )
+    result = cli(*common_args, "--max-checks", "20")
+    assert result.returncode == 2
+    assert "--max-checks" in json.loads(result.stdout)["error"]
+    assert not calls
+    result = cli(*common_args)
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert len(calls) == 28
+    packets = [json.loads(body["messages"][1]["content"]) for _, _, body in calls]
+    assert {p["target"]["path"] for p in packets} == {"new file.ex", "test.exs"}
+    assert all(":current_source" in p["files"][0]["content"] for p in packets)
+
+
+@pytest.mark.parametrize(
+    "extra",
+    [
+        ("a.ex", "--changed"),
+        ("--changed", "--lines", "1:1"),
+        ("--max-checks", "0", "a.ex"),
+    ],
+)
+def test_invalid_selections_never_make_requests(tmp_path, server, extra):
+    url, calls = server
+    (tmp_path / "a.ex").write_text("def run, do: :ok\n")
+    result = cli("check", *extra, "--root", tmp_path, "--base-url", url, "--format", "json")
+    assert result.returncode == 2
+    assert json.loads(result.stdout)["error"]
+    assert not calls
+
+
+@pytest.mark.skipif(shutil.which("mix") is None, reason="requires Elixir/Mix")
+@pytest.mark.parametrize("model,expected", [("clean", 0), ("warning", 2), ("unknown", 2)])
+def test_exunit_example_gates_normal_mix_tests(tmp_path, server, model, expected):
+    url, calls = server
+    (tmp_path / "mix.exs").write_text(
+        "defmodule Fixture.MixProject do\n"
+        "  use Mix.Project\n"
+        '  def project, do: [app: :fixture, version: "0.1.0"]\n'
+        "end\n"
+    )
+    tests = tmp_path / "test"
+    tests.mkdir()
+    (tests / "test_helper.exs").write_text("ExUnit.start(exclude: [:slop])\n")
+    example = Path(__file__).resolve().parents[1] / "examples" / "slop_test.exs"
+    shutil.copyfile(example, tests / "slop_test.exs")
+    subprocess.run(["git", "init", "-q", tmp_path], check=True)
+    subprocess.run(["git", "-C", tmp_path, "add", "."], check=True)
+    subprocess.run(
+        [
+            "git",
+            "-C",
+            tmp_path,
+            "-c",
+            "user.name=Test",
+            "-c",
+            "user.email=test@example.com",
+            "commit",
+            "-qm",
+            "base",
+        ],
+        check=True,
+    )
+    (tmp_path / "changed.ex").write_text("defmodule Changed do\nend\n")
+    env = {
+        **os.environ,
+        "PATH": str(Path(sys.executable).parent) + os.pathsep + os.environ["PATH"],
+        "SLOP_PROVIDER": "local",
+        "SLOP_MODEL": model,
+        "SLOP_BASE_URL": url,
+        "SLOP_BASE": "HEAD",
+    }
+    excluded = subprocess.run(
+        ["mix", "test"],
+        cwd=tmp_path,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    assert excluded.returncode == 0, excluded.stdout + excluded.stderr
+    assert not calls
+    result = subprocess.run(
+        ["mix", "test", "--include", "slop"],
+        cwd=tmp_path,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    assert result.returncode == expected, result.stdout + result.stderr
+    assert len(calls) == 14
+
+
+def test_junit_cannot_overwrite_source_or_make_calls_with_invalid_output(tmp_path, server):
+    url, calls = server
+    source = tmp_path / "a.ex"
+    source.write_text("def run, do: :ok\n")
+    common_args = (
+        "check",
+        "a.ex",
+        "--root",
+        tmp_path,
+        "--base-url",
+        url,
+        "--format",
+        "json",
+    )
+    result = cli(*common_args, "--junit", source, env={**os.environ, "OPENAI_API_KEY": "test"})
+    assert result.returncode == 2
+    assert "--junit" in json.loads(result.stdout)["error"]
+    assert source.read_text() == "def run, do: :ok\n"
+    result = cli(*common_args, "--junit", source / "report.xml")
+    assert result.returncode == 2
+    assert not calls
+
+
+def test_junit_replaces_the_report_without_writing_through_a_hard_link(tmp_path, server):
+    url, _ = server
+    source = tmp_path / "a.ex"
+    source.write_text("def run, do: :ok\n")
+    report = tmp_path / "report.xml"
+    os.link(source, report)
+    result = cli(
+        "check",
+        "a.ex",
+        "--root",
+        tmp_path,
+        "--provider",
+        "local",
+        "--model",
+        "clean",
+        "--base-url",
+        url,
+        "--rule",
+        "redundant_wrapper",
+        "--junit",
+        report,
+    )
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert source.read_text() == "def run, do: :ok\n"
+    assert ET.parse(report).getroot().attrib["tests"] == "1"

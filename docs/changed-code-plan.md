@@ -21,6 +21,4 @@ and a README that explains the problem and shows each pattern.
 - Run lint, formatting, the full test suite, build/install checks, and the existing
   report and Elixir witness checks. Re-read changed code before publication.
 
-The optional Norma clarification is pending. The general command and JUnit
-report will work in ordinary test/CI runners. A named integration must match the
-actual tool's documented interface.
+The user confirmed that “Norma” meant normal test/CI setup.

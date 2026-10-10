@@ -7,7 +7,8 @@ from pathlib import Path
 import httpx
 
 from slop_decisions import __version__
-from slop_decisions.context import build_packet
+from slop_decisions.changes import changed_files
+from slop_decisions.context import build_packet, safe_path
 from slop_decisions.dataset import fetch_sources, load_dataset, packet_for, read_jsonl
 from slop_decisions.evaluation import score, sweep
 from slop_decisions.output import emit
@@ -15,6 +16,7 @@ from slop_decisions.profiles import thresholds
 from slop_decisions.providers import Provider, ProviderConfig
 from slop_decisions.rubrics import load_rubrics
 from slop_decisions.runner import run_eval
+from slop_decisions.test_report import outcome, prepare_junit, write_junit
 
 
 class Parser(argparse.ArgumentParser):
@@ -27,8 +29,8 @@ def common(parser, *, default=argparse.SUPPRESS):
 
 
 def model_options(parser):
-    parser.add_argument("--provider", choices=["openai", "openrouter", "local"], default="local")
-    parser.add_argument("--model", required=True)
+    parser.add_argument("--provider", choices=["openai", "openrouter", "local"], default="openai")
+    parser.add_argument("--model", help="OpenAI default: gpt-6-luna; required for local/OpenRouter")
     parser.add_argument("--api", choices=["decisions", "responses", "chat"])
     parser.add_argument("--base-url", help="API root including /v1; defaults to provider endpoint")
     parser.add_argument(
@@ -71,12 +73,17 @@ def dataset_options(parser):
 
 
 def config(args):
+    model = args.model
+    if model is None:
+        if args.provider != "openai":
+            raise ValueError(f"--model is required for --provider {args.provider}")
+        model = "gpt-6-luna"
     return ProviderConfig(
+        model=model,
         **{
             name: getattr(args, name)
             for name in (
                 "provider",
-                "model",
                 "api",
                 "base_url",
                 "key_env",
@@ -116,26 +123,42 @@ def parser():
     p.add_argument("--full", action="store_true", help="Include all rubric fields")
     p = commands.add_parser(
         "check",
-        help="Assess explicit files/spans; no code is executed",
-        epilog="Examples: slop-decisions check lib/a.ex --model qwen3:8b; "
-        "slop-decisions check lib/a.ex --lines 20:45 --model gpt-6-luna "
-        "--provider openai --dimension success_shaped_failure",
+        help="Check files or Git changes; defaults to all rules with OpenAI",
+        epilog="Examples: slop-decisions check lib/a.ex; "
+        "slop-decisions check --changed origin/main --junit results/slop.xml; "
+        "slop-decisions check lib/a.ex --provider local --model qwen3:8b "
+        "--rule success_shaped_failure",
     )
     common(p)
     model_options(p)
-    p.add_argument("files", nargs="+", help="Source paths relative to --root")
+    p.add_argument("files", nargs="*", help="Source paths relative to --root")
     p.add_argument("--root", type=Path, default=Path.cwd())
+    p.add_argument(
+        "--changed",
+        nargs="?",
+        const="HEAD",
+        metavar="REF",
+        help="Check changed Elixir files since the merge base with REF (default: HEAD)",
+    )
     p.add_argument("--lines", help="Inclusive start:end; requires exactly one input file")
     p.add_argument(
         "--related", action="append", default=[], help="Explicit contract/callee/helper file"
     )
     p.add_argument(
-        "--dimension", action="append", help="Repeat to select checks; defaults to three"
+        "--rule",
+        "--dimension",
+        dest="dimension",
+        action="append",
+        help="Repeat to select rules; defaults to all 14 built-in rules",
     )
     p.add_argument(
-        "--max-checks", type=int, default=20, help="Fail before requests if plan exceeds limit"
+        "--max-checks",
+        type=int,
+        default=200,
+        help="Fail before requests if plan exceeds limit (default: 200)",
     )
     p.add_argument("--dry-run", action="store_true", help="Show source packets without model calls")
+    p.add_argument("--junit", type=Path, help="Also write a JUnit XML report for a test runner")
     p = commands.add_parser("fetch", help="Fetch and hash-check pinned public source files")
     common(p)
     dataset_options(p)
@@ -150,8 +173,8 @@ def parser():
     p = commands.add_parser(
         "eval",
         help="Run a reproducible evaluation and save JSONL",
-        epilog="Examples: slop-decisions eval --model qwen3:8b --out runs/local; "
-        "slop-decisions eval --provider openai --model gpt-6-luna --out runs/oai",
+        epilog="Examples: slop-decisions eval --provider local --model qwen3:8b --out runs/local; "
+        "slop-decisions eval --out runs/oai",
     )
     common(p)
     dataset_options(p)
@@ -182,6 +205,79 @@ def parser():
     return root
 
 
+def check(args):
+    if args.max_checks < 1:
+        raise ValueError("--max-checks must be positive")
+    if args.changed is not None and (args.files or args.lines):
+        raise ValueError("use --changed without file arguments or --lines")
+    if args.changed is None and not args.files:
+        raise ValueError("select source files or use --changed [REF]")
+    if args.lines and len(args.files) != 1:
+        raise ValueError("--lines requires exactly one input file")
+    if args.dry_run and args.junit:
+        raise ValueError("--dry-run cannot write a --junit test result")
+    selection = changed_files(args.root, args.changed) if args.changed is not None else None
+    files = selection["files"] if selection is not None else list(dict.fromkeys(args.files))
+    bank = load_rubrics(args.rubrics)
+    names = list(dict.fromkeys(args.dimension or bank))
+    if any(n not in bank for n in names):
+        raise ValueError("unknown rule; run slop-decisions checks")
+    conf, policy = model_policy(args, {name: bank[name] for name in names})
+    if len(files) * len(names) > args.max_checks:
+        raise ValueError("plan exceeds --max-checks; narrow inputs or explicitly raise the limit")
+    packets = []
+    for file in files:
+        if args.lines:
+            start, end = map(int, args.lines.split(":"))
+        else:
+            start, end = 1, len(safe_path(args.root, file).read_text(encoding="utf-8").splitlines())
+        packets.append(
+            build_packet(
+                args.root,
+                file,
+                start,
+                end,
+                mode=args.context,
+                related=tuple(args.related),
+                max_chars=args.max_chars,
+            )
+        )
+    details = {"selection": selection} if selection is not None else {}
+    if args.dry_run:
+        return {
+            "checks": len(packets) * len(names),
+            "packets": packets,
+            "threshold_policy": policy,
+            **details,
+        }, 0
+    if args.junit:
+        inputs = [args.root / fragment["path"] for p in packets for fragment in p["files"]]
+        inputs.extend(path for path in (args.rubrics, args.calibration) if path is not None)
+        prepare_junit(args.junit, inputs)
+    results = []
+    if packets:
+        with Provider(conf) as client:
+            for packet in packets:
+                for name in names:
+                    observation = client.assess(packet, bank[name], args.prompt)
+                    results.append({"target": packet["target"], "dimension": name, **observation})
+    else:
+        details["note"] = "No changed Elixir files to check."
+    statuses = [outcome(row, policy["threshold"]) for row in results]
+    warnings, unassessed = statuses.count("failure"), statuses.count("error")
+    if args.junit:
+        write_junit(args.junit, results, policy["threshold"])
+    return {
+        "checks": len(results),
+        "warnings": warnings,
+        "unassessed": unassessed,
+        "threshold": policy["threshold"],
+        "threshold_policy": policy,
+        "results": results,
+        **details,
+    }, 1 if unassessed else (3 if warnings else 0)
+
+
 def run(args):
     if args.command is None:
         sources, targets, labels = load_dataset()
@@ -203,66 +299,7 @@ def run(args):
             ]
         }, 0
     if args.command == "check":
-        bank = load_rubrics(args.rubrics)
-        names = list(
-            dict.fromkeys(
-                args.dimension
-                or ["success_shaped_failure", "test_claim_gap", "avoidable_repeated_traversal"]
-            )
-        )
-        if any(n not in bank for n in names):
-            raise ValueError("unknown dimension; run slop-decisions checks")
-        conf, policy = model_policy(args, {name: bank[name] for name in names})
-        if len(args.files) * len(names) > args.max_checks:
-            raise ValueError(
-                "plan exceeds --max-checks; narrow inputs or explicitly raise the limit"
-            )
-        if args.lines and len(args.files) != 1:
-            raise ValueError("--lines requires exactly one input file")
-        packets = []
-        for file in args.files:
-            if args.lines:
-                start, end = map(int, args.lines.split(":"))
-            else:
-                from slop_decisions.context import safe_path
-
-                start, end = 1, len(safe_path(args.root, file).read_text().splitlines())
-            packets.append(
-                build_packet(
-                    args.root,
-                    file,
-                    start,
-                    end,
-                    mode=args.context,
-                    related=tuple(args.related),
-                    max_chars=args.max_chars,
-                )
-            )
-        if args.dry_run:
-            return {
-                "checks": len(packets) * len(names),
-                "packets": packets,
-                "threshold_policy": policy,
-            }, 0
-        results = []
-        with Provider(conf) as client:
-            for packet in packets:
-                for name in names:
-                    observation = client.assess(packet, bank[name], args.prompt)
-                    results.append({"target": packet["target"], "dimension": name, **observation})
-        unassessed = sum(r["result"]["status"] == "unassessed" for r in results)
-        warnings = sum(
-            r["result"]["status"] == "assessed"
-            and r["result"]["probability"] >= policy["threshold"]
-            for r in results
-        )
-        return {
-            "warnings": warnings,
-            "unassessed": unassessed,
-            "threshold": policy["threshold"],
-            "threshold_policy": policy,
-            "results": results,
-        }, 1 if unassessed else (3 if warnings else 0)
+        return check(args)
     sources, targets, labels = load_dataset(args.dataset)
     if args.command == "fetch":
         return fetch_sources(sources, args.cache), 0

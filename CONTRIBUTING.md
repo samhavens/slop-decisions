@@ -13,6 +13,7 @@ uv build
 Provider tests run offline, including a real loopback HTTP server exercised by
 the CLI. Do not add paid network requests to the default tests. The separate
 witness workflow downloads hash-pinned public source and needs Elixir.
+That workflow also runs the ExUnit example against a local test server.
 
 For a new check, define one observable predicate, the evidence needed to assess
 it, a positive case, and a hard negative with similar syntax. Add an executable
@@ -36,5 +37,5 @@ When reporting performance, identify candidate/preference labels
 and distinguish full upstream tests from extracted-unit witnesses.
 
 For reader documentation, use [ASD-STE100](https://www.asd-ste100.org/).
-State the problem and benefit first. Keep the README short.
+State the problem and benefit first. Keep the README to setup and the pattern table.
 Put setup options, API details, and evidence in linked guides.

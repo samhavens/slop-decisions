@@ -1,6 +1,8 @@
 # Set up a model
 
 Source files go to the provider you select. Use a local server to keep source on your machine.
+The default provider is OpenAI, with `gpt-6-luna` and the Decisions API.
+“Jev-style” describes a decision about a defined condition; this package does not call the Jev API.
 
 ## Local models
 
@@ -19,7 +21,7 @@ Run a code check:
 
 ```sh
 slop-decisions check lib/orders.ex --provider local --model qwen3:8b \
-  --dimension success_shaped_failure
+  --rule success_shaped_failure
 ```
 
 For another server, supply its URL and the name of its loaded model:
@@ -27,23 +29,24 @@ For another server, supply its URL and the name of its loaded model:
 ```sh
 slop-decisions check lib/orders.ex --provider local \
   --base-url http://127.0.0.1:8080/v1 --model MODEL_NAME \
-  --dimension success_shaped_failure
+  --rule success_shaped_failure
 ```
 
 The URL must include `/v1`. Replace `MODEL_NAME` with your model name.
 If the server requires a key, set `LOCAL_API_KEY`.
+`--provider local` requires `--model`; it never selects a cloud model for you.
 
 Servers such as LM Studio, llama.cpp, vLLM, and MLX can use this connection type.
 See [Ollama's API guide](https://docs.ollama.com/api/openai-compatibility) for its supported options.
 
 ## OpenAI
 
-Set `OPENAI_API_KEY` in your environment. Select a model available to your account.
+Set `OPENAI_API_KEY` in your environment. Use `--model` to change the default model.
 For a result with a written reason, use Responses:
 
 ```sh
 slop-decisions check lib/orders.ex --provider openai --api responses \
-  --model gpt-6-luna --dimension success_shaped_failure
+  --model gpt-6-luna --rule success_shaped_failure
 ```
 
 For predicate probabilities, use `--api decisions`. This is the OpenAI default.
@@ -64,7 +67,7 @@ Replace `MODEL_ID` with a model ID from OpenRouter:
 
 ```sh
 slop-decisions check lib/orders.ex --provider openrouter \
-  --model MODEL_ID --dimension success_shaped_failure
+  --model MODEL_ID --rule success_shaped_failure
 ```
 
 OpenRouter uses Chat Completions. See its [API guide](https://openrouter.ai/docs/api/reference/overview).
