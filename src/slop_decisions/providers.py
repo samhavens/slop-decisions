@@ -217,8 +217,6 @@ class Provider:
             if any(a["type"] != "predicate" for a in answers):
                 raise ValueError("unexpected decision type")
             values = {a["name"]: probability(a["probability"]) for a in answers}
-            if values["context_sufficient"] < self.config.context_threshold:
-                return unknown("insufficient_context")
             return {
                 "status": "assessed",
                 "probability": values[rubric["name"]],
@@ -254,6 +252,7 @@ class Provider:
         ]
         start = time.monotonic()
         usage = {}
+        signals = {}
         result = unknown("request_failed")
         for attempt in range(self.config.retries + 1):
             try:
@@ -285,6 +284,13 @@ class Provider:
                         and math.isfinite(v)
                     }
                 result = self.parse(data, rubric)
+                if self.config.transport_api == "decisions" and result["status"] == "assessed":
+                    signals["decision_scores"] = {
+                        "context_probability": result["context_probability"],
+                        "defect_probability": result["probability"],
+                    }
+                    if result["context_probability"] < self.config.context_threshold:
+                        result = unknown("insufficient_context")
                 break
             except (httpx.TimeoutException, httpx.NetworkError):
                 result = unknown("timeout_or_connection_error")
@@ -297,6 +303,7 @@ class Provider:
                 result = unknown("invalid_provider_output")
             break
         return {
+            **signals,
             "result": result,
             "latency_seconds": round(time.monotonic() - start, 4),
             "attempts": attempt + 1,

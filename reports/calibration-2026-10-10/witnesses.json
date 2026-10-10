@@ -1,0 +1,565 @@
+{
+  "suite_hash": "1d09950a10c376cb7ad68bbb1aea0f87fe5a61ee76dc2ee3258ebef4fbdb5f14",
+  "cases": [
+    {
+      "case_id": "calibration-success_shaped_failure-defect",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-success_shaped_failure-repair",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-success_shaped_failure-control",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-success_shaped_failure-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-invalid_state_accommodation-defect",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-invalid_state_accommodation-repair",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-invalid_state_accommodation-control",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-invalid_state_accommodation-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-test_claim_gap-defect",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-test_claim_gap-repair",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-test_claim_gap-control",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-test_claim_gap-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-semantic_duplicate-defect",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-semantic_duplicate-repair",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-semantic_duplicate-control",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-semantic_duplicate-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-process_without_runtime_reason-defect",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-process_without_runtime_reason-repair",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-process_without_runtime_reason-control",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-process_without_runtime_reason-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-policy_free_abstraction-defect",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-policy_free_abstraction-repair",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-policy_free_abstraction-control",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-policy_free_abstraction-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-derived_state_drift-defect",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-derived_state_drift-repair",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-derived_state_drift-control",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-derived_state_drift-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-disguised_state_machine-defect",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-disguised_state_machine-repair",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-disguised_state_machine-control",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-disguised_state_machine-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-timing_instead_of_synchronization-defect",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-timing_instead_of_synchronization-repair",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-timing_instead_of_synchronization-control",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-timing_instead_of_synchronization-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-presentation_only_authorization-defect",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-presentation_only_authorization-repair",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-presentation_only_authorization-control",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-presentation_only_authorization-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-framework_reimplementation-defect",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-framework_reimplementation-repair",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-framework_reimplementation-control",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-framework_reimplementation-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-semantic_comment_noise-defect",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-semantic_comment_noise-repair",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-semantic_comment_noise-control",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-semantic_comment_noise-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-avoidable_repeated_traversal-defect",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-avoidable_repeated_traversal-repair",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-avoidable_repeated_traversal-control",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-avoidable_repeated_traversal-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "calibration-redundant_wrapper-defect",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-redundant_wrapper-repair",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-redundant_wrapper-control",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "calibration-redundant_wrapper-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-success_shaped_failure-defect",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-success_shaped_failure-repair",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-success_shaped_failure-control",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-success_shaped_failure-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-invalid_state_accommodation-defect",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-invalid_state_accommodation-repair",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-invalid_state_accommodation-control",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-invalid_state_accommodation-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-test_claim_gap-defect",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-test_claim_gap-repair",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-test_claim_gap-control",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-test_claim_gap-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-semantic_duplicate-defect",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-semantic_duplicate-repair",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-semantic_duplicate-control",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-semantic_duplicate-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-process_without_runtime_reason-defect",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-process_without_runtime_reason-repair",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-process_without_runtime_reason-control",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-process_without_runtime_reason-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-policy_free_abstraction-defect",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-policy_free_abstraction-repair",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-policy_free_abstraction-control",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-policy_free_abstraction-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-derived_state_drift-defect",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-derived_state_drift-repair",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-derived_state_drift-control",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-derived_state_drift-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-disguised_state_machine-defect",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-disguised_state_machine-repair",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-disguised_state_machine-control",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-disguised_state_machine-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-timing_instead_of_synchronization-defect",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-timing_instead_of_synchronization-repair",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-timing_instead_of_synchronization-control",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-timing_instead_of_synchronization-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-presentation_only_authorization-defect",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-presentation_only_authorization-repair",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-presentation_only_authorization-control",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-presentation_only_authorization-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-framework_reimplementation-defect",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-framework_reimplementation-repair",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-framework_reimplementation-control",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-framework_reimplementation-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-semantic_comment_noise-defect",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-semantic_comment_noise-repair",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-semantic_comment_noise-control",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-semantic_comment_noise-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-avoidable_repeated_traversal-defect",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-avoidable_repeated_traversal-repair",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-avoidable_repeated_traversal-control",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-avoidable_repeated_traversal-missing",
+      "parsed": true,
+      "witness": "source_review"
+    },
+    {
+      "case_id": "holdout-redundant_wrapper-defect",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-redundant_wrapper-repair",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-redundant_wrapper-control",
+      "parsed": true,
+      "witness": "passed"
+    },
+    {
+      "case_id": "holdout-redundant_wrapper-missing",
+      "parsed": true,
+      "witness": "source_review"
+    }
+  ]
+}
