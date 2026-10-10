@@ -1,0 +1,10 @@
+{
+  "before": {
+    "lib/account.ex": "defmodule Account do\n  use Ecto.Schema\n  schema \"accounts\" do\n    field :email, :string\n  end\nend\n"
+  },
+  "after": {
+    "lib/account.ex": "defmodule Account do\n  use Ecto.Schema\n  import Ecto.Changeset\n  schema \"accounts\" do\n    field :email, :string\n  end\n  def changeset(account, attrs) do\n    account\n    |> cast(attrs, [:email])\n    |> validate_required([:email])\n    |> unsafe_validate_unique(:email, App.Repo)\n    |> unique_constraint(:email)\n  end\nend\n",
+    "lib/registration.ex": "defmodule Registration do\n  @doc \"Create an account. Email addresses must be unique across accounts.\"\n  def register(attrs), do: %Account{} |> Account.changeset(attrs) |> App.Repo.insert()\nend\n"
+  },
+  "history": []
+}

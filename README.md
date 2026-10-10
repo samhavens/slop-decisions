@@ -1,8 +1,8 @@
 # slop-decisions
 
 Agents can write working code that becomes hard to understand and maintain.
-slop-decisions gives Codex 17 rules to review behavior and context that static
-checks such as [ex_slop](https://github.com/elixir-vibe/ex_slop) cannot judge.
+slop-decisions gives Codex 26 checks for defects, wrong abstractions, hidden
+coupling, and unsafe retries that static checks such as [ex_slop](https://github.com/elixir-vibe/ex_slop) cannot judge.
 
 **We recommend using both.**
 
@@ -20,7 +20,7 @@ Then, in your code project:
 $slop-review Review my changes against origin/main.
 ```
 
-Codex reviews all 17 rules in the current session. It reads related code and tests,
+Codex reviews all 26 rules in the current session. It reads related code and tests,
 then gives findings with evidence. There are no separate checker API calls;
 normal Codex usage still applies.
 
@@ -55,7 +55,18 @@ Each rule asks about behavior and context. Matching syntax alone is not enough.
 | State lost after reconnect<br>`liveview_reconnect_state_loss` | A wizard keeps earlier answers only in assigns and cannot restore them after remount. |
 | Database reads repeated per record<br>`per_record_database_read` | A helper calls `Repo.preload` for each post instead of loading the association for the list. |
 
+| Shared code that mixes separate policies<br>`false_unification` | Trial signup passes flags to skip billing steps in a shared completion function. |
+| Tests tied to private implementation<br>`test_implementation_coupling` | A counter test fails after a private state change that preserves all public behavior. |
+| Private process details spread across callers<br>`scattered_process_interface` | Several modules update an Agent's private map fields. |
+| Too much data sent to a process<br>`oversized_process_capture` | An audit task captures a large parsed request just to read its ID. |
+| Independent instances share global settings<br>`global_configuration_coupling` | Starting client B changes the endpoint used by client A. |
+| Ordinary work repeated by macros<br>`unnecessary_compile_time_work` | A macro copies the same runtime parser into every caller. |
+| A check and update can race<br>`non_atomic_invariant` | Two reservations read the last available slot before either claims it. |
+| A retry repeats a side effect<br>`unsafe_retry` | A lost response causes a shipment retry with a new idempotency key. |
+| Retry layers multiply work<br>`multiplicative_retries` | Four worker attempts each make three client attempts, exceeding a four-request budget. |
+
 [Full rules and exceptions](src/slop_decisions/data/rubrics.json) ·
+[Review methods and sources](skills/slop-review/references/investigation.md) ·
 [Phoenix and Ecto examples](docs/phoenix.md) ·
 [Compare models](docs/run-eval.md) · [Calibration](docs/calibration.md) ·
 [Contribute](CONTRIBUTING.md) · [MIT license](LICENSE)

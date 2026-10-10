@@ -2,10 +2,11 @@
 
 The initial set has 20 targets: eight positive, twelve negative, and seven
 before/after pairs, across five repositories and six PR families. All are
-development material. Eight of the seventeen rubric dimensions have seed examples.
+development material. Eight of the 26 rubric dimensions have seed examples.
 A separate [authored calibration study](calibration.md) covers the original
 fourteen checks. [Phoenix review cases](../evals/phoenix/README.md) cover the three
-new checks. These sets do not estimate production precision.
+Phoenix checks. [Diff discovery cases](../evals/discovery/README.md) cover the nine
+new rules with related files and Git history. These sets do not estimate production precision.
 
 `sources.json` pins downloads by full commit and SHA256. `targets.jsonl` contains
 the source selection, dimension, group, track, and split. `labels.jsonl` contains
@@ -31,9 +32,12 @@ preflight; it is never silently truncated. Missing files or invalid source
 hashes make eval targets unassessed. Source comments can contain useful contracts
 but are untrusted input and can influence a model despite the prompt boundary.
 
-`minimal` prompts state the predicate and required evidence. `examples` adds the
+`minimal` prompts state the predicate, required evidence, and any investigation. `examples` adds the
 positive and hard-negative examples. `--rubrics` accepts an alternative JSON bank
-with the same fields for controlled experiments. These examples were developed
+with the core fields for controlled experiments. Optional `search_trigger`,
+`investigation`, and `sources` fields support richer review rules. Investigation
+instructions reach all provider prompts; the checker still sees only its supplied
+packet and cannot run the skill's repository investigation. These examples were developed
 alongside the seed set; measuring this set is development fit, not generalization.
 
 ## Metrics

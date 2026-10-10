@@ -21,7 +21,8 @@
     "required_context": "Test/suite, implementation under test, fixtures and assertion helpers.",
     "positive": "Cookie object-key tests use only keys requiring no encoding; removing key encoding survives. A missing-key branch has no distinguishing assertion.",
     "negative": "A narrowly described smoke test; assertions delegated to helpers; a test uses discriminating boundary inputs.",
-    "severity": "warning"
+    "severity": "warning",
+    "investigation": "Name a contract-breaking mutation and a discriminating input before running it. Exclude equivalent or irrelevant mutations. Use test_implementation_coupling for the complementary case where a contract-preserving change breaks the test."
   },
   {
     "name": "semantic_duplicate",
@@ -29,7 +30,8 @@
     "required_context": "Both implementations and their consumers or contracts.",
     "positive": "A test repeats the same server/user/backend setup already supplied by a canonical helper.",
     "negative": "Similar operations enforce different policies or deliberately coexist during migration.",
-    "severity": "advisory"
+    "severity": "advisory",
+    "investigation": "Compare the policies and change reasons, not only syntax. Check history for migration or compatibility constraints. Do not merge independently evolving policies merely to remove repeated lines; also consider false_unification."
   },
   {
     "name": "process_without_runtime_reason",
@@ -45,7 +47,11 @@
     "required_context": "Layer, consumers, configuration and intended policy.",
     "positive": "An internal option and several helpers only route to the same required export policy.",
     "negative": "A stable public facade, external adapter, or useful test seam with one implementation.",
-    "severity": "advisory"
+    "severity": "advisory",
+    "investigation": "List the facts a caller must know and the coordinated edits needed for a supported change. Compare those burdens with the proposed simpler equivalent. Preserve a deep module that hides useful complexity even if its implementation is long.",
+    "sources": [
+      "https://github.com/johnousterhout/aposd-vs-clean-code/blob/main/README.md#method-length"
+    ]
   },
   {
     "name": "derived_state_drift",
@@ -134,5 +140,128 @@
     "positive": "After fetching posts, Enum.map calls a helper that preloads each unloaded author separately, adding one database query per post.",
     "negative": "Repo.preload on the whole list batches an association; query preloads use a fixed number of queries; already-loaded associations cause no new read. Separate batched queries can outperform a join, especially for has-many data. Distinct required per-record semantics cannot be dropped just to reduce query count.",
     "severity": "warning"
+  },
+  {
+    "name": "false_unification",
+    "predicate": "Does a shared abstraction couple independently changing policies, with caller-specific branches or flags compensating for the mismatch?",
+    "required_context": "Shared implementation, actual callers and arguments, policy contracts, and relevant history or change requirements.",
+    "search_trigger": "Shared functions with mode flags, caller identity checks, or options meaningful to only one caller.",
+    "investigation": "Specialize the shared code for each actual caller and remove inactive branches. Identify which independent policy changes still require edits or knowledge in other callers. Compare the facts callers must know before and after separating those policies.",
+    "positive": "Invoice collection and trial enrollment share a pipeline whose trial flag disables tax and payment steps; changing trial eligibility requires understanding billing-only flags. Separate operations retain only a small shared formatting step.",
+    "negative": "A serializer implements one encoding contract with supported output formats. A shared transactional workflow has coherent variations. Different callers alone do not establish independent policies.",
+    "severity": "advisory",
+    "sources": [
+      "https://sandimetz.com/blog/2016/1/20/the-wrong-abstraction",
+      "https://elixir.hexdocs.pm/design-anti-patterns.html#unrelated-multi-clause-function"
+    ]
+  },
+  {
+    "name": "test_implementation_coupling",
+    "predicate": "Does this test reject a concrete implementation change that preserves the behavior the test is meant to protect?",
+    "required_context": "Test and helpers, implementation, public and operational contracts, and a specific equivalent implementation.",
+    "search_trigger": "Assertions on private state layouts, helper calls, incidental ordering, or snapshots of internal structure.",
+    "investigation": "Propose an equivalent implementation or representation. Check that outputs, effects, errors, ordering and resource limits required by the contract stay the same. Run the unchanged test against both when possible; identify the assertion that rejects only the representation.",
+    "positive": "A queue test asserts a private list state; replacing it with a two-list queue preserves public FIFO behavior but breaks the assertion.",
+    "negative": "An assertion enforces exactly one charge, a query budget, required ordering, serialization compatibility, or the documented representation of a low-level primitive. A failed test alone does not prove equivalence.",
+    "severity": "advisory",
+    "sources": [
+      "https://testing.googleblog.com/2015/01/testing-on-toilet-change-detector-tests.html",
+      "https://testing.googleblog.com/2021/04/mutation-testing.html"
+    ]
+  },
+  {
+    "name": "scattered_process_interface",
+    "predicate": "Do callers outside a process owner depend on its private state representation or message protocol, forcing coordinated changes when that implementation changes?",
+    "required_context": "Process owner, public API, external callbacks or messages, consumers, and any documented extension protocol.",
+    "search_trigger": "Agent.get/update callbacks or raw GenServer/send messages outside the owning module.",
+    "investigation": "Map external state accesses and message constructors to the owner. Try one internal representation or protocol change and list the callers that must change with it. Check whether a stable operation could own those details.",
+    "positive": "Two callers update the private :entries map in an Agent; a move to a queue requires both callers to learn the new layout.",
+    "negative": "Callbacks stay inside the owner. A documented public protocol, behavior callback, or deliberate state primitive exposes these operations as its contract.",
+    "severity": "advisory",
+    "sources": [
+      "https://elixir.hexdocs.pm/process-anti-patterns.html#scattered-process-interfaces"
+    ]
+  },
+  {
+    "name": "oversized_process_capture",
+    "predicate": "Does a process closure or message carry a substantially larger term than the receiving operation needs, causing avoidable copying or retention?",
+    "required_context": "Closure captures or payload, producer data size and lifetime, receiver accesses, and relevant BEAM sharing behavior.",
+    "search_trigger": "Task/spawn closures capture a conn, socket, full result set or state to read a few fields; messages pass the entire object.",
+    "investigation": "Trace the fields actually read in the receiver. Compare the retained or copied term with extracting those fields before spawning or sending. Establish material size or lifetime; distinguish copied structures from reference-counted binaries and small captures.",
+    "positive": "An async audit task captures a request map containing a large parsed body only to read request_id; extracting the ID keeps the body out of the task environment.",
+    "negative": "The receiver needs the complete payload, the term is small, or the claimed copying cost is unsupported. Shared large binaries are not necessarily copied byte for byte.",
+    "severity": "advisory",
+    "sources": [
+      "https://elixir.hexdocs.pm/process-anti-patterns.html#sending-unnecessary-data",
+      "https://www.erlang.org/doc/system/eff_guide_processes.html"
+    ]
+  },
+  {
+    "name": "global_configuration_coupling",
+    "predicate": "Does ambient mutable configuration prevent independently configured consumers from coexisting or cause one consumer to change another consumer's behavior?",
+    "required_context": "Configuration reads and writes, initialization, consumers, intended scope, and concurrent test setup where relevant.",
+    "search_trigger": "A reusable client reads Application env or a global registry for settings described as per instance, request or tenant.",
+    "investigation": "Construct two supported consumers with different settings. Interleave initialization and calls; trace which value each call reads. Verify whether one instance overwrites the other or whether the policy is intentionally global.",
+    "positive": "Starting a second API client changes a global endpoint that the first client reads on every request, so the first now sends to the second endpoint.",
+    "negative": "Application-wide policy is intentional. Configuration is captured in each instance. A globally selected implementation preserves the same contract for all consumers.",
+    "severity": "warning",
+    "sources": [
+      "https://elixir.hexdocs.pm/design-anti-patterns.html#using-application-configuration-for-libraries"
+    ]
+  },
+  {
+    "name": "unnecessary_compile_time_work",
+    "predicate": "Does compile-time expansion or dependency capture perform ordinary work at each use site without a required compile-time contract, causing avoidable generated code or dependency coupling?",
+    "required_context": "Macro definition and call sites, expanded code, dependency versions, compiler phase requirements, and xref or equivalent dependency evidence.",
+    "search_trigger": "Macros embed large ordinary implementations, evaluate runtime-only aliases during compilation, or generate repeated helpers.",
+    "investigation": "Expand a representative call and inspect what repeats. In a safe project copy, use mix xref trace on a caller when dependency behavior matters. Compare an ordinary function or small macro delegating to one, preserving AST inspection, hygiene and evaluation timing.",
+    "positive": "A macro embeds the same parsing pipeline in each caller even though it inspects no caller AST; one function preserves behavior and removes repeated generated implementation.",
+    "negative": "A DSL inspects caller AST or registers compile-time metadata; generation specializes useful code; a module is genuinely needed at compile time. Macro presence or size alone is insufficient.",
+    "severity": "advisory",
+    "sources": [
+      "https://elixir.hexdocs.pm/macro-anti-patterns.html",
+      "https://hexdocs.pm/mix/Mix.Tasks.Xref.html"
+    ]
+  },
+  {
+    "name": "non_atomic_invariant",
+    "predicate": "Can concurrent operations violate a required invariant because its check and update are not protected by an effective atomic boundary?",
+    "required_context": "Invariant, all writers, migrations and database constraints or process ownership, isolation/locking semantics, and conflict handling.",
+    "search_trigger": "Check then insert/update, read-modify-write, unsafe_validate_unique, or multiple writes that must succeed together.",
+    "investigation": "Write a two-operation interleaving with reads and commits. Inspect the actual constraint, lock or conditional update and its scope. Check error handling. A transaction alone is not proof of serialization; missing migrations or external storage guarantees can prevent a conclusion.",
+    "positive": "Two signups both see an unused email and insert it; the supplied schema has no unique index. A lost-update reservation allows two callers to consume the last slot.",
+    "negative": "An early uniqueness check is backed by the matching unique index and conflict handling. A conditional update, effective lock or single owner enforces the invariant for every writer.",
+    "severity": "warning",
+    "sources": [
+      "https://hexdocs.pm/ecto/Ecto.Changeset.html#unsafe_validate_unique/4",
+      "https://www.postgresql.org/docs/current/transaction-iso.html"
+    ]
+  },
+  {
+    "name": "unsafe_retry",
+    "predicate": "Can a retry repeat an externally visible side effect after an ambiguous outcome because the operation lacks an effective idempotency or reconciliation contract?",
+    "required_context": "Side effect, retry path including worker restarts, remote outcome contract, identity/key lifetime and enforcement, and persistence boundaries.",
+    "search_trigger": "Retrying writes after timeouts, job redelivery, new idempotency keys on each attempt, or saving completion only after an external action.",
+    "investigation": "Trace success remotely, lost response, then retry or restart. Check that one logical operation keeps the same identity and the receiver atomically enforces it for the required time and payload. A key header or local success flag alone is not proof.",
+    "positive": "A fulfillment call succeeds but its response is lost; the worker retries with a new request key and creates a second shipment.",
+    "negative": "A stable operation key is atomically deduplicated by the receiver, a state-setting operation is idempotent, or reconciliation resolves an unknown result before another attempt. No retry path means this predicate does not apply.",
+    "severity": "warning",
+    "sources": [
+      "https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/",
+      "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/"
+    ]
+  },
+  {
+    "name": "multiplicative_retries",
+    "predicate": "Do retry layers multiply downstream attempts or reset deadlines so one operation can exceed its intended load or latency budget?",
+    "required_context": "Complete retrying call path, installed client defaults, attempts versus retries semantics, backoff, deadlines, and the operation budget.",
+    "search_trigger": "Worker or application retry loops call clients that also retry; each layer starts a new full timeout.",
+    "investigation": "Count maximum downstream attempts across reachable layers, including the first attempt. Trace one exhausted call and deadline propagation. Compare the count and elapsed-time bound with the stated budget; inspect library settings rather than assuming defaults.",
+    "positive": "An operation permits four downstream attempts, but four worker attempts each invoke a client allowing three attempts, producing twelve.",
+    "negative": "One layer owns retries; inner retries are disabled, or layers consume a shared attempt/deadline budget with cancellation. Nested retries alone do not prove a harmful budget violation.",
+    "severity": "warning",
+    "sources": [
+      "https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/"
+    ]
   }
 ]

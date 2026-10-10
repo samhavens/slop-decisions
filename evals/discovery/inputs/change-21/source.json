@@ -1,0 +1,9 @@
+{
+  "before": {
+    "lib/reader.ex": "defmodule Reader do\nend\n"
+  },
+  "after": {
+    "lib/reader.ex": "defmodule Reader do\n  require ExternalParser\n  def read(value), do: ExternalParser.parse(value)\nend\n"
+  },
+  "history": []
+}

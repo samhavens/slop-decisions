@@ -1,0 +1,11 @@
+{
+  "before": {
+    "lib/fields.ex": "defmodule Fields do\n  @doc \"Parse comma-separated integer fields. Whitespace is ignored. Invalid fields raise.\"\n  def parse(value) do\n    value |> String.split(\",\") |> Enum.map(&String.trim/1) |> Enum.map(&String.to_integer/1)\n  end\nend\n",
+    "lib/readers.ex": "defmodule FirstReader do\n  def read(value), do: Fields.parse(value)\nend\ndefmodule SecondReader do\n  def read(value), do: Fields.parse(value)\nend\n"
+  },
+  "after": {
+    "lib/fields.ex": "defmodule Fields do\n  @doc \"Parse comma-separated integer fields. Whitespace is ignored. Invalid fields raise.\"\n  defmacro parse(value) do\n    quote do\n      unquote(value)\n      |> String.split(\",\")\n      |> Enum.map(&String.trim/1)\n      |> Enum.map(&String.to_integer/1)\n    end\n  end\nend\n",
+    "lib/readers.ex": "defmodule FirstReader do\n  require Fields\n  def read(value), do: Fields.parse(value)\nend\ndefmodule SecondReader do\n  require Fields\n  def read(value), do: Fields.parse(value)\nend\n"
+  },
+  "history": []
+}

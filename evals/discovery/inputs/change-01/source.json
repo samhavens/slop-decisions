@@ -1,0 +1,10 @@
+{
+  "before": {
+    "lib/policies.ex": "defmodule Billing do\n  @doc \"Build a paid invoice. Tax applies to the subtotal.\"\n  def complete(order) do\n    %{kind: :invoice, total: order.subtotal + order.tax, paid: true}\n  end\nend\ndefmodule Trials do\n  @doc \"Activate a trial without collecting money. Its duration is in days.\"\n  def activate(trial), do: %{kind: :trial, days: trial.days, paid: false}\nend\n"
+  },
+  "after": {
+    "lib/policies.ex": "defmodule Billing do\n  @doc \"Build a paid invoice. Tax applies to the subtotal.\"\n  def complete(order) do\n    Completion.run(order, trial: false, collect: true, include_tax: true)\n  end\nend\ndefmodule Trials do\n  @doc \"Activate a trial without collecting money. Its duration is in days.\"\n  def activate(trial) do\n    Completion.run(trial, trial: true, collect: false, include_tax: false)\n  end\nend\n",
+    "lib/completion.ex": "defmodule Completion do\n  def run(data, opts) do\n    result = if opts[:trial], do: %{kind: :trial, days: data.days}, else: %{kind: :invoice}\n    result = if opts[:trial] do\n      result\n    else\n      amount = if opts[:include_tax], do: data.subtotal + data.tax, else: data.subtotal\n      Map.put(result, :total, amount)\n    end\n    Map.put(result, :paid, opts[:collect])\n  end\nend\n"
+  },
+  "history": []
+}

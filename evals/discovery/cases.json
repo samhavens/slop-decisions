@@ -1,0 +1,212 @@
+[
+  {
+    "case_id": "change-01",
+    "dimension": "false_unification",
+    "expected": "finding",
+    "kind": "maintenance",
+    "rationale": "The shared operation interleaves invoicing and trial activation. Each caller must choose flags about the other policy; specialization recovers two independent operations.",
+    "missing": null,
+    "pilot": true,
+    "source": "inputs/change-01/source.json"
+  },
+  {
+    "case_id": "change-02",
+    "dimension": "false_unification",
+    "expected": "no_finding",
+    "kind": null,
+    "rationale": "Both formats encode the same list of integer fields with the same escaping-free contract; a delimiter is a coherent supported variation.",
+    "missing": null,
+    "pilot": true,
+    "source": "inputs/change-02/source.json"
+  },
+  {
+    "case_id": "change-03",
+    "dimension": "test_implementation_coupling",
+    "expected": "finding",
+    "kind": "maintenance",
+    "rationale": "The new assertion freezes the private map layout. An integer state preserves the declared API but fails this assertion.",
+    "missing": null,
+    "pilot": true,
+    "source": "inputs/change-03/source.json"
+  },
+  {
+    "case_id": "change-04",
+    "dimension": "test_implementation_coupling",
+    "expected": "no_finding",
+    "kind": null,
+    "rationale": "The added message count enforces the documented exactly-one effect contract; a second charge is an observable error.",
+    "missing": null,
+    "pilot": true,
+    "source": "inputs/change-04/source.json"
+  },
+  {
+    "case_id": "change-05",
+    "dimension": "scattered_process_interface",
+    "expected": "finding",
+    "kind": "maintenance",
+    "rationale": "Dashboard and export read Worklist private state with external callbacks. Replacing the list or key requires coordinated edits in all three modules.",
+    "missing": null,
+    "pilot": true,
+    "source": "inputs/change-05/source.json"
+  },
+  {
+    "case_id": "change-06",
+    "dimension": "scattered_process_interface",
+    "expected": "no_finding",
+    "kind": null,
+    "rationale": "The new client uses a documented stable protocol. History preserves the tuple form for deployed v1 clients; neither message exposes the private integer state.",
+    "missing": null,
+    "pilot": true,
+    "source": "inputs/change-06/source.json"
+  },
+  {
+    "case_id": "change-07",
+    "dimension": "non_atomic_invariant",
+    "expected": "finding",
+    "kind": "defect",
+    "rationale": "Two callers can both read one available slot before either decrement, then both return :ok and leave -1. Agent serializes individual calls, not the multi-call operation.",
+    "missing": null,
+    "pilot": true,
+    "source": "inputs/change-07/source.json"
+  },
+  {
+    "case_id": "change-08",
+    "dimension": "non_atomic_invariant",
+    "expected": "no_finding",
+    "kind": null,
+    "rationale": "The early read is advisory. The actual reservation still checks and decrements in one get_and_update callback; competing requests cannot both reserve the last slot.",
+    "missing": null,
+    "pilot": true,
+    "source": "inputs/change-08/source.json"
+  },
+  {
+    "case_id": "change-09",
+    "dimension": "unsafe_retry",
+    "expected": "finding",
+    "kind": "defect",
+    "rationale": "A timed-out successful shipment is retried under a new key. The supplied carrier commits once per key, so a single run creates two shipments.",
+    "missing": null,
+    "pilot": true,
+    "source": "inputs/change-09/source.json"
+  },
+  {
+    "case_id": "change-10",
+    "dimension": "unsafe_retry",
+    "expected": "no_finding",
+    "kind": null,
+    "rationale": "The same durable operation_id and payload reach atomic carrier deduplication on each attempt. The lost-response sequence creates one shipment.",
+    "missing": null,
+    "pilot": true,
+    "source": "inputs/change-10/source.json"
+  },
+  {
+    "case_id": "change-11",
+    "dimension": "unsafe_retry",
+    "expected": "insufficient_context",
+    "kind": null,
+    "rationale": "The adapter and service contract are not supplied. Stable order identity might or might not be enforced by the receiver.",
+    "missing": "Adapter implementation and remote idempotency contract.",
+    "pilot": true,
+    "source": "inputs/change-11/source.json"
+  },
+  {
+    "case_id": "change-12",
+    "dimension": "non_atomic_invariant",
+    "expected": "insufficient_context",
+    "kind": null,
+    "rationale": "The changeset alone cannot establish whether the matching database index exists. Migrations and deployed schema are absent.",
+    "missing": "Migration or database schema and insert conflict handling.",
+    "pilot": true,
+    "source": "inputs/change-12/source.json"
+  },
+  {
+    "case_id": "change-13",
+    "dimension": "oversized_process_capture",
+    "expected": "finding",
+    "kind": "maintenance",
+    "rationale": "The new Task captures the entire large parsed payload solely for its request ID. Extracting the ID leaves the payload outside the closure.",
+    "missing": null,
+    "pilot": false,
+    "source": "inputs/change-13/source.json"
+  },
+  {
+    "case_id": "change-14",
+    "dimension": "oversized_process_capture",
+    "expected": "no_finding",
+    "kind": null,
+    "rationale": "Only the ID and sink enter the closure; the parsed payload is not captured.",
+    "missing": null,
+    "pilot": false,
+    "source": "inputs/change-14/source.json"
+  },
+  {
+    "case_id": "change-15",
+    "dimension": "global_configuration_coupling",
+    "expected": "finding",
+    "kind": "defect",
+    "rationale": "Creating B overwrites the global endpoint used by A. The advertised per-client independence is lost.",
+    "missing": null,
+    "pilot": false,
+    "source": "inputs/change-15/source.json"
+  },
+  {
+    "case_id": "change-16",
+    "dimension": "global_configuration_coupling",
+    "expected": "no_finding",
+    "kind": null,
+    "rationale": "Application configuration provides a default that is captured by value. Explicit endpoints and previously constructed clients stay independent.",
+    "missing": null,
+    "pilot": false,
+    "source": "inputs/change-16/source.json"
+  },
+  {
+    "case_id": "change-17",
+    "dimension": "unnecessary_compile_time_work",
+    "expected": "finding",
+    "kind": "maintenance",
+    "rationale": "The macro copies a runtime parsing pipeline into both consumers without inspecting syntax or compile-time data. A function preserves evaluation and error behavior.",
+    "missing": null,
+    "pilot": false,
+    "source": "inputs/change-17/source.json"
+  },
+  {
+    "case_id": "change-18",
+    "dimension": "unnecessary_compile_time_work",
+    "expected": "no_finding",
+    "kind": null,
+    "rationale": "The macro retains caller syntax for error messages and evaluates the expression once. A normal function cannot recover that syntax.",
+    "missing": null,
+    "pilot": false,
+    "source": "inputs/change-18/source.json"
+  },
+  {
+    "case_id": "change-19",
+    "dimension": "multiplicative_retries",
+    "expected": "finding",
+    "kind": "defect",
+    "rationale": "Four outer attempts each run three client attempts, yielding twelve. The documented per-operation downstream limit is four.",
+    "missing": null,
+    "pilot": false,
+    "source": "inputs/change-19/source.json"
+  },
+  {
+    "case_id": "change-20",
+    "dimension": "multiplicative_retries",
+    "expected": "no_finding",
+    "kind": null,
+    "rationale": "The outer layer owns the four-attempt budget and explicitly disables inner retries.",
+    "missing": null,
+    "pilot": false,
+    "source": "inputs/change-20/source.json"
+  },
+  {
+    "case_id": "change-21",
+    "dimension": "unnecessary_compile_time_work",
+    "expected": "insufficient_context",
+    "kind": null,
+    "rationale": "The external macro definition and dependency version are absent; the call alone cannot show avoidable compile-time work.",
+    "missing": "ExternalParser implementation and compile-time contract.",
+    "pilot": false,
+    "source": "inputs/change-21/source.json"
+  }
+]

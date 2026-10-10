@@ -1,0 +1,11 @@
+{
+  "before": {
+    "lib/worklist.ex": "defmodule Worklist do\n  @moduledoc \"Owns pending job IDs. The internal state is private.\"\n  def start_link, do: Agent.start_link(fn -> %{pending: []} end)\n  def add(pid, id), do: Agent.update(pid, &%{&1 | pending: [id | &1.pending]})\n  def take(pid), do: Agent.get_and_update(pid, fn\n    %{pending: []} = state -> {:empty, state}\n    %{pending: [id | rest]} = state -> {{:ok, id}, %{state | pending: rest}}\n  end)\nend\n"
+  },
+  "after": {
+    "lib/worklist.ex": "defmodule Worklist do\n  @moduledoc \"Owns pending job IDs. The internal state is private.\"\n  def start_link, do: Agent.start_link(fn -> %{pending: []} end)\n  def add(pid, id), do: Agent.update(pid, &%{&1 | pending: [id | &1.pending]})\n  def take(pid), do: Agent.get_and_update(pid, fn\n    %{pending: []} = state -> {:empty, state}\n    %{pending: [id | rest]} = state -> {{:ok, id}, %{state | pending: rest}}\n  end)\nend\n",
+    "lib/dashboard.ex": "defmodule Dashboard do\n  def pending_count(queue), do: Agent.get(queue, &length(&1.pending))\nend\n",
+    "lib/export.ex": "defmodule Export do\n  def pending_ids(queue), do: Agent.get(queue, &Enum.reverse(&1.pending))\nend\n"
+  },
+  "history": []
+}

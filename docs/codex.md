@@ -1,6 +1,6 @@
 # Review with Codex
 
-The skill uses all 17 rules in your current Codex session. Codex can read callers,
+The skill uses all 26 rules in your current Codex session. Codex can read callers,
 validators, and tests to check whether a suspicious pattern is a real problem.
 Each finding must include a code location and evidence.
 See the [measured review results and limits](../reports/skill-2026-10-10/README.md).
@@ -40,9 +40,19 @@ $slop-review Review lib/orders.ex and its tests. Only check success_shaped_failu
 ```
 
 Without a ref or file selection, the skill reviews local changes against `HEAD`.
-Findings distinguish code defects, weak tests, and maintenance issues. A test gap
+Findings distinguish defects, test gaps, maintenance costs, and API hazards. A test gap
 can exist in correct code. An incomplete review must say what remains unchecked.
 
 The skill adds no separate checker API calls. It still uses your Codex model and
 usage allowance. Use the existing session to reuse context. For a new scripted
 review and CI options, see [tests and CI](ci.md).
+
+The skill follows contracts across files, tests races and retries, and checks
+history before removing an exception. It tests both directions: wrong behavior
+must fail a test, while an equivalent implementation should pass. See the focused
+[review references](../skills/slop-review/SKILL.md#investigate-the-cause).
+
+If your project uses [usage_rules](https://github.com/ash-project/usage_rules),
+the skill can read its existing dependency guidance and search version-specific
+docs. It does not require the tool or rewrite your project instructions. See
+[dependency contracts](../skills/slop-review/references/investigation.md#dependency-contracts).

@@ -1,0 +1,9 @@
+{
+  "before": {
+    "lib/export.ex": "defmodule Export do\n  @doc \"Encode integer fields as comma-separated or tab-separated text.\"\n  def csv(values), do: Enum.map_join(values, \",\", &Integer.to_string/1)\n  def tsv(values), do: Enum.map_join(values, \"\\t\", &Integer.to_string/1)\nend\n"
+  },
+  "after": {
+    "lib/export.ex": "defmodule Export do\n  @doc \"Encode integer fields as comma-separated or tab-separated text.\"\n  def encode(values, format) when format in [:csv, :tsv] do\n    separator = if format == :csv, do: \",\", else: \"\\t\"\n    Enum.map_join(values, separator, &Integer.to_string/1)\n  end\nend\n"
+  },
+  "history": []
+}

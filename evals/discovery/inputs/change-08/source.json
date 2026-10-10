@@ -1,0 +1,10 @@
+{
+  "before": {
+    "lib/slots.ex": "defmodule Slots do\n  @moduledoc \"One process owns a pool. Concurrent reservations must never exceed its capacity.\"\n  def start_link(count), do: Agent.start_link(fn -> count end)\n  def available(pid), do: Agent.get(pid, & &1)\n  def reserve(pid) do\n    Agent.get_and_update(pid, fn\n      0 -> {:full, 0}\n      n when n > 0 -> {:ok, n - 1}\n    end)\n  end\nend\n"
+  },
+  "after": {
+    "lib/slots.ex": "defmodule Slots do\n  @moduledoc \"One process owns a pool. Concurrent reservations must never exceed its capacity.\"\n  def start_link(count), do: Agent.start_link(fn -> count end)\n  def available(pid), do: Agent.get(pid, & &1)\n  def reserve(pid) do\n    Agent.get_and_update(pid, fn\n      0 -> {:full, 0}\n      n when n > 0 -> {:ok, n - 1}\n    end)\n  end\nend\n",
+    "lib/booking.ex": "defmodule Booking do\n  def reserve(pool) do\n    if Slots.available(pool) > 0, do: Slots.reserve(pool), else: :full\n  end\nend\n"
+  },
+  "history": []
+}

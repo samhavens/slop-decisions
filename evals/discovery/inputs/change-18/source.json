@@ -1,0 +1,9 @@
+{
+  "before": {
+    "lib/contracts.ex": "defmodule Contracts do\n  def check(value), do: if(value, do: :ok, else: raise(\"check failed\"))\nend\n"
+  },
+  "after": {
+    "lib/contracts.ex": "defmodule Contracts do\n  @doc \"Evaluate an expression once and include its source in failure messages.\"\n  defmacro check(expr) do\n    source = Macro.to_string(expr)\n    quote do\n      if unquote(expr), do: :ok, else: raise(\"check failed: \" <> unquote(source))\n    end\n  end\nend\n"
+  },
+  "history": []
+}

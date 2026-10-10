@@ -1,0 +1,13 @@
+{
+  "before": {
+    "lib/retry.ex": "defmodule Retry do\n  def run(fun, attempts) when attempts > 0 do\n    case fun.() do\n      {:error, :busy} when attempts > 1 -> run(fun, attempts - 1)\n      result -> result\n    end\n  end\nend\n",
+    "lib/client.ex": "defmodule Client do\n  @doc \"Read-only lookup. At most three attempts, including the first.\"\n  def lookup(transport), do: Retry.run(transport, 3)\nend\n",
+    "lib/lookup.ex": "defmodule Lookup do\n  @moduledoc \"An operation may make at most four downstream requests.\"\n  def run(transport), do: Client.lookup(transport)\nend\n"
+  },
+  "after": {
+    "lib/retry.ex": "defmodule Retry do\n  def run(fun, attempts) when attempts > 0 do\n    case fun.() do\n      {:error, :busy} when attempts > 1 -> run(fun, attempts - 1)\n      result -> result\n    end\n  end\nend\n",
+    "lib/client.ex": "defmodule Client do\n  @doc \"Read-only lookup. At most three attempts, including the first.\"\n  def lookup(transport), do: Retry.run(transport, 3)\nend\n",
+    "lib/lookup.ex": "defmodule Lookup do\n  @moduledoc \"An operation may make at most four downstream requests.\"\n  def run(transport), do: Retry.run(fn -> Client.lookup(transport) end, 4)\nend\n"
+  },
+  "history": []
+}

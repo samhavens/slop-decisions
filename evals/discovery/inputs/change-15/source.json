@@ -1,0 +1,9 @@
+{
+  "before": {
+    "lib/client.ex": "defmodule Client do\n  @moduledoc \"Clients for different endpoints must coexist in one VM.\"\n  def new(endpoint), do: %{endpoint: endpoint}\n  def endpoint(client), do: client.endpoint\nend\n"
+  },
+  "after": {
+    "lib/client.ex": "defmodule Client do\n  @moduledoc \"Clients for different endpoints must coexist in one VM.\"\n  def new(endpoint) do\n    Application.put_env(:review_fixture, :endpoint, endpoint)\n    %{}\n  end\n  def endpoint(_client), do: Application.fetch_env!(:review_fixture, :endpoint)\nend\n"
+  },
+  "history": []
+}

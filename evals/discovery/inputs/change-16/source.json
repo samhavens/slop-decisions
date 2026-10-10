@@ -1,0 +1,9 @@
+{
+  "before": {
+    "lib/client.ex": "defmodule Client do\n  @moduledoc \"Clients for different endpoints must coexist in one VM.\"\n  def new(endpoint), do: %{endpoint: endpoint}\n  def endpoint(client), do: client.endpoint\nend\n"
+  },
+  "after": {
+    "lib/client.ex": "defmodule Client do\n  @moduledoc \"Clients for different endpoints must coexist in one VM.\"\n  def new(opts) do\n    %{endpoint: Keyword.get_lazy(opts, :endpoint, fn ->\n      Application.fetch_env!(:review_fixture, :endpoint)\n    end)}\n  end\n  def endpoint(client), do: client.endpoint\nend\n"
+  },
+  "history": []
+}

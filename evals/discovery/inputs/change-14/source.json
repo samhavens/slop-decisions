@@ -1,0 +1,11 @@
+{
+  "before": {
+    "lib/audit.ex": "defmodule Audit do\n  @doc \"Send the request ID to the local audit sink.\"\n  def record(request, sink), do: send(sink, {:request, request.id})\nend\n",
+    "lib/requests.ex": "defmodule Requests do\n  @doc \"Parsed payload is a list of up to 100,000 maps; audit records only its ID.\"\n  def accepted(payload, sink) do\n    request = %{id: make_ref(), payload: payload}\n    Audit.record(request, sink)\n    request.id\n  end\nend\n"
+  },
+  "after": {
+    "lib/audit.ex": "defmodule Audit do\n  @doc \"Send the request ID to the local audit sink.\"\n  def record(request, sink) do\n    id = request.id\n    Task.start(fn -> send(sink, {:request, id}) end)\n  end\nend\n",
+    "lib/requests.ex": "defmodule Requests do\n  @doc \"Parsed payload is a list of up to 100,000 maps; audit records only its ID.\"\n  def accepted(payload, sink) do\n    request = %{id: make_ref(), payload: payload}\n    Audit.record(request, sink)\n    request.id\n  end\nend\n"
+  },
+  "history": []
+}

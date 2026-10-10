@@ -1,0 +1,11 @@
+{
+  "before": {
+    "lib/checkout.ex": "defmodule Checkout do\n  @doc \"Submit exactly one charge through the supplied synchronous gateway.\"\n  def pay(id, gateway), do: gateway.(id)\nend\n",
+    "test/checkout_test.exs": "ExUnit.start()\ndefmodule CheckoutTest do\n  use ExUnit.Case\n  test \"submits the charge\" do\n    gateway = fn id -> send(self(), {:charge, id}); :ok end\n    assert Checkout.pay(\"order-1\", gateway) == :ok\n    assert_received {:charge, \"order-1\"}\n  end\nend\n"
+  },
+  "after": {
+    "lib/checkout.ex": "defmodule Checkout do\n  @doc \"Submit exactly one charge through the supplied synchronous gateway.\"\n  def pay(id, gateway), do: gateway.(id)\nend\n",
+    "test/checkout_test.exs": "ExUnit.start()\ndefmodule CheckoutTest do\n  use ExUnit.Case\n  test \"submits exactly one charge\" do\n    gateway = fn id -> send(self(), {:charge, id}); :ok end\n    assert Checkout.pay(\"order-1\", gateway) == :ok\n    assert_received {:charge, \"order-1\"}\n    refute_received {:charge, _}\n  end\nend\n"
+  },
+  "history": []
+}

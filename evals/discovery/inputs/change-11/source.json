@@ -1,0 +1,9 @@
+{
+  "before": {
+    "lib/delivery.ex": "defmodule Delivery do\n  def deliver(order, adapter), do: adapter.send_order(order.id, order)\nend\n"
+  },
+  "after": {
+    "lib/delivery.ex": "defmodule Delivery do\n  def deliver(order, adapter) do\n    case adapter.send_order(order.id, order) do\n      {:error, :timeout} -> adapter.send_order(order.id, order)\n      result -> result\n    end\n  end\nend\n"
+  },
+  "history": []
+}

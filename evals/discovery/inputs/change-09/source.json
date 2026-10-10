@@ -1,0 +1,11 @@
+{
+  "before": {
+    "lib/shipping.ex": "defmodule Shipping do\n  @moduledoc \"Sandbox carrier model: keys deduplicate atomically for the lifetime of this server. First success may lose its reply.\"\n  def start_link, do: Agent.start_link(fn -> %{} end)\n  def create(server, key, order) do\n    Agent.get_and_update(server, fn shipments ->\n      case Map.fetch(shipments, key) do\n        {:ok, ^order} -> {{:ok, key}, shipments}\n        {:ok, _other} -> {{:error, :key_conflict}, shipments}\n        :error -> {{:error, :timeout}, Map.put(shipments, key, order)}\n      end\n    end)\n  end\n  def shipments(server), do: Agent.get(server, & &1)\nend\n",
+    "lib/ship_order.ex": "defmodule ShipOrder do\n  @doc \"Submit one shipment for an order using its durable operation_id.\"\n  def run(carrier, order), do: Shipping.create(carrier, order.operation_id, order)\nend\n"
+  },
+  "after": {
+    "lib/shipping.ex": "defmodule Shipping do\n  @moduledoc \"Sandbox carrier model: keys deduplicate atomically for the lifetime of this server. First success may lose its reply.\"\n  def start_link, do: Agent.start_link(fn -> %{} end)\n  def create(server, key, order) do\n    Agent.get_and_update(server, fn shipments ->\n      case Map.fetch(shipments, key) do\n        {:ok, ^order} -> {{:ok, key}, shipments}\n        {:ok, _other} -> {{:error, :key_conflict}, shipments}\n        :error -> {{:error, :timeout}, Map.put(shipments, key, order)}\n      end\n    end)\n  end\n  def shipments(server), do: Agent.get(server, & &1)\nend\n",
+    "lib/ship_order.ex": "defmodule ShipOrder do\n  @doc \"Submit one shipment for an order using its durable operation_id.\"\n  def run(carrier, order) do\n    case Shipping.create(carrier, order.operation_id, order) do\n      {:error, :timeout} -> Shipping.create(carrier, make_ref(), order)\n      result -> result\n    end\n  end\nend\n"
+  },
+  "history": []
+}
