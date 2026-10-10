@@ -1,0 +1,95 @@
+{
+  "method": "Author audit of all raw findings, locations, supplied contracts, probe edits and recorded process results. Distinct from status scoring.",
+  "supported_findings": 6,
+  "unsupported_findings": 0,
+  "useful_test_changes_preserved": 4,
+  "missing_context_identified": 1,
+  "scope_controls_respected": 1,
+  "preservation_limit": "The two removal recommendations name retained tests and execute their failure controls. No project runner or CI configuration is included, so external test selection remains unverified and is explicitly disclosed in both reviews.",
+  "cases": [
+    {
+      "case_id": "change-01",
+      "frozen_expected": "finding",
+      "review_status": "finding",
+      "judgment": "supported_finding",
+      "evidence": "The changeset-only assertion passes with save disabled. A real save/get test fails under that control. Correction repairs the persistence proof."
+    },
+    {
+      "case_id": "change-02",
+      "frozen_expected": "no_finding",
+      "review_status": "no_finding",
+      "judgment": "supported_no_finding",
+      "evidence": "The capability declaration is a public contract. Separate capability and persistence mutations fail their own tests."
+    },
+    {
+      "case_id": "change-03",
+      "frozen_expected": "finding",
+      "review_status": "finding",
+      "judgment": "supported_finding",
+      "evidence": "The initial row supplies the asserted effect. Empty-store repair passes with real save and fails with no-op save."
+    },
+    {
+      "case_id": "change-04",
+      "frozen_expected": "no_finding",
+      "review_status": "no_finding",
+      "judgment": "supported_no_finding",
+      "evidence": "The caller produces the denial message from the supplied rejection. Wrong caller mapping fails; the mock does not replace the asserted behavior."
+    },
+    {
+      "case_id": "change-07",
+      "frozen_expected": "finding",
+      "review_status": "finding",
+      "judgment": "supported_finding",
+      "evidence": "Missing ID exits before ownership. Guard removal passes the original assertion and fails after correcting the ID and expected domain error."
+    },
+    {
+      "case_id": "change-09",
+      "frozen_expected": "finding",
+      "review_status": "finding",
+      "judgment": "supported_finding",
+      "evidence": "The copied matrix adds no separate boundary. ProfileTest at test/profile_test.exs:4 catches trim removal and wrapper failure; direct retained-test execution catches trim removal. External CI selection is not supplied."
+    },
+    {
+      "case_id": "change-10",
+      "frozen_expected": "no_finding",
+      "review_status": "no_finding",
+      "judgment": "supported_no_finding",
+      "evidence": "Wrong query-field and omitted URI-decoding controls fail the new integration test while helper coverage passes."
+    },
+    {
+      "case_id": "change-13",
+      "frozen_expected": "finding",
+      "review_status": "finding",
+      "judgment": "supported_finding",
+      "evidence": "Only the new private-state test uses the added export. A private key rename preserves the retained public test but fails the new assertion. Removing the export leaves LedgerTest at test/ledger_test.exs:4 passing; a no-op record then fails it. External CI selection is not supplied."
+    },
+    {
+      "case_id": "change-17",
+      "frozen_expected": "finding",
+      "review_status": "finding",
+      "judgment": "supported_finding",
+      "evidence": "An independently specified half-refund stays required. Returning one third passes the new type assertion and fails the old amount assertion."
+    },
+    {
+      "case_id": "change-18",
+      "frozen_expected": "no_finding",
+      "review_status": "no_finding",
+      "judgment": "supported_no_finding",
+      "evidence": "Removing the private-map assertion retains a public test that accepts both storage forms and rejects a no-op add."
+    },
+    {
+      "case_id": "change-21",
+      "frozen_expected": "insufficient_context",
+      "review_status": "insufficient_context",
+      "judgment": "supported_insufficient_context",
+      "evidence": "The shared macro is unavailable and does not compile in the supplied snapshot. No conclusion about coverage loss or preservation is justified."
+    },
+    {
+      "case_id": "change-22",
+      "frozen_expected": "no_finding",
+      "review_status": "no_finding",
+      "judgment": "supported_scope_boundary",
+      "evidence": "A real arithmetic defect remains. Its lack of a slop finding correctly follows this request; it is not a general clean-code judgment."
+    }
+  ]
+}

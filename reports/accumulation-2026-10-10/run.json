@@ -1,0 +1,177 @@
+{
+  "source_commit": "8fedaaee4140113250c9744a1c319a2a9a7e28db",
+  "model": "gpt-6-astra",
+  "reasoning_effort": "max",
+  "trials": 1,
+  "context": "One fresh independent reviewer; twelve cases share its context. No plain-review or previous-skill comparison.",
+  "provider_api_calls": 0,
+  "local_elixir_executions": 39,
+  "case_order": [
+    {
+      "case_id": "change-02",
+      "repository": "cases/change-02",
+      "base": "d2664e745c3e68c284d5d054b0ec633f27d52a88"
+    },
+    {
+      "case_id": "change-18",
+      "repository": "cases/change-18",
+      "base": "edbb849f264555ffb9cc2f642d33baf2fe636e4b"
+    },
+    {
+      "case_id": "change-10",
+      "repository": "cases/change-10",
+      "base": "db2f0b612b4c76f8f3b4962a06160dd329d52c60"
+    },
+    {
+      "case_id": "change-17",
+      "repository": "cases/change-17",
+      "base": "499a6ee0eb0e9a7a49689bbf22b664c7846639ad"
+    },
+    {
+      "case_id": "change-13",
+      "repository": "cases/change-13",
+      "base": "81eaab7fcc52bd5216415231f1c8aecf0e2f0803"
+    },
+    {
+      "case_id": "change-03",
+      "repository": "cases/change-03",
+      "base": "ac3b4a8126e72ae8c190425cb99f0c2908b9ca7c"
+    },
+    {
+      "case_id": "change-21",
+      "repository": "cases/change-21",
+      "base": "0ae20b00d593df78cafd55e2a5acdcf7d8bced02"
+    },
+    {
+      "case_id": "change-22",
+      "repository": "cases/change-22",
+      "base": "80c19b6e120636dcacf49074db86595ce65f1f01"
+    },
+    {
+      "case_id": "change-07",
+      "repository": "cases/change-07",
+      "base": "e9f4d52157aecb3083b0c43999ac879caa717d29"
+    },
+    {
+      "case_id": "change-01",
+      "repository": "cases/change-01",
+      "base": "ac3b4a8126e72ae8c190425cb99f0c2908b9ca7c"
+    },
+    {
+      "case_id": "change-04",
+      "repository": "cases/change-04",
+      "base": "d1cc5d9019936a6f902adee20ab87e4101b5f17e"
+    },
+    {
+      "case_id": "change-09",
+      "repository": "cases/change-09",
+      "base": "77f5a38f08a39b454551f73ea9ed7b8cd9afe6a8"
+    }
+  ],
+  "source_sha256": {
+    "skills/slop-review/LICENSE": "754e4c4017eb3435e00ca886c2b2b6c72eaf8d85bdc238754f48e4c76ca903c8",
+    "skills/slop-review/SKILL.md": "701fb7200dd9442a4ce87448aadc277db8bf6985f099eb24104810cd8437ce40",
+    "skills/slop-review/agents/openai.yaml": "35a6dcfb6f261aa7848541b2669b83d83b9ce724a94d58e17bb72dc3356ff8ef",
+    "skills/slop-review/references/abstractions.md": "98eac7eda7bcb67fd6aacb6f2c25bee2a8cbd31b0a7c3aa14e6c30100eeb6a53",
+    "skills/slop-review/references/broader-review.md": "160048a4722c738cdce10ee3c8b8233dafdd72f631d70f9552f6c116007ac289",
+    "skills/slop-review/references/broader-rules.json": "ab75fcec3341ae302f41be9997e17e4c243889715965739beb0195661ad6c541",
+    "skills/slop-review/references/consistency.md": "3b30ab5b44a481b67ccd92fce1703288fe24ce876ef88e44982c3c1279f38ec6",
+    "skills/slop-review/references/investigation.md": "b3d52b6c7844a65d96ac802bceee7df6ab8f18590d9bbd902aae5aa444812e87",
+    "skills/slop-review/references/otp.md": "41e90910ad94913be745497399f4f9a19d80e1f91b371c2202964dd8d0e55079",
+    "skills/slop-review/references/phoenix.md": "e569e1cbf4796b5f801ab086d8b2c34ee0f3b270b7bdbbd3f52b2dd6542926c9",
+    "skills/slop-review/references/rules.json": "f540fc7cf699b4b4d7c955e8bc113f634e22b870dca4071b26ae9ecfe93845cd",
+    "skills/slop-review/references/sources.md": "eaf2bd68f956027d3bcc1647970c9e0fb7761a4eba38fa2d6fc29e03a3c93e87",
+    "skills/slop-review/references/test-contracts.md": "c6954750f7092e3e7d8e701ada2f6ac0fcb8377330d4a3e575ca34e445d7f4b8",
+    "skills/slop-review/references/verification.md": "f881463777144106cb83545c6ecf529866bf090f25cda74384e6eff29b0ab5ae",
+    "evals/accumulation/README.md": "c56790fe3616eaf21bb75eb7d6d03a74a92057aca77f514bfb8a864634fcedf8",
+    "evals/accumulation/cases.json": "f836207d871780db94d7f2283944cc5db0e1a67b714c5cbac8960bec65fe2b64",
+    "evals/accumulation/inputs/change-01/source.json": "eaf764185081afa09a2aeaa8a10bab9e9e0c0dbb15c92af7278c55d1737ad197",
+    "evals/accumulation/inputs/change-02/source.json": "b2a859579a0621ae2200f43c32ac420624d5cb179c9a41b0632e93e1b1ade8aa",
+    "evals/accumulation/inputs/change-03/source.json": "3db798edd17ddb24e4f40ab9f3761fbc9983f8c52f585d07acb8ad197537667e",
+    "evals/accumulation/inputs/change-04/source.json": "9d2e21a89ac34e457a16786ac6fbe1ab39d833c4478617922d5f132da69aeaeb",
+    "evals/accumulation/inputs/change-05/source.json": "8a4eb4f5850637c612c36f38d403fd536d511eaec82043d866727cc4a5205cf5",
+    "evals/accumulation/inputs/change-06/source.json": "bdfd8fe0e3d836954e2fc55d5b4790c7f2b2d87114e710a56d3bd12f95dfc914",
+    "evals/accumulation/inputs/change-07/source.json": "77e843a35c2805cf364ba54f60644c5c84c8d29982cf74171b06830241c12ce5",
+    "evals/accumulation/inputs/change-08/source.json": "aea90c1d113078356e5c2d4bb7769c9998aa76c57a8f3b77d82220ddc9fa25a5",
+    "evals/accumulation/inputs/change-09/source.json": "30459e3ce82a2b04c8b8bc61de0d837f606060fdc70cf81a2ac5a6c746eed5a4",
+    "evals/accumulation/inputs/change-10/source.json": "1f4d0d42a2e0577c209f9685230e1afe94ee997c6bc8f61ee1b9cee8ef9b433b",
+    "evals/accumulation/inputs/change-11/source.json": "9d402752331f822b6682e39e9d79ab1953bd53e8725c63816be852798d225c03",
+    "evals/accumulation/inputs/change-12/source.json": "eb1e902e6efb766b93299ee1f0c36d4f2b8b9533bef0727aacaa6e06d98411c3",
+    "evals/accumulation/inputs/change-13/source.json": "43d72c2379685c0855abefb835c2ef4ed7bae1359298f8e18af405a7952fdf8a",
+    "evals/accumulation/inputs/change-14/source.json": "72b786d1f74faa7dd4b46cad8ff32c1335b64c10952d870451835f79f6a30d98",
+    "evals/accumulation/inputs/change-15/source.json": "7cc5d9a58c9e004210e82b7826231b6b6d1613299d7959d9f47cafe80a1bb356",
+    "evals/accumulation/inputs/change-16/source.json": "f3feed05d35f3a7b5d1bfa6452a204f06b8e685fedb17eb2617bd65fd08d24d9",
+    "evals/accumulation/inputs/change-17/source.json": "2dfb64a1b83956fcbd19eab5d32681afd6bb59f3d83405b610da7ed1ce3fd7e7",
+    "evals/accumulation/inputs/change-18/source.json": "d10dfd9dd26d7d54b00b844ffa2feabf5aba6674c1434d85af4cf4c25388db6c",
+    "evals/accumulation/inputs/change-19/source.json": "a362a6355bfca6f5cda6b630a79f59153b1d701514a373d2dfbcf5889d8190da",
+    "evals/accumulation/inputs/change-20/source.json": "8028991abaedc415972e88a9e39caa0505e3569fd3099dbe09771442f0a66ccf",
+    "evals/accumulation/inputs/change-21/source.json": "6507d58372e4f907aa7320a947f114252f5c68009d523c738579cecb89aa6f1b",
+    "evals/accumulation/inputs/change-22/source.json": "3403d8acf205d474b1c6ea6b8cd6b1f7cbe43a6d631f5e57336821dc8defd222",
+    "evals/accumulation/provenance.json": "657c6775f6121c865794ebcc5a6bb3e97b339a3df77f158641577e76478e3045",
+    "evals/accumulation/request.txt": "16341c69620964ceafa15a7dfca69569f8f0bc834cf8059429e0164d4a68cb82",
+    "scripts/skill_eval.py": "970aac7654c317e53fbf9409f44de494c75f3d7f9f99faed78de08c16690347f"
+  },
+  "review_input_sha256": {
+    "cases/change-01/lib/accounts.ex": "517cff2580fdc6a4e12244c6a9a00b3426f0377c49d6bb74cb5d4d396f642cb8",
+    "cases/change-01/test/accounts_test.exs": "afe91423cb6cf45d3838f9ff886ee566ea4cc64a4ca0debb57fcd8b70d8c9c0d",
+    "cases/change-02/lib/accounts.ex": "517cff2580fdc6a4e12244c6a9a00b3426f0377c49d6bb74cb5d4d396f642cb8",
+    "cases/change-02/test/capability_test.exs": "b01f1e2a8cec6f729798e67887d7e83b6c6ac177627519cfe1e6e52be4c2b6a9",
+    "cases/change-02/test/persistence_test.exs": "9a5b1e1d61bcd2b03f543ce9dd96ed5a413669e0f781d36630ecd844077dd269",
+    "cases/change-03/lib/accounts.ex": "517cff2580fdc6a4e12244c6a9a00b3426f0377c49d6bb74cb5d4d396f642cb8",
+    "cases/change-03/test/accounts_test.exs": "8811dff2288ae4b3b9b900cf4a836a0e387d51b7e80c39eaacee8dd1d11a617c",
+    "cases/change-04/lib/presenter.ex": "10b2d2fdeaa7e926a8b68400d10244efd9d34f03a87956c35d8eec947abe047e",
+    "cases/change-04/test/presenter_test.exs": "5a7fcba5c9e7911403e722e4a97086e1329d2baaabee4353b08ce0dac8aa7c06",
+    "cases/change-07/lib/documents.ex": "5003cb05c0448b5ac761f3d7ad52ef791bd63afe131d8b1e4b64911cf77f5b3f",
+    "cases/change-07/test/documents_test.exs": "169268559798ea31aca129da9d8b02265bdbf96ef623de0cfe2caf386e6468a8",
+    "cases/change-09/lib/profile.ex": "99bd5796fcb925a416097b58fc0042bded168d3894608c83a89eb36bd0186e72",
+    "cases/change-09/test/normalize_test.exs": "ff917dcab3c4716af3ebe747c20fd140056a3c19f3ba19bdbb473972c10fa01d",
+    "cases/change-09/test/profile_test.exs": "0740b50f6f4e99a417252b803e6170197a340a650d6f5bbfb521dd664ec41255",
+    "cases/change-10/lib/profile.ex": "99bd5796fcb925a416097b58fc0042bded168d3894608c83a89eb36bd0186e72",
+    "cases/change-10/test/normalize_test.exs": "ff917dcab3c4716af3ebe747c20fd140056a3c19f3ba19bdbb473972c10fa01d",
+    "cases/change-10/test/profile_test.exs": "40d06bd46fb3932c4a436cdd17c876407fd31a089906171e39ccb2ffdfbf2efc",
+    "cases/change-13/lib/app.ex": "6a40d690b543bfa732241f4beed6d0723ad29523cec6d3ffb12d4cd36ae0564a",
+    "cases/change-13/lib/ledger.ex": "2989ef8c89b3af80b1a1ea00b2212edd65a8b5ec31fc75920c7f90845b96ffae",
+    "cases/change-13/test/ledger_test.exs": "2542097e5868f9d4c1957eb87dfd679100028ba4ee5d3200b6c79b1644e94884",
+    "cases/change-13/test/state_test.exs": "50164aed45bf86542664cd747d9c9ee7b74f2afe45da24f174b67a0153dea969",
+    "cases/change-17/lib/refund.ex": "7bef1f1dec8eaa207ff77beaac8a3f934fa86b90ef529106e0d3adf5ed0ff5a4",
+    "cases/change-17/test/refund_test.exs": "cb6508d0c7dccc83d67835323091f53ddef93b887ff0fce459b23184860a96a8",
+    "cases/change-18/lib/counter.ex": "9ab0e9f3a987a26ae50b499afa2f6fa95a66bcb03b6acaaea8636013c022ceee",
+    "cases/change-18/test/counter_test.exs": "aecbc88752cbd2cdb870b5eec2b7bec81222eb42d2a66fa6275c03f8add25a34",
+    "cases/change-21/lib/documents.ex": "5003cb05c0448b5ac761f3d7ad52ef791bd63afe131d8b1e4b64911cf77f5b3f",
+    "cases/change-21/test/documents_test.exs": "40b600259564025aea8e534b7532482c5250b708f4d3b261ebadd2dc3798728b",
+    "cases/change-22/lib/shipping_fee.ex": "56b03025e7583dc16a6ca56b3ec1b15a989f1815e6d8159d142f7617a322d636",
+    "request.txt": "7b76f94f40c14a2242c1c7addb2d2f665698c95056ee18fb728ad9b2963364e2",
+    "skill/LICENSE": "754e4c4017eb3435e00ca886c2b2b6c72eaf8d85bdc238754f48e4c76ca903c8",
+    "skill/SKILL.md": "701fb7200dd9442a4ce87448aadc277db8bf6985f099eb24104810cd8437ce40",
+    "skill/agents/openai.yaml": "35a6dcfb6f261aa7848541b2669b83d83b9ce724a94d58e17bb72dc3356ff8ef",
+    "skill/references/abstractions.md": "98eac7eda7bcb67fd6aacb6f2c25bee2a8cbd31b0a7c3aa14e6c30100eeb6a53",
+    "skill/references/broader-review.md": "160048a4722c738cdce10ee3c8b8233dafdd72f631d70f9552f6c116007ac289",
+    "skill/references/broader-rules.json": "ab75fcec3341ae302f41be9997e17e4c243889715965739beb0195661ad6c541",
+    "skill/references/consistency.md": "3b30ab5b44a481b67ccd92fce1703288fe24ce876ef88e44982c3c1279f38ec6",
+    "skill/references/investigation.md": "b3d52b6c7844a65d96ac802bceee7df6ab8f18590d9bbd902aae5aa444812e87",
+    "skill/references/otp.md": "41e90910ad94913be745497399f4f9a19d80e1f91b371c2202964dd8d0e55079",
+    "skill/references/phoenix.md": "e569e1cbf4796b5f801ab086d8b2c34ee0f3b270b7bdbbd3f52b2dd6542926c9",
+    "skill/references/rules.json": "f540fc7cf699b4b4d7c955e8bc113f634e22b870dca4071b26ae9ecfe93845cd",
+    "skill/references/sources.md": "eaf2bd68f956027d3bcc1647970c9e0fb7761a4eba38fa2d6fc29e03a3c93e87",
+    "skill/references/test-contracts.md": "c6954750f7092e3e7d8e701ada2f6ac0fcb8377330d4a3e575ca34e445d7f4b8",
+    "skill/references/verification.md": "f881463777144106cb83545c6ecf529866bf090f25cda74384e6eff29b0ab5ae",
+    "tasks.json": "b8dcbed5da7bbde22fb2cf506818cd590074bd6a423869a0da096b0d0a0d7127"
+  },
+  "inputs_and_skill_unchanged": true,
+  "usage_scope": "Reviewer only; excludes development, scoring and release work.",
+  "usage": {
+    "input_tokens": 532616,
+    "cached_input_tokens": 464256,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 9233,
+    "reasoning_output_tokens": 2837,
+    "total_tokens": 541849
+  },
+  "uncached_input_tokens": 68360,
+  "token_accounting": "Cumulative across tool turns. Cached input is included in input; reasoning output is included in output. Codex usage, not a checker API invoice.",
+  "started_at": 1791676082,
+  "completed_at": 1791676288,
+  "duration_ms": 205834,
+  "results_sha256": "dc4bbf5efc2d1d8cdff38578fbed9e9d2bac6642b33388a977c9f9b2b8864d32",
+  "probe_log_sha256": "72d372fd2eff21a96e0bc7d6355ba2c95d793401d9089525a3a5f88fde7a3c5f"
+}

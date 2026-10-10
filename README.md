@@ -27,7 +27,7 @@ before recommending removal. It makes no separate checker API calls; normal
 Codex usage applies.
 
 [Install and select checks](docs/codex.md) · [Tests and CI](docs/ci.md) ·
-[Evidence and eval limits](evals/accumulation/README.md)
+[Skill eval and limits](reports/accumulation-2026-10-10/README.md)
 
 ## Patterns
 

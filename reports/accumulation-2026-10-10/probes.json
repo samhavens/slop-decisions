@@ -1,0 +1,630 @@
+[
+  {
+    "case_id": "change-02",
+    "probe": "baseline",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/accounts.ex",
+      "-r",
+      "test/capability_test.exs",
+      "-r",
+      "test/persistence_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 613317, max_cases: 20\n\n..\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 2 passed\n"
+  },
+  {
+    "case_id": "change-02",
+    "probe": "save_noop",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/accounts.ex",
+      "-r",
+      "test/capability_test.exs",
+      "-r",
+      "test/persistence_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 969862, max_cases: 20\n\n.\n\n  1) test save stores a new account (PersistenceTest)\n     test/persistence_test.exs:4\n     Assertion with == failed\n     code:  assert Accounts.get(store, 42) == row\n     left:  nil\n     right: %{id: 42, name: \"Ada\"}\n     stacktrace:\n       test/persistence_test.exs:8: (test)\n\n\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1/2 passed\nFailed: 1 test\n"
+  },
+  {
+    "case_id": "change-02",
+    "probe": "capability_false",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/accounts.ex",
+      "-r",
+      "test/capability_test.exs",
+      "-r",
+      "test/persistence_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 329026, max_cases: 20\n\n\n\n  1) test advertises the public persistence capability (CapabilityTest)\n     test/capability_test.exs:4\n     Assertion with == failed\n     code:  assert Accounts.capabilities() == %{persistence: true}\n     left:  %{persistence: false}\n     right: %{persistence: true}\n     stacktrace:\n       test/capability_test.exs:5: (test)\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1/2 passed\nFailed: 1 test\n"
+  },
+  {
+    "case_id": "change-18",
+    "probe": "baseline",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/counter.ex",
+      "-r",
+      "test/counter_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 683624, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-18",
+    "probe": "old_storage_new_tests",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/counter.ex",
+      "-r",
+      "test/counter_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 39880, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-18",
+    "probe": "add_noop",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/counter.ex",
+      "-r",
+      "test/counter_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 380338, max_cases: 20\n\n\n\n  1) test adds to the public count (CounterTest)\n     test/counter_test.exs:4\n     Assertion with == failed\n     code:  assert Counter.value(pid) == 2\n     left:  0\n     right: 2\n     stacktrace:\n       test/counter_test.exs:7: (test)\n\n\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 0/1 passed\nFailed: 1 test\n"
+  },
+  {
+    "case_id": "change-10",
+    "probe": "baseline",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/profile.ex",
+      "-r",
+      "test/normalize_test.exs",
+      "-r",
+      "test/profile_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 745033, max_cases: 20\n\n..\nFinished in 0.02 seconds (0.02s on load, 0.00s async, 0.00s sync)\n\nResult: 2 passed\n"
+  },
+  {
+    "case_id": "change-10",
+    "probe": "wrong_query_field",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/profile.ex",
+      "-r",
+      "test/normalize_test.exs",
+      "-r",
+      "test/profile_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 96389, max_cases: 20\n\n.\n\n  1) test decodes and selects the name field before normalization (ProfileTest)\n     test/profile_test.exs:4\n     Assertion with == failed\n     code:  assert Profile.from_query(\"name=%20ALICE%20&city=Paris\") == \"alice\"\n     left:  \"paris\"\n     right: \"alice\"\n     stacktrace:\n       test/profile_test.exs:5: (test)\n\n\nFinished in 0.02 seconds (0.02s on load, 0.00s async, 0.00s sync)\n\nResult: 1/2 passed\nFailed: 1 test\n"
+  },
+  {
+    "case_id": "change-10",
+    "probe": "no_uri_decode",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/profile.ex",
+      "-r",
+      "test/normalize_test.exs",
+      "-r",
+      "test/profile_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 457646, max_cases: 20\n\n.\n\n  1) test decodes and selects the name field before normalization (ProfileTest)\n     test/profile_test.exs:4\n     Assertion with == failed\n     code:  assert Profile.from_query(\"name=%20ALICE%20&city=Paris\") == \"alice\"\n     left:  \"%20alice%20\"\n     right: \"alice\"\n     stacktrace:\n       test/profile_test.exs:5: (test)\n\n\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1/2 passed\nFailed: 1 test\n"
+  },
+  {
+    "case_id": "change-17",
+    "probe": "baseline",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/refund.ex",
+      "-r",
+      "test/refund_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 812999, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-17",
+    "probe": "third_amount_new_test",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/refund.ex",
+      "-r",
+      "test/refund_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 182530, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-17",
+    "probe": "third_amount_old_test",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/refund.ex",
+      "-r",
+      "test/refund_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 551600, max_cases: 20\n\n\n\n  1) test refunds half the paid amount (RefundTest)\n     test/refund_test.exs:4\n     Assertion with == failed\n     code:  assert Refund.amount(200) == 100\n     left:  66\n     right: 100\n     stacktrace:\n       test/refund_test.exs:5: (test)\n\n\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 0/1 passed\nFailed: 1 test\n"
+  },
+  {
+    "case_id": "change-13",
+    "probe": "baseline",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/ledger.ex",
+      "-r",
+      "lib/app.ex",
+      "-r",
+      "test/ledger_test.exs",
+      "-r",
+      "test/state_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 926325, max_cases: 20\n\n..\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 2 passed\n"
+  },
+  {
+    "case_id": "change-13",
+    "probe": "equivalent_total_storage",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/ledger.ex",
+      "-r",
+      "lib/app.ex",
+      "-r",
+      "test/ledger_test.exs",
+      "-r",
+      "test/state_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 285071, max_cases: 20\n\n.\n\n  1) test ledger tracks each new entry (StateTest)\n     test/state_test.exs:4\n     Assertion with == failed\n     code:  assert Ledger.__test_state__(pid) == %{entries: [3]}\n     left:  3\n     right: %{entries: [3]}\n     stacktrace:\n       test/state_test.exs:7: (test)\n\n\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1/2 passed\nFailed: 1 test\n"
+  },
+  {
+    "case_id": "change-13",
+    "probe": "record_noop",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/ledger.ex",
+      "-r",
+      "lib/app.ex",
+      "-r",
+      "test/ledger_test.exs",
+      "-r",
+      "test/state_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 644054, max_cases: 20\n\n\n\n  1) test records charges in the total (LedgerTest)\n     test/ledger_test.exs:4\n     Assertion with == failed\n     code:  assert App.add_charge(pid, 3) == 3\n     left:  0\n     right: 3\n     stacktrace:\n       test/ledger_test.exs:6: (test)\n\n\n\n  2) test ledger tracks each new entry (StateTest)\n     test/state_test.exs:4\n     Assertion with == failed\n     code:  assert Ledger.__test_state__(pid) == %{entries: [3]}\n     left:  %{entries: []}\n     right: %{entries: [3]}\n     stacktrace:\n       test/state_test.exs:7: (test)\n\n\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 0/2 passed\nFailed: 2 tests\n"
+  },
+  {
+    "case_id": "change-03",
+    "probe": "baseline",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/accounts.ex",
+      "-r",
+      "test/accounts_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 999207, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-03",
+    "probe": "save_noop_existing_fixture",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/accounts.ex",
+      "-r",
+      "test/accounts_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 345480, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-03",
+    "probe": "empty_fixture",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/accounts.ex",
+      "-r",
+      "test/accounts_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 688482, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-03",
+    "probe": "empty_fixture_save_noop",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/accounts.ex",
+      "-r",
+      "test/accounts_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 28510, max_cases: 20\n\n\n\n  1) test creates an account that does not yet exist (AccountsTest)\n     test/accounts_test.exs:4\n     Assertion with == failed\n     code:  assert Accounts.get(store, 42) == row\n     left:  nil\n     right: %{id: 42, name: \"Ada\"}\n     stacktrace:\n       test/accounts_test.exs:8: (test)\n\n\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 0/1 passed\nFailed: 1 test\n"
+  },
+  {
+    "case_id": "change-21",
+    "probe": "baseline",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/documents.ex",
+      "-r",
+      "test/documents_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 1,
+    "output": "    error: module SharedAuthorizationCases is not loaded and could not be found\n    \u2502\n  4 \u2502   use SharedAuthorizationCases, operation: &Documents.delete/3\n    \u2502   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    \u2502\n    \u2514\u2500 test/documents_test.exs:4: DocumentsTest (module)\n\n** (CompileError) test/documents_test.exs: cannot compile module DocumentsTest (errors have been logged)\n    (elixir 1.20.2) expanding macro: Kernel.use/2\n    test/documents_test.exs:4: DocumentsTest (module)\n"
+  },
+  {
+    "case_id": "change-21",
+    "probe": "old_test_baseline",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/documents.ex",
+      "-r",
+      "test/documents_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 718943, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-22",
+    "probe": "inspection_only",
+    "output": "No tests supplied; inspected arithmetic-only diff, module contract, and local history for focused slop rules."
+  },
+  {
+    "case_id": "change-07",
+    "probe": "baseline",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/documents.ex",
+      "-r",
+      "test/documents_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 55862, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-07",
+    "probe": "authorization_bypassed_missing_id",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/documents.ex",
+      "-r",
+      "test/documents_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 401467, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n    warning: variable \"row\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n    \u2502\n  7 \u2502         {:ok, row} ->\n    \u2502               ~\n    \u2502\n    \u2514\u2500 lib/documents.ex:7:15: Documents.delete/3\n\n    warning: variable \"user\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n    \u2502\n  3 \u2502   def delete(store, id, user) do\n    \u2502                         ~~~~\n    \u2502\n    \u2514\u2500 lib/documents.ex:3:25: Documents.delete/3\n\n"
+  },
+  {
+    "case_id": "change-07",
+    "probe": "existing_id",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/documents.ex",
+      "-r",
+      "test/documents_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 752295, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-07",
+    "probe": "existing_id_authorization_bypassed",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/documents.ex",
+      "-r",
+      "test/documents_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 99108, max_cases: 20\n\n\n\n  1) test bob cannot delete alice's document (DocumentsTest)\n     test/documents_test.exs:4\n     Assertion with == failed\n     code:  assert Documents.delete(store, 1, :bob) == {:error, :unauthorized}\n     left:  :ok\n     right: {:error, :unauthorized}\n     stacktrace:\n       test/documents_test.exs:6: (test)\n\n\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 0/1 passed\nFailed: 1 test\n    warning: variable \"row\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n    \u2502\n  7 \u2502         {:ok, row} ->\n    \u2502               ~\n    \u2502\n    \u2514\u2500 lib/documents.ex:7:15: Documents.delete/3\n\n    warning: variable \"user\" is unused (if the variable is not meant to be used, prefix it with an underscore)\n    \u2502\n  3 \u2502   def delete(store, id, user) do\n    \u2502                         ~~~~\n    \u2502\n    \u2514\u2500 lib/documents.ex:3:25: Documents.delete/3\n\n"
+  },
+  {
+    "case_id": "change-01",
+    "probe": "baseline",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/accounts.ex",
+      "-r",
+      "test/accounts_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 439741, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-01",
+    "probe": "save_noop_declaration_test",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/accounts.ex",
+      "-r",
+      "test/accounts_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 776765, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-01",
+    "probe": "behavioral_test",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/accounts.ex",
+      "-r",
+      "test/accounts_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 124435, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-01",
+    "probe": "save_noop_behavioral_test",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/accounts.ex",
+      "-r",
+      "test/accounts_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 485885, max_cases: 20\n\n\n\n  1) test persists a new account (AccountsTest)\n     test/accounts_test.exs:4\n     Assertion with == failed\n     code:  assert Accounts.get(store, 42) == row\n     left:  nil\n     right: %{id: 42, name: \"Ada\"}\n     stacktrace:\n       test/accounts_test.exs:8: (test)\n\n\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 0/1 passed\nFailed: 1 test\n"
+  },
+  {
+    "case_id": "change-04",
+    "probe": "baseline",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/presenter.ex",
+      "-r",
+      "test/presenter_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 848526, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-04",
+    "probe": "wrong_denial_message",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/presenter.ex",
+      "-r",
+      "test/presenter_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 200192, max_cases: 20\n\n\n\n  1) test shows a gateway rejection (PresenterTest)\n     test/presenter_test.exs:4\n     Assertion with == failed\n     code:  assert Presenter.submit(gateway, :request) == \"Access denied\"\n     left:  \"Sent\"\n     right: \"Access denied\"\n     stacktrace:\n       test/presenter_test.exs:6: (test)\n\n\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 0/1 passed\nFailed: 1 test\n"
+  },
+  {
+    "case_id": "change-09",
+    "probe": "baseline",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/profile.ex",
+      "-r",
+      "test/normalize_test.exs",
+      "-r",
+      "test/profile_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 565475, max_cases: 20\n\n..\nFinished in 0.02 seconds (0.02s on load, 0.00s async, 0.00s sync)\n\nResult: 2 passed\n"
+  },
+  {
+    "case_id": "change-09",
+    "probe": "omit_trim",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/profile.ex",
+      "-r",
+      "test/normalize_test.exs",
+      "-r",
+      "test/profile_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 913215, max_cases: 20\n\n\n\n  1) test normalizes profile names (ProfileTest)\n     test/profile_test.exs:4\n     Assertion with == failed\n     code:  assert Profile.name(input) == expected\n     left:  \" alice \"\n     right: \"alice\"\n     stacktrace:\n       test/profile_test.exs:6: anonymous fn/2 in ProfileTest.\"test normalizes profile names\"/1\n       (elixir 1.20.2) lib/enum.ex:2622: Enum.\"-reduce/3-lists^foldl/2-0-\"/3\n       test/profile_test.exs:5: (test)\n\n\n\n  2) test normalizes names (NormalizeTest)\n     test/normalize_test.exs:4\n     Assertion with == failed\n     code:  assert Normalize.name(input) == expected\n     left:  \" alice \"\n     right: \"alice\"\n     stacktrace:\n       test/normalize_test.exs:6: anonymous fn/2 in NormalizeTest.\"test normalizes names\"/1\n       (elixir 1.20.2) lib/enum.ex:2622: Enum.\"-reduce/3-lists^foldl/2-0-\"/3\n       test/normalize_test.exs:5: (test)\n\n\nFinished in 0.02 seconds (0.02s on load, 0.00s async, 0.00s sync)\n\nResult: 0/2 passed\nFailed: 2 tests\n"
+  },
+  {
+    "case_id": "change-09",
+    "probe": "broken_public_wrapper",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/profile.ex",
+      "-r",
+      "test/normalize_test.exs",
+      "-r",
+      "test/profile_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 281280, max_cases: 20\n\n.\n\n  1) test normalizes profile names (ProfileTest)\n     test/profile_test.exs:4\n     Assertion with == failed\n     code:  assert Profile.name(input) == expected\n     left:  \" ALICE \"\n     right: \"alice\"\n     stacktrace:\n       test/profile_test.exs:6: anonymous fn/2 in ProfileTest.\"test normalizes profile names\"/1\n       (elixir 1.20.2) lib/enum.ex:2622: Enum.\"-reduce/3-lists^foldl/2-0-\"/3\n       test/profile_test.exs:5: (test)\n\n\nFinished in 0.02 seconds (0.02s on load, 0.00s async, 0.00s sync)\n\nResult: 1/2 passed\nFailed: 1 test\n"
+  },
+  {
+    "case_id": "change-13",
+    "probe": "equivalent_renamed_entries",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/ledger.ex",
+      "-r",
+      "lib/app.ex",
+      "-r",
+      "test/ledger_test.exs",
+      "-r",
+      "test/state_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 372413, max_cases: 20\n\n.\n\n  1) test ledger tracks each new entry (StateTest)\n     test/state_test.exs:4\n     Assertion with == failed\n     code:  assert Ledger.__test_state__(pid) == %{entries: [3]}\n     left:  %{charges: [3]}\n     right: %{entries: [3]}\n     stacktrace:\n       test/state_test.exs:7: (test)\n\n\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1/2 passed\nFailed: 1 test\n"
+  },
+  {
+    "case_id": "change-13",
+    "probe": "retained_test_without_export",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/ledger.ex",
+      "-r",
+      "lib/app.ex",
+      "-r",
+      "test/ledger_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 730583, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-13",
+    "probe": "retained_test_record_noop",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/ledger.ex",
+      "-r",
+      "lib/app.ex",
+      "-r",
+      "test/ledger_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 88772, max_cases: 20\n\n\n\n  1) test records charges in the total (LedgerTest)\n     test/ledger_test.exs:4\n     Assertion with == failed\n     code:  assert App.add_charge(pid, 3) == 3\n     left:  0\n     right: 3\n     stacktrace:\n       test/ledger_test.exs:6: (test)\n\n\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 0/1 passed\nFailed: 1 test\n"
+  },
+  {
+    "case_id": "change-09",
+    "probe": "retained_test_only",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/profile.ex",
+      "-r",
+      "test/profile_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 0,
+    "output": "Running ExUnit with seed: 454021, max_cases: 20\n\n.\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 1 passed\n"
+  },
+  {
+    "case_id": "change-09",
+    "probe": "retained_test_omit_trim",
+    "command": [
+      "elixir",
+      "-r",
+      "lib/profile.ex",
+      "-r",
+      "test/profile_test.exs",
+      "-e",
+      ""
+    ],
+    "exit_code": 2,
+    "output": "Running ExUnit with seed: 805003, max_cases: 20\n\n\n\n  1) test normalizes profile names (ProfileTest)\n     test/profile_test.exs:4\n     Assertion with == failed\n     code:  assert Profile.name(input) == expected\n     left:  \" alice \"\n     right: \"alice\"\n     stacktrace:\n       test/profile_test.exs:6: anonymous fn/2 in ProfileTest.\"test normalizes profile names\"/1\n       (elixir 1.20.2) lib/enum.ex:2622: Enum.\"-reduce/3-lists^foldl/2-0-\"/3\n       test/profile_test.exs:5: (test)\n\n\nFinished in 0.01 seconds (0.01s on load, 0.00s async, 0.00s sync)\n\nResult: 0/1 passed\nFailed: 1 test\n"
+  }
+]

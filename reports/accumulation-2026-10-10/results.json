@@ -1,0 +1,268 @@
+[
+  {
+    "case_id": "change-02",
+    "status": "no_finding",
+    "findings": [],
+    "missing_context": [],
+    "tests_run": [
+      "Inspection: capabilities/0 is expressly a public discovery contract. test/persistence_test.exs:4 independently verifies the write; capability and persistence mutations fail their respective tests.",
+      "scratch/change-02/baseline: elixir -r lib/accounts.ex -r test/capability_test.exs -r test/persistence_test.exs -e ''; exit 0; 2 passed.",
+      "scratch/change-02/save_noop: elixir -r lib/accounts.ex -r test/capability_test.exs -r test/persistence_test.exs -e ''; exit 2; 1/2 passed; failed test save stores a new account (PersistenceTest).",
+      "scratch/change-02/capability_false: elixir -r lib/accounts.ex -r test/capability_test.exs -r test/persistence_test.exs -e ''; exit 2; 1/2 passed; failed test advertises the public persistence capability (CapabilityTest)."
+    ],
+    "scope": [
+      "lib/accounts.ex",
+      "test/capability_test.exs",
+      "test/persistence_test.exs"
+    ]
+  },
+  {
+    "case_id": "change-18",
+    "status": "no_finding",
+    "findings": [],
+    "missing_context": [],
+    "tests_run": [
+      "Inspection: storage is explicitly private. The removed assertion checks the old representation; the remaining public-count test passes for both storage implementations and rejects a no-op add.",
+      "scratch/change-18/baseline: elixir -r lib/counter.ex -r test/counter_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-18/old_storage_new_tests: elixir -r lib/counter.ex -r test/counter_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-18/add_noop: elixir -r lib/counter.ex -r test/counter_test.exs -e ''; exit 2; 0/1 passed; failed test adds to the public count (CounterTest)."
+    ],
+    "scope": [
+      "lib/counter.ex",
+      "test/counter_test.exs"
+    ]
+  },
+  {
+    "case_id": "change-10",
+    "status": "no_finding",
+    "findings": [],
+    "missing_context": [],
+    "tests_run": [
+      "Inspection: the added test protects URI decoding and name-field selection, which the existing NormalizeTest cannot observe. Both boundary-specific controls fail only the added test.",
+      "scratch/change-10/baseline: elixir -r lib/profile.ex -r test/normalize_test.exs -r test/profile_test.exs -e ''; exit 0; 2 passed.",
+      "scratch/change-10/wrong_query_field: elixir -r lib/profile.ex -r test/normalize_test.exs -r test/profile_test.exs -e ''; exit 2; 1/2 passed; failed test decodes and selects the name field before normalization (ProfileTest).",
+      "scratch/change-10/no_uri_decode: elixir -r lib/profile.ex -r test/normalize_test.exs -r test/profile_test.exs -e ''; exit 2; 1/2 passed; failed test decodes and selects the name field before normalization (ProfileTest)."
+    ],
+    "scope": [
+      "lib/profile.ex",
+      "test/normalize_test.exs",
+      "test/profile_test.exs"
+    ]
+  },
+  {
+    "case_id": "change-17",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Keep the exact refund amount assertion",
+        "kind": "test_gap",
+        "rule": "verification_weakening",
+        "path": "test/refund_test.exs",
+        "line": 5,
+        "evidence": "The diff replaces the only exact amount assertion with is_integer/1 while lib/refund.ex still requires exactly half the original amount. A scratch mutation from div(original, 2) to div(original, 3) returns 66 for 200: the new test passes, but the HEAD test fails against the same mutation. The test now accepts an incorrect refund amount without an independent requirement change or retained amount check.",
+        "correction": "Restore the independent expected amount assertion, Refund.amount(200) == 100. Preserve the half-amount contract rather than merely checking its result type.",
+        "verification": "execution"
+      }
+    ],
+    "missing_context": [],
+    "tests_run": [
+      "scratch/change-17/baseline: elixir -r lib/refund.ex -r test/refund_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-17/third_amount_new_test: elixir -r lib/refund.ex -r test/refund_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-17/third_amount_old_test: elixir -r lib/refund.ex -r test/refund_test.exs -e ''; exit 2; 0/1 passed; failed test refunds half the paid amount (RefundTest)."
+    ],
+    "scope": [
+      "lib/refund.ex",
+      "test/refund_test.exs"
+    ]
+  },
+  {
+    "case_id": "change-13",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Remove the state export that exists only to enforce a private layout",
+        "kind": "maintenance",
+        "rule": "test_only_production_scaffolding",
+        "path": "lib/ledger.ex",
+        "line": 6,
+        "evidence": "The added __test_state__/1 export is used only by the new test/state_test.exs:7 assertion on %{entries: [3]}; the module explicitly makes representation private, and App uses only record/2 and total/1. Renaming the private entries field consistently to charges preserves the public operations and passes the existing LedgerTest, yet fails the new state assertion. The export therefore adds production API solely to couple a test to storage layout. The retained test \"records charges in the total\" at test/ledger_test.exs:4 exercises App.add_charge/2 through record/2 and total/1, checks both the first charge and accumulation, and fails when record/2 is a no-op.",
+        "correction": "Remove __test_state__/1 and its private-layout test. Retain test/ledger_test.exs:4 in the test selection; it passes without the export and independently rejects a missing record effect. No replacement state getter is needed.",
+        "verification": "execution"
+      }
+    ],
+    "missing_context": [
+      "No project runner or CI selection is supplied; preservation was verified by directly loading the named retained ExUnit test. Keep that test included in any external test selection."
+    ],
+    "tests_run": [
+      "scratch/change-13/baseline: elixir -r lib/ledger.ex -r lib/app.ex -r test/ledger_test.exs -r test/state_test.exs -e ''; exit 0; 2 passed.",
+      "scratch/change-13/equivalent_total_storage: elixir -r lib/ledger.ex -r lib/app.ex -r test/ledger_test.exs -r test/state_test.exs -e ''; exit 2; 1/2 passed; failed test ledger tracks each new entry (StateTest).",
+      "scratch/change-13/record_noop: elixir -r lib/ledger.ex -r lib/app.ex -r test/ledger_test.exs -r test/state_test.exs -e ''; exit 2; 0/2 passed; failed test records charges in the total (LedgerTest), test ledger tracks each new entry (StateTest).",
+      "scratch/change-13/equivalent_renamed_entries: elixir -r lib/ledger.ex -r lib/app.ex -r test/ledger_test.exs -r test/state_test.exs -e ''; exit 2; 1/2 passed; failed test ledger tracks each new entry (StateTest).",
+      "scratch/change-13/retained_test_without_export: elixir -r lib/ledger.ex -r lib/app.ex -r test/ledger_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-13/retained_test_record_noop: elixir -r lib/ledger.ex -r lib/app.ex -r test/ledger_test.exs -e ''; exit 2; 0/1 passed; failed test records charges in the total (LedgerTest)."
+    ],
+    "scope": [
+      "lib/app.ex",
+      "lib/ledger.ex",
+      "test/ledger_test.exs",
+      "test/state_test.exs"
+    ]
+  },
+  {
+    "case_id": "change-03",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Start the persistence fixture without the expected account",
+        "kind": "test_gap",
+        "rule": "mock_defined_behavior",
+        "path": "test/accounts_test.exs",
+        "line": 6,
+        "evidence": "The test claims to create a previously absent account, but its Agent fixture already contains exactly the row asserted after Accounts.save/2. Replacing save/2 with a no-op returning :ok leaves the new test green, because setup supplies the entire asserted persistence result. Starting the store empty passes with the real save and fails with the same no-op, showing that the current fixture manufactures the proof.",
+        "correction": "Initialize the Agent with an empty map (and optionally assert the ID is absent), then call save/2 and assert that get/2 returns the row. Keep the persistence contract and repair its fixture.",
+        "verification": "execution"
+      }
+    ],
+    "missing_context": [],
+    "tests_run": [
+      "scratch/change-03/baseline: elixir -r lib/accounts.ex -r test/accounts_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-03/save_noop_existing_fixture: elixir -r lib/accounts.ex -r test/accounts_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-03/empty_fixture: elixir -r lib/accounts.ex -r test/accounts_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-03/empty_fixture_save_noop: elixir -r lib/accounts.ex -r test/accounts_test.exs -e ''; exit 2; 0/1 passed; failed test creates an account that does not yet exist (AccountsTest)."
+    ],
+    "scope": [
+      "lib/accounts.ex",
+      "test/accounts_test.exs"
+    ]
+  },
+  {
+    "case_id": "change-21",
+    "status": "insufficient_context",
+    "findings": [],
+    "missing_context": [
+      "SharedAuthorizationCases.__using__/1 and the generated tests, including fixtures, assertions, and whether they bypass or exercise the ownership guard.",
+      "The loading and test-selection setup for SharedAuthorizationCases; direct execution fails because the module is absent, so equivalent retained coverage cannot be verified."
+    ],
+    "tests_run": [
+      "Inspection: the entire supplied repository and local history contain no SharedAuthorizationCases implementation or test-loading configuration. The replacement coverage cannot be judged from the use declaration.",
+      "scratch/change-21/baseline: elixir -r lib/documents.ex -r test/documents_test.exs -e ''; exit 1; could not compile: SharedAuthorizationCases is not loaded and could not be found.",
+      "scratch/change-21/old_test_baseline: elixir -r lib/documents.ex -r test/documents_test.exs -e ''; exit 0; 1 passed."
+    ],
+    "scope": [
+      "lib/documents.ex",
+      "test/documents_test.exs"
+    ]
+  },
+  {
+    "case_id": "change-22",
+    "status": "no_finding",
+    "findings": [],
+    "missing_context": [],
+    "tests_run": [
+      "Inspection only: the sole diff changes a multiplication factor. It introduces none of the focused slop patterns; general arithmetic correctness is outside this review. No tests were supplied or run."
+    ],
+    "scope": [
+      "lib/shipping_fee.ex"
+    ]
+  },
+  {
+    "case_id": "change-07",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Exercise the existing document in the ownership denial test",
+        "kind": "test_gap",
+        "rule": "unreachable_negative_control",
+        "path": "test/documents_test.exs",
+        "line": 6,
+        "evidence": "Setup creates Alice's document at ID 1, but the assertion deletes ID 2. Documents.delete/3 returns :not_found before evaluating ownership, and the broad {:error, _} match accepts that unrelated rejection. Replacing only the ownership guard with true leaves this test passing. Using ID 1 and asserting {:error, :unauthorized} passes against the original implementation and fails against the guard-bypass control.",
+        "correction": "Attempt deletion of the existing ID 1 as :bob, assert {:error, :unauthorized}, and assert that the stored document remains. Retain the negative authorization contract with valid prerequisites.",
+        "verification": "execution"
+      }
+    ],
+    "missing_context": [],
+    "tests_run": [
+      "scratch/change-07/baseline: elixir -r lib/documents.ex -r test/documents_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-07/authorization_bypassed_missing_id: elixir -r lib/documents.ex -r test/documents_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-07/existing_id: elixir -r lib/documents.ex -r test/documents_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-07/existing_id_authorization_bypassed: elixir -r lib/documents.ex -r test/documents_test.exs -e ''; exit 2; 0/1 passed; failed test bob cannot delete alice's document (DocumentsTest)."
+    ],
+    "scope": [
+      "lib/documents.ex",
+      "test/documents_test.exs"
+    ]
+  },
+  {
+    "case_id": "change-01",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Verify an actual write in the persistence test",
+        "kind": "test_gap",
+        "rule": "declaration_substituted_for_behavior",
+        "path": "test/accounts_test.exs",
+        "line": 5,
+        "evidence": "The test named \"persists a new account\" only checks Accounts.changeset/1.valid?, which is produced by an integer-ID check and never calls save/2 or examines a store. Replacing save/2 with a no-op leaves the test passing, so it supplies no evidence for the persistence contract. A scratch test starting an empty Agent, saving the row, and reading it back passes for the implementation and fails for that no-op.",
+        "correction": "Replace or supplement the validity assertion with an empty-store save/get assertion that independently verifies the account was written. A separate changeset validation test can remain if it is named for that narrower contract.",
+        "verification": "execution"
+      }
+    ],
+    "missing_context": [],
+    "tests_run": [
+      "scratch/change-01/baseline: elixir -r lib/accounts.ex -r test/accounts_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-01/save_noop_declaration_test: elixir -r lib/accounts.ex -r test/accounts_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-01/behavioral_test: elixir -r lib/accounts.ex -r test/accounts_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-01/save_noop_behavioral_test: elixir -r lib/accounts.ex -r test/accounts_test.exs -e ''; exit 2; 0/1 passed; failed test persists a new account (AccountsTest)."
+    ],
+    "scope": [
+      "lib/accounts.ex",
+      "test/accounts_test.exs"
+    ]
+  },
+  {
+    "case_id": "change-04",
+    "status": "no_finding",
+    "findings": [],
+    "missing_context": [],
+    "tests_run": [
+      "Inspection: the gateway owns authorization and the presenter owns the denial message. The mock supplies a legitimate dependency result; mutating the presenter mapping makes the new test fail.",
+      "scratch/change-04/baseline: elixir -r lib/presenter.ex -r test/presenter_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-04/wrong_denial_message: elixir -r lib/presenter.ex -r test/presenter_test.exs -e ''; exit 2; 0/1 passed; failed test shows a gateway rejection (PresenterTest)."
+    ],
+    "scope": [
+      "lib/presenter.ex",
+      "test/presenter_test.exs"
+    ]
+  },
+  {
+    "case_id": "change-09",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Consolidate the copied normalization matrix into the public contract test",
+        "kind": "maintenance",
+        "rule": "redundant_test_expansion",
+        "path": "test/normalize_test.exs",
+        "line": 5,
+        "evidence": "The added NormalizeTest repeats exactly the input/expected matrix already in \"normalizes profile names\" at test/profile_test.exs:4. The existing test calls the public Profile.name/1, which directly calls the application-private Normalize.name/1 with no additional setup or mocks. Omitting String.trim/1 fails both tests; breaking only Profile.name/1 fails the retained public test while the new private test still passes. The new suite has no separate public API, serialization, wiring, or lifecycle contract and duplicates maintenance of the same examples. The retained test passes when loaded alone and still fails the trim-removal control.",
+        "correction": "Remove the added duplicate test/normalize_test.exs and keep test/profile_test.exs:4 in the test selection. Preserve the public name policy and its independently specified values; add a case only when it protects a distinct behavior.",
+        "verification": "execution"
+      }
+    ],
+    "missing_context": [
+      "No project runner or CI selection is supplied; preservation was verified by directly loading the named retained ExUnit test. Keep that test included in any external test selection."
+    ],
+    "tests_run": [
+      "scratch/change-09/baseline: elixir -r lib/profile.ex -r test/normalize_test.exs -r test/profile_test.exs -e ''; exit 0; 2 passed.",
+      "scratch/change-09/omit_trim: elixir -r lib/profile.ex -r test/normalize_test.exs -r test/profile_test.exs -e ''; exit 2; 0/2 passed; failed test normalizes profile names (ProfileTest), test normalizes names (NormalizeTest).",
+      "scratch/change-09/broken_public_wrapper: elixir -r lib/profile.ex -r test/normalize_test.exs -r test/profile_test.exs -e ''; exit 2; 1/2 passed; failed test normalizes profile names (ProfileTest).",
+      "scratch/change-09/retained_test_only: elixir -r lib/profile.ex -r test/profile_test.exs -e ''; exit 0; 1 passed.",
+      "scratch/change-09/retained_test_omit_trim: elixir -r lib/profile.ex -r test/profile_test.exs -e ''; exit 2; 0/1 passed; failed test normalizes profile names (ProfileTest)."
+    ],
+    "scope": [
+      "lib/profile.ex",
+      "test/normalize_test.exs",
+      "test/profile_test.exs"
+    ]
+  }
+]

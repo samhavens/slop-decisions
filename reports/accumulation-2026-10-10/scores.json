@@ -1,0 +1,28 @@
+{
+  "label_matches": 12,
+  "total": 12,
+  "reviews": 12,
+  "missing_cases": [],
+  "confusion": {
+    "finding": {
+      "finding": 6,
+      "no_finding": 0,
+      "insufficient_context": 0,
+      "missing": 0
+    },
+    "no_finding": {
+      "finding": 0,
+      "no_finding": 5,
+      "insufficient_context": 0,
+      "missing": 0
+    },
+    "insufficient_context": {
+      "finding": 0,
+      "no_finding": 0,
+      "insufficient_context": 1,
+      "missing": 0
+    }
+  },
+  "disagreements": [],
+  "evidence_audit": "Required: these counts score status, not finding validity."
+}

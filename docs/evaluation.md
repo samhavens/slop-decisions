@@ -102,7 +102,9 @@ chunk-reader stubs. They establish the narrow behavior under test, not the
 correctness of entire upstream applications. The Boundary preference and setup
 deduplication remain candidate judgments; the intentional delay is source-reviewed.
 
-The default review now focuses on agent-accumulated slop. Older results describe
-their recorded rule sets, not accuracy of the current default. The
+The default review now focuses on agent-accumulated slop. Its
+[pilot results](../reports/accumulation-2026-10-10/README.md) include a separate
+evidence and preservation audit. Older results describe their recorded rule sets,
+not accuracy of the current default. The
 [accumulation fixtures](../evals/accumulation/README.md) test manufactured evidence,
 coverage preservation and the narrower scope.

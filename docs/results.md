@@ -1,7 +1,11 @@
-# Choose a model
+# Historical API measurements
 
-The default, OpenAI Responses, gives a written reason for each result.
-It scored higher than Decisions and the tested local model on the public-source evaluation.
+These measurements compare OpenAI Responses, Decisions and a small local model
+on the original public-source set. They do not measure the current 13-rule default.
+For the focused Codex skill, see its [pilot results](../reports/accumulation-2026-10-10/README.md).
+
+OpenAI Responses gives a written reason for each result. It scored higher than
+Decisions and the tested local model on this set.
 
 ```sh
 slop-decisions check lib/orders.ex
