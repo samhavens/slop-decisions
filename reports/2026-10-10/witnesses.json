@@ -1,0 +1,90 @@
+{
+  "elixir": "Erlang/OTP 29 [erts-17.0.3] [source] [64-bit] [smp:10:10] [ds:10:10:10] [async-threads:1] [jit] [dtrace]\n\nElixir 1.20.2 (compiled with Erlang/OTP 29)",
+  "results": [
+    {
+      "witness": "ex_slop_identity_semantics",
+      "tests": 4,
+      "observed_test_failures": 0,
+      "expected_test_failures": 0,
+      "verified": true
+    },
+    {
+      "witness": "tesla_private_before_baseline",
+      "tests": 21,
+      "observed_test_failures": 0,
+      "expected_test_failures": 0,
+      "verified": true
+    },
+    {
+      "witness": "tesla_private_before_mutant",
+      "tests": 21,
+      "observed_test_failures": 0,
+      "expected_test_failures": 0,
+      "verified": true
+    },
+    {
+      "witness": "tesla_cookie_before_baseline",
+      "tests": 16,
+      "observed_test_failures": 0,
+      "expected_test_failures": 0,
+      "verified": true
+    },
+    {
+      "witness": "tesla_cookie_before_mutant",
+      "tests": 16,
+      "observed_test_failures": 0,
+      "expected_test_failures": 0,
+      "verified": true
+    },
+    {
+      "witness": "tesla_private_after_baseline",
+      "tests": 21,
+      "observed_test_failures": 0,
+      "expected_test_failures": 0,
+      "verified": true
+    },
+    {
+      "witness": "tesla_private_after_mutant",
+      "tests": 21,
+      "observed_test_failures": 1,
+      "expected_test_failures": 1,
+      "verified": true
+    },
+    {
+      "witness": "tesla_cookie_after_baseline",
+      "tests": 17,
+      "observed_test_failures": 0,
+      "expected_test_failures": 0,
+      "verified": true
+    },
+    {
+      "witness": "tesla_cookie_after_mutant",
+      "tests": 17,
+      "observed_test_failures": 1,
+      "expected_test_failures": 1,
+      "verified": true
+    },
+    {
+      "witness": "tesla_stream_extracted_unit",
+      "tests": 3,
+      "observed_test_failures": 0,
+      "expected_test_failures": 0,
+      "verified": true
+    },
+    {
+      "witness": "logflare_egress_extracted_unit",
+      "tests": 1,
+      "observed_test_failures": 0,
+      "expected_test_failures": 0,
+      "verified": true
+    },
+    {
+      "witness": "bandit_accumulation_extracted_unit",
+      "tests": 2,
+      "observed_test_failures": 0,
+      "expected_test_failures": 0,
+      "verified": true
+    }
+  ],
+  "scope": "Tesla cookie/private full upstream test modules with controlled mutations; identity, stream, metrics, and accumulation extracted-unit witnesses. Boundary taste and setup duplication remain candidate judgments."
+}

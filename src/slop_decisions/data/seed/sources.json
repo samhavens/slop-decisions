@@ -1,0 +1,205 @@
+[
+  {
+    "repo": "elixir-tesla/tesla",
+    "revision": "e7ab2dc7a2e8bc28576d9585e46c7c3672ab635a",
+    "path": "lib/tesla/adapter/finch.ex",
+    "sha256": "afddb949f53bfe59628c8e254869befb7a732a6d8f254f0efaa4c141977ca86b",
+    "id": "s01"
+  },
+  {
+    "repo": "elixir-tesla/tesla",
+    "revision": "e7ab2dc7a2e8bc28576d9585e46c7c3672ab635a",
+    "path": "test/tesla/adapter/finch_test.exs",
+    "sha256": "9680140a852b3f6f7c7e5963c4f3d29a7f59d98ed70411f4e03d4ab5168beb7d",
+    "id": "s02"
+  },
+  {
+    "repo": "elixir-tesla/tesla",
+    "revision": "e7ab2dc7a2e8bc28576d9585e46c7c3672ab635a",
+    "path": "lib/tesla/error.ex",
+    "sha256": "f89cc8c712099b190b5addae9f91725fd85f1de6aa8412e833ac70ca1fbcf31c",
+    "id": "s03"
+  },
+  {
+    "repo": "elixir-tesla/tesla",
+    "revision": "9045218eac904b9781e51397e7610d1ac2696ae8",
+    "path": "lib/tesla/adapter/finch.ex",
+    "sha256": "1d5f42839bb3e8c60eb2bd0ffc8900354041bce7344dc5831ff2c1c91b6b5470",
+    "id": "s04"
+  },
+  {
+    "repo": "elixir-tesla/tesla",
+    "revision": "9045218eac904b9781e51397e7610d1ac2696ae8",
+    "path": "test/tesla/adapter/finch_test.exs",
+    "sha256": "a4c1a686800f6908e6f2b134fe6d5843141aebe18baf47728696edcfd4e410a1",
+    "id": "s05"
+  },
+  {
+    "repo": "elixir-tesla/tesla",
+    "revision": "9045218eac904b9781e51397e7610d1ac2696ae8",
+    "path": "lib/tesla/error.ex",
+    "sha256": "f89cc8c712099b190b5addae9f91725fd85f1de6aa8412e833ac70ca1fbcf31c",
+    "id": "s06"
+  },
+  {
+    "repo": "elixir-tesla/tesla",
+    "revision": "2f4b7f3608b3569cd12bc80216dba868926355d7",
+    "path": "test/tesla/open_api/cookie_params_test.exs",
+    "sha256": "fd5ca5465aa05cba054c233a3376f13c33551bf284743efaeb3673f075ece1c6",
+    "id": "s07"
+  },
+  {
+    "repo": "elixir-tesla/tesla",
+    "revision": "2f4b7f3608b3569cd12bc80216dba868926355d7",
+    "path": "test/tesla/open_api/path_template_test.exs",
+    "sha256": "47c870f74936ddd1b7283cd29a98ee6bacc1c8d93f4eaaf618e1c414c4952c8e",
+    "id": "s08"
+  },
+  {
+    "repo": "elixir-tesla/tesla",
+    "revision": "2f4b7f3608b3569cd12bc80216dba868926355d7",
+    "path": "lib/tesla/open_api/cookie_params.ex",
+    "sha256": "a27b7f34a143b9ec98201249b56a5f3b540d6e355d484eaf490642b042fd60fe",
+    "id": "s09"
+  },
+  {
+    "repo": "elixir-tesla/tesla",
+    "revision": "2f4b7f3608b3569cd12bc80216dba868926355d7",
+    "path": "lib/tesla/open_api/path_template.ex",
+    "sha256": "be79de34f79dfddc8cf71a7ae95c2968ab56ca6178c83df0ca583d8e27a37870",
+    "id": "s10"
+  },
+  {
+    "repo": "elixir-tesla/tesla",
+    "revision": "be1943321590014e61316194dd2d3d38e96a2d54",
+    "path": "test/tesla/open_api/cookie_params_test.exs",
+    "sha256": "2ad4b36c8fe4021ccfaab85285e0cda0e9ecfa29ad51dd8a64d9f20869d2021f",
+    "id": "s11"
+  },
+  {
+    "repo": "elixir-tesla/tesla",
+    "revision": "be1943321590014e61316194dd2d3d38e96a2d54",
+    "path": "test/tesla/open_api/path_template_test.exs",
+    "sha256": "fb773ba1e20a7a07b4dcdfad04d301b18cd8ce64e93412026474efc173b352f1",
+    "id": "s12"
+  },
+  {
+    "repo": "elixir-tesla/tesla",
+    "revision": "be1943321590014e61316194dd2d3d38e96a2d54",
+    "path": "lib/tesla/open_api/cookie_params.ex",
+    "sha256": "a27b7f34a143b9ec98201249b56a5f3b540d6e355d484eaf490642b042fd60fe",
+    "id": "s13"
+  },
+  {
+    "repo": "elixir-tesla/tesla",
+    "revision": "be1943321590014e61316194dd2d3d38e96a2d54",
+    "path": "lib/tesla/open_api/path_template.ex",
+    "sha256": "be79de34f79dfddc8cf71a7ae95c2968ab56ca6178c83df0ca583d8e27a37870",
+    "id": "s14"
+  },
+  {
+    "repo": "Logflare/logflare",
+    "revision": "de0a077560ecd2e000b9ce9be88338e51545f80b",
+    "path": "lib/logflare/backends/adaptor/syslog_adaptor/pipeline.ex",
+    "sha256": "d4341c2d10a1da8dca227fac1d12385fdbac216208aa12f439375589c9b96e6c",
+    "id": "s15"
+  },
+  {
+    "repo": "Logflare/logflare",
+    "revision": "de0a077560ecd2e000b9ce9be88338e51545f80b",
+    "path": "test/logflare/backends/adaptor/syslog_adaptor_test.exs",
+    "sha256": "aaaceebd09e2f703962c178a17a1ee3e5d8701bb8409209e3d2a0191d14aebde",
+    "id": "s16"
+  },
+  {
+    "repo": "Logflare/logflare",
+    "revision": "740bce56caadd3aed007043ac0558ef5fd24ba7b",
+    "path": "lib/logflare/backends/adaptor/syslog_adaptor/pipeline.ex",
+    "sha256": "97b6ad41291dc1af63126da5adab781966bfd7a6719b98f9ea1d2cee7462c19d",
+    "id": "s17"
+  },
+  {
+    "repo": "Logflare/logflare",
+    "revision": "740bce56caadd3aed007043ac0558ef5fd24ba7b",
+    "path": "test/logflare/backends/adaptor/syslog_adaptor_test.exs",
+    "sha256": "c31060efc88701581ded561f051f449462c823087aa373f1e477e18b910ab7c6",
+    "id": "s18"
+  },
+  {
+    "repo": "mtrudel/bandit",
+    "revision": "13d0143b1477ef16536e52fc9597c99dd6126617",
+    "path": "lib/bandit/http1/socket.ex",
+    "sha256": "8860f7d7f9b7aa9f59465f829cb7f74ce963f0899e82194472728a342bfcd781",
+    "id": "s19"
+  },
+  {
+    "repo": "mtrudel/bandit",
+    "revision": "7f401eb56d1a70dc53f70963ce2d5a359ee70ab7",
+    "path": "lib/bandit/http1/socket.ex",
+    "sha256": "c9c9168e818bc127264343dc0ed410b99e85d07fde35a3ecd3da9f00c551bd26",
+    "id": "s20"
+  },
+  {
+    "repo": "sasa1977/boundary",
+    "revision": "b05335d046f05e0eb2ff5461c20196fa2fee3987",
+    "path": "lib/boundary/checker.ex",
+    "sha256": "069cd55e871d069324609567625781bfbe5a093741f70b2e2f7fa6ba7d1fcddc",
+    "id": "s21"
+  },
+  {
+    "repo": "sasa1977/boundary",
+    "revision": "5a0b0047d109ab65ad34792583bdcf1687f9eecb",
+    "path": "lib/boundary/checker.ex",
+    "sha256": "6ee38765ae0801dfaf857d44b0001a46579588b8d06d7bf3f817a2ed0f20ab82",
+    "id": "s22"
+  },
+  {
+    "repo": "elixir-vibe/ex_slop",
+    "revision": "668da7552d967c78020831ec1fdd4b89c21ac561",
+    "path": "test/checks/refactor/identity_passthrough_test.exs",
+    "sha256": "952f9481da38d05b0a4030d17a1bb3d5f7338daa502faee6382b8e856c8f39a2",
+    "id": "s23"
+  },
+  {
+    "id": "s24",
+    "repo": "elixir-tesla/tesla",
+    "revision": "2f4b7f3608b3569cd12bc80216dba868926355d7",
+    "path": "lib/tesla/param.ex",
+    "sha256": "99af3a2f6d494f1f1d821997c6a34a46a80df05db737fd4f68837b1be3db01b7"
+  },
+  {
+    "id": "s25",
+    "repo": "elixir-tesla/tesla",
+    "revision": "2f4b7f3608b3569cd12bc80216dba868926355d7",
+    "path": "lib/tesla/open_api/cookie_param.ex",
+    "sha256": "a842b3fecdf8e81fb40038a5382ebe4d9660f4bebacab6c00bcb72080f6d0efc"
+  },
+  {
+    "id": "s26",
+    "repo": "elixir-tesla/tesla",
+    "revision": "be1943321590014e61316194dd2d3d38e96a2d54",
+    "path": "lib/tesla/param.ex",
+    "sha256": "99af3a2f6d494f1f1d821997c6a34a46a80df05db737fd4f68837b1be3db01b7"
+  },
+  {
+    "id": "s27",
+    "repo": "elixir-tesla/tesla",
+    "revision": "be1943321590014e61316194dd2d3d38e96a2d54",
+    "path": "lib/tesla/open_api/cookie_param.ex",
+    "sha256": "a842b3fecdf8e81fb40038a5382ebe4d9660f4bebacab6c00bcb72080f6d0efc"
+  },
+  {
+    "id": "s28",
+    "repo": "Logflare/logflare",
+    "revision": "de0a077560ecd2e000b9ce9be88338e51545f80b",
+    "path": "lib/logflare/backends/adaptor/syslog_adaptor/pool.ex",
+    "sha256": "7e2269df131189d99e99c565fcc296b5740eff8d7f072a8e171363069547bbc4"
+  },
+  {
+    "id": "s29",
+    "repo": "Logflare/logflare",
+    "revision": "740bce56caadd3aed007043ac0558ef5fd24ba7b",
+    "path": "lib/logflare/backends/adaptor/syslog_adaptor/pool.ex",
+    "sha256": "7e2269df131189d99e99c565fcc296b5740eff8d7f072a8e171363069547bbc4"
+  }
+]
