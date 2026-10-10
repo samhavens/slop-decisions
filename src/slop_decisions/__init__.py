@@ -1,3 +1,3 @@
-"""Semantic code checks with explicit uncertainty and reproducible evaluation."""
+"""Semantic review rules and reproducible model evaluations."""
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"

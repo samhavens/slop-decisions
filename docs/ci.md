@@ -1,77 +1,34 @@
-# Use in tests and CI
+# Use with tests and CI
 
-Run the checker after your normal tests. A nonzero exit code fails the step:
+Keep your normal tests and static checks as required CI steps. Use
+[the Codex skill](codex.md) to review changed code after those checks. Turn
+confirmed defects and test gaps into regression tests that CI can run without a
+model. A model review is not a test pass.
+
+In an existing Codex session:
+
+```text
+$slop-review Review changes against origin/main. Use the test results above and verify each finding.
+```
+
+To start a separate review from a script, install the skill, sign in to Codex,
+and run this from your project's Git root:
 
 ```sh
-mix test && slop-decisions check --changed origin/main --junit results/slop.xml
+codex exec --sandbox read-only \
+  --output-last-message slop-review.md \
+  '$slop-review Review changes against origin/main. Do not edit source files.'
 ```
 
-Use your test command in place of `mix test`. The checker uses OpenAI and all
-14 rules by default. [Choose local or OpenRouter](models.md) with the same flags
-used for a single file.
+Fetch the base branch before the review. The command starts a new Codex session
+and uses its model allowance. A zero exit code means the session finished;
+it does not mean the code passed review. Read or upload `slop-review.md` as a
+review artifact. Tests that need build output may not run in a read-only sandbox;
+the report must say which evidence is missing.
 
-## Select changes
+For a hosted runner, use the [Codex GitHub Action](https://developers.openai.com/codex/github-action/)
+with the same skill and prompt. See [Codex automation](https://developers.openai.com/codex/noninteractive/)
+for authentication and output options.
 
-`--changed REF` compares your current files with the common ancestor of `HEAD`
-and `REF`. It includes committed branch work, staged edits, unstaged edits,
-and new files that Git does not ignore. Use `--changed` without a ref for local
-changes since `HEAD`.
-
-Only `.ex` and `.exs` files are selected. Each selected file is checked in full,
-so a result can identify a defect outside the edited lines. Deleted and empty
-files are listed as skipped. A run with no files to check passes without a model
-request. Merge conflicts and missing history fail before any request.
-
-Run from the Git root, or set `--root`. Fetch the base branch first. In a shallow
-CI checkout, fetch the full history. Inspect the selected source without calls:
-
-```sh
-slop-decisions check --changed origin/main --dry-run --format json
-```
-
-Each file uses 14 checks by default. Use `--rule NAME` to select fewer rules,
-or `--max-checks COUNT` to change the default limit of 200 checks.
-Add `--related PATH` when a check needs a caller, helper, or contract.
-
-## Read test results
-
-`--junit PATH` writes one test case per file and rule. A warning is a failure.
-An unassessed check is an error. This includes missing context, provider errors,
-and invalid replies. The report does not turn an incomplete check into a pass.
-Invalid inputs return exit code 2 without a JUnit report.
-
-The command returns 0 for a pass, 3 for warnings, or 1 for unassessed checks.
-See [all exit codes](usage.md#read-results). These results depend on the model;
-read the [evaluation limits](results.md) before making this a required merge check.
-
-For GitHub Actions, copy [the workflow](../examples/github-actions.yml) to
-`.github/workflows/slop.yml`. Add `OPENAI_API_KEY` as a repository secret.
-The workflow checks pull requests from branches in your repository and uploads
-the JUnit file. It skips fork pull requests, which do not receive that secret.
-
-## Run through ExUnit
-
-Copy [slop_test.exs](../examples/slop_test.exs) to your project's `test/` directory.
-Keep model calls separate from routine test runs: add `exclude: [:slop]` to
-the existing `ExUnit.start` call in `test/test_helper.exs`.
-
-```elixir
-ExUnit.start(exclude: [:slop])
-```
-
-Include the check when needed:
-
-```sh
-SLOP_BASE=origin/main mix test --include slop
-```
-
-For a local model:
-
-```sh
-SLOP_BASE=origin/main SLOP_PROVIDER=local SLOP_MODEL=qwen3:8b \
-  mix test --include slop
-```
-
-`SLOP_BASE` defaults to `HEAD`. Use `SLOP_BASE_URL` for another model server.
-The example allows five minutes for the model checks; change its timeout if needed.
-See [ExUnit's test setup](https://hexdocs.pm/ex_unit/ExUnit.html) for test configuration.
+For explicit per-rule API experiments, including JUnit and ExUnit, use
+[the API test setup](api-ci.md). It supports local models, OpenAI, and OpenRouter.

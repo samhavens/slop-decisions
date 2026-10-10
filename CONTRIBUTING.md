@@ -19,6 +19,13 @@ For a new check, define one observable predicate, the evidence needed to assess
 it, a positive case, and a hard negative with similar syntax. Add an executable
 counterexample where possible. Do not infer whether a person used AI.
 
+The standalone Codex skill is in `skills/slop-review`. When you change
+`src/slop_decisions/data/rubrics.json`, copy it to the skill's
+`references/rules.json`. Tests check that both copies match and that the skill's
+references work outside this repository. Test review instructions on a small
+repository with known defects and valid lookalikes; do not give the reviewer the
+answer key. Check its evidence and missed cases, not just its wording.
+
 For a new case, add pinned source and spans to `data/seed/targets.jsonl`, and put
 labels, rationale, provenance, and grading witnesses in `labels.jsonl`. The
 package data lives under `src/slop_decisions/`. Keep every revision, neighboring

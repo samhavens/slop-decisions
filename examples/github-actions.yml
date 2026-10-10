@@ -1,12 +1,17 @@
-name: Code checks
-on: pull_request
+name: API check experiment
+on:
+  workflow_dispatch:
+    inputs:
+      base:
+        description: Git ref to compare with the selected branch
+        required: true
+        default: origin/main
+        type: string
 permissions:
   contents: read
 
 jobs:
   slop:
-    # Fork PRs do not receive the provider secret.
-    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -15,12 +20,12 @@ jobs:
       - uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff # v6
         with:
           python-version: '3.13'
-      - run: uv tool install git+https://github.com/samhavens/slop-decisions.git@v0.4.0
+      - run: uv tool install git+https://github.com/samhavens/slop-decisions.git@v0.5.0
       - name: Check changed Elixir files
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          BASE_BRANCH: ${{ github.base_ref }}
-        run: slop-decisions check --changed "origin/$BASE_BRANCH" --junit results/slop.xml
+          BASE_REF: ${{ inputs.base }}
+        run: slop-decisions check --changed "$BASE_REF" --junit results/slop.xml
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:

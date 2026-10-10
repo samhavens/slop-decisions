@@ -1,0 +1,114 @@
+[
+  {
+    "name": "success_shaped_failure",
+    "predicate": "Does a reachable failure path produce a return value, metric, event, or state that represents successful authoritative work?",
+    "required_context": "Target, failure contract, and relevant callers/callees or metric semantics.",
+    "positive": "A failed authoritative query becomes an empty successful result; successful-egress telemetry fires before a failed send.",
+    "negative": "A documented optional cache miss falls back to the authoritative source; metrics explicitly count attempted work.",
+    "severity": "warning"
+  },
+  {
+    "name": "invalid_state_accommodation",
+    "predicate": "Does internal code accommodate representations excluded by an established input contract?",
+    "required_context": "Normalization boundary, target, and internal input contract.",
+    "positive": "After normalization into a struct, private helpers independently accept nil, atom-key maps, and string-key maps.",
+    "negative": "A public compatibility adapter intentionally accepts several representations.",
+    "severity": "advisory"
+  },
+  {
+    "name": "test_claim_gap",
+    "predicate": "Can an obvious incorrect implementation of the behavior covered by this test or supplied suite pass all its assertions?",
+    "required_context": "Test/suite, implementation under test, fixtures and assertion helpers.",
+    "positive": "Cookie object-key tests use only keys requiring no encoding; removing key encoding survives. A missing-key branch has no distinguishing assertion.",
+    "negative": "A narrowly described smoke test; assertions delegated to helpers; a test uses discriminating boundary inputs.",
+    "severity": "warning"
+  },
+  {
+    "name": "semantic_duplicate",
+    "predicate": "Does the target independently reimplement a supplied existing domain operation without a meaningful contract difference?",
+    "required_context": "Both implementations and their consumers or contracts.",
+    "positive": "A test repeats the same server/user/backend setup already supplied by a canonical helper.",
+    "negative": "Similar operations enforce different policies or deliberately coexist during migration.",
+    "severity": "advisory"
+  },
+  {
+    "name": "process_without_runtime_reason",
+    "predicate": "Does a process merely organize code without needed state ownership, coordination, isolation, concurrency limits, or lifecycle?",
+    "required_context": "Whole process module, supervision/ownership and callers.",
+    "positive": "A GenServer serializes independent pure calculations solely for namespacing.",
+    "negative": "A coordinator owns resources and timers even if it also exposes a simple getter.",
+    "severity": "advisory"
+  },
+  {
+    "name": "policy_free_abstraction",
+    "predicate": "Does the target add indirection or configurability without a distinct contract, supported variation, or useful boundary?",
+    "required_context": "Layer, consumers, configuration and intended policy.",
+    "positive": "An internal option and several helpers only route to the same required export policy.",
+    "negative": "A stable public facade, external adapter, or useful test seam with one implementation.",
+    "severity": "advisory"
+  },
+  {
+    "name": "derived_state_drift",
+    "predicate": "Are two representations of the same fact independently maintained with a visible path that can make them disagree?",
+    "required_context": "Initialization and all relevant update paths.",
+    "positive": "A removal callback updates the collection but leaves its stored count unchanged.",
+    "negative": "A consistently updated body-length accumulator avoids repeatedly traversing accumulated data; a deliberate historical snapshot has different semantics.",
+    "severity": "warning"
+  },
+  {
+    "name": "disguised_state_machine",
+    "predicate": "Do independently stored booleans encode mutually constrained states of one domain concept with reachable meaningless combinations?",
+    "required_context": "State initialization and transition paths.",
+    "positive": "Loading, loaded and failed flags can simultaneously remain true for one operation.",
+    "negative": "Independent feature capabilities or flags with separate meanings.",
+    "severity": "advisory"
+  },
+  {
+    "name": "timing_instead_of_synchronization",
+    "predicate": "Does elapsed time stand in for observing completion or establishing required ordering?",
+    "required_context": "Sleep/timer, asynchronous operation, and test/lifecycle contract.",
+    "positive": "Sleep before checking a worker write and assume it has finished.",
+    "negative": "A delayed server deliberately triggers a receive-timeout test; actual debounce or expiry behavior is under test.",
+    "severity": "warning"
+  },
+  {
+    "name": "presentation_only_authorization",
+    "predicate": "Is a restriction confined to rendering/navigation while the corresponding server action lacks equivalent authorization?",
+    "required_context": "UI restriction, action/event handler, and authorization in called context functions.",
+    "positive": "Hide a delete button but accept arbitrary delete events without a server-side check.",
+    "negative": "The action calls an authorization-enforcing context or scoped lookup.",
+    "severity": "warning"
+  },
+  {
+    "name": "framework_reimplementation",
+    "predicate": "Does custom code duplicate an available project framework facility without materially different semantics?",
+    "required_context": "Custom code, installed dependency version, and supplied facility documentation.",
+    "positive": "A parallel casting and validation pipeline duplicates the supplied Ecto changeset contract.",
+    "negative": "The required semantics differ or the installed dependency lacks the feature.",
+    "severity": "advisory"
+  },
+  {
+    "name": "semantic_comment_noise",
+    "predicate": "Does an implementation comment only paraphrase obvious adjacent code, adding no rationale, invariant, warning, or constraint?",
+    "required_context": "Comment and adjacent implementation.",
+    "positive": "A comment repeats that fetch_users fetches users.",
+    "negative": "A comment explains why ordering matters, why a simpler implementation fails, or documents a public API.",
+    "severity": "advisory"
+  },
+  {
+    "name": "avoidable_repeated_traversal",
+    "predicate": "Does a loop repeatedly traverse growing accumulated data to recover information maintainable locally without changing behavior?",
+    "required_context": "Loop initialization, recursive transitions, length limits, and underlying traversal semantics.",
+    "positive": "Compute the length of the entire accumulated iodata at every received chunk.",
+    "negative": "Maintain a consistently updated length counter or compute a genuinely new value.",
+    "severity": "warning"
+  },
+  {
+    "name": "redundant_wrapper",
+    "predicate": "Can the marked wrapper be replaced by its input without changing any output, exception, or other observable behavior?",
+    "required_context": "Complete wrapper, patterns and exhaustive alternatives.",
+    "positive": "An exhaustive case returns every matched value unchanged including its catch-all.",
+    "negative": "A non-exhaustive identity case raises on unmatched input; map reconstruction drops extra keys; a result tuple is unwrapped.",
+    "severity": "advisory"
+  }
+]

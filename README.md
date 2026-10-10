@@ -1,48 +1,34 @@
 # slop-decisions
 
-Agents can write working code with patterns that make a project hard to understand and maintain over time.
-slop-decisions uses [Jev-style decision models](https://typesafe.ai/blog/introducing-system-one-models-and-jev)
-to check Elixir code for patterns that static checks such as [ex_slop](https://github.com/elixir-vibe/ex_slop) cannot judge.
+Agents can write working code that becomes hard to understand and maintain.
+slop-decisions gives Codex 14 rules to review behavior and context that static
+checks such as [ex_slop](https://github.com/elixir-vibe/ex_slop) cannot judge.
 
 **We recommend using both.**
 
 ## Use it
 
-Install with [uv](https://docs.astral.sh/uv/getting-started/installation/) and Python 3.11 or later.
-Set `OPENAI_API_KEY` in your environment, then run:
+In Codex, ask:
 
-```sh
-uv tool install git+https://github.com/samhavens/slop-decisions.git
-slop-decisions check lib/orders.ex
+```text
+Use $skill-installer to install https://github.com/samhavens/slop-decisions/tree/main/skills/slop-review
 ```
 
-This runs **all 14 rules** with OpenAI `gpt-6-luna` through the Responses API, with a reason for each result.
-Review the results before you change code. See the [model comparison](docs/results.md).
+Then, in your code project:
 
-Use a local model with [Ollama running](docs/models.md#local-models):
-
-```sh
-ollama pull qwen3:8b
-slop-decisions check lib/orders.ex --provider local --model qwen3:8b
+```text
+$slop-review Review my changes against origin/main.
 ```
 
-Restrict the rules with `--rule`. Repeat it to select more than one:
+Codex reviews all 14 rules in the current session. It reads related code and tests,
+then gives findings with evidence. There are no separate checker API calls;
+normal Codex usage still applies.
 
-```sh
-slop-decisions check lib/orders.ex \
-  --rule success_shaped_failure --rule derived_state_drift
-```
+[Install and select rules](docs/codex.md) · [Use with tests and CI](docs/ci.md)
 
-Check changed files in tests or CI:
-
-```sh
-slop-decisions check --changed origin/main --junit results/slop.xml
-```
-
-This checks current `.ex` and `.exs` files changed since the common ancestor with `origin/main`.
-Omit `origin/main` to check local changes since `HEAD`.
-See [CI and ExUnit setup](docs/ci.md), [OpenRouter and other servers](docs/models.md),
-or [file, line, and context options](docs/usage.md).
+The experimental API checker and eval suite support **OpenAI, OpenRouter, and
+local models**. See [API setup](docs/usage.md), [model options](docs/models.md),
+and [evaluation limits](docs/results.md). Model scores are not a reliable merge gate.
 
 ## Patterns
 

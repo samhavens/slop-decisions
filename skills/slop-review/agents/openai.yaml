@@ -1,0 +1,4 @@
+interface:
+  display_name: "Slop review"
+  short_description: "Review Elixir changes with evidence and counterexamples"
+  default_prompt: "Use $slop-review to review my changes against origin/main."

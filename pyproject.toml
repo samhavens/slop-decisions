@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "slop-decisions"
-version = "0.4.0"
-description = "Evidence-grounded semantic code checks and reproducible Elixir evaluations"
+version = "0.5.0"
+description = "Elixir review rules for Codex and experimental model evaluations"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"

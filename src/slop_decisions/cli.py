@@ -118,7 +118,7 @@ def model_policy(args, bank):
 
 
 def parser():
-    root = Parser(description="Named semantic code checks and pinned-source evaluations.")
+    root = Parser(description="Experimental API code checks and pinned-source evaluations.")
     root.add_argument("--version", action="version", version=__version__)
     common(root, default="toon")
     commands = root.add_subparsers(dest="command", parser_class=Parser)
@@ -127,7 +127,7 @@ def parser():
     p.add_argument("--full", action="store_true", help="Include all rubric fields")
     p = commands.add_parser(
         "check",
-        help="Check files or Git changes; defaults to all rules with OpenAI",
+        help="Run experimental API checks; defaults to all rules with OpenAI",
         epilog="Examples: slop-decisions check lib/a.ex; "
         "slop-decisions check --changed origin/main --junit results/slop.xml; "
         "slop-decisions check lib/a.ex --provider local --model qwen3:8b "
@@ -287,7 +287,8 @@ def run(args):
         sources, targets, labels = load_dataset()
         return {
             "bin": str(Path(sys.argv[0]).resolve()).replace(str(Path.home()), "~"),
-            "description": "Check semantic code defects with local or hosted models.",
+            "description": "Review rules for Codex and experimental local or hosted API checks.",
+            "codex_skill": "https://github.com/samhavens/slop-decisions/tree/main/skills/slop-review",
             "checks": len(load_rubrics()),
             "development_targets": len(targets),
             "help": ["slop-decisions checks", "slop-decisions fetch", "slop-decisions eval --help"],

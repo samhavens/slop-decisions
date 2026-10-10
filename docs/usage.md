@@ -1,6 +1,30 @@
-# Use the checker
+# Use the experimental API checker
 
-Set `OPENAI_API_KEY` or [select another provider](models.md).
+For a review in your existing session, use [the Codex skill](codex.md).
+The API checker makes one model request per file and rule. Its scores are
+experimental; review findings before changing code or blocking a merge.
+
+Install with [uv](https://docs.astral.sh/uv/getting-started/installation/) and Python 3.11 or later:
+
+```sh
+uv tool install git+https://github.com/samhavens/slop-decisions.git
+```
+
+Set `OPENAI_API_KEY` in your environment, then check a file:
+
+```sh
+slop-decisions check lib/orders.ex
+```
+
+This uses all 14 rules with OpenAI `gpt-6-luna` through the Responses API.
+For [a local model](models.md#local-models), start Ollama, then run:
+
+```sh
+ollama pull qwen3:8b
+slop-decisions check lib/orders.ex --provider local --model qwen3:8b
+```
+
+[Select OpenRouter or another server](models.md) with the same command.
 Run commands from the root of your code repository.
 Replace the paths below with your own files.
 
@@ -51,14 +75,15 @@ Each file uses one check per selected rule. A plan above the limit fails before 
 `--max-chars` limits the source size; the default is 100,000 characters per input.
 The checker rejects excess source instead of removing part of it.
 
-Use `--changed` to select changed Elixir files. See [tests and CI](ci.md) for
+Use `--changed` to select changed Elixir files. See [API tests and CI](api-ci.md) for
 Git comparison rules, JUnit reports, and an ExUnit example.
 
 ## Read results
 
 An `assessed` result includes the model's estimate of the defect probability.
 A probability at or above `--threshold` produces a warning. The fallback is 0.8.
-This value is experimental. [Validate a profile](calibration.md) before using it as a required CI check.
+This value is experimental. [Calibration](calibration.md) can measure a threshold
+on a labeled dataset; it does not establish reliability on a new project.
 `threshold_policy` shows where each threshold came from. Use `--calibration FILE`
 to apply a passing profile, or supply explicit threshold values.
 
