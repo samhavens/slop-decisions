@@ -1,0 +1,164 @@
+{
+  "started_at": "2026-10-10T21:39:03.595589+00:00",
+  "source_commit": "5840b7935705ff684bee3b80b8622a7797aff85e",
+  "prior_commit": "e90b610cdc5e1bff2119eefe7aad3fb4dc4ae261",
+  "trials_per_arm": 1,
+  "case_order": [
+    {
+      "case_id": "change-02",
+      "repository": "cases/change-02",
+      "base": "8427907bcd10e7e5e23f9807afe0caa25444168b"
+    },
+    {
+      "case_id": "change-10",
+      "repository": "cases/change-10",
+      "base": "09ef68b4b88ed4e732a623c5f26302646a98f90f"
+    },
+    {
+      "case_id": "change-07",
+      "repository": "cases/change-07",
+      "base": "d39605ce3b9a6429520d8d32844877515369ab3a"
+    },
+    {
+      "case_id": "change-09",
+      "repository": "cases/change-09",
+      "base": "09ef68b4b88ed4e732a623c5f26302646a98f90f"
+    },
+    {
+      "case_id": "change-08",
+      "repository": "cases/change-08",
+      "base": "d39605ce3b9a6429520d8d32844877515369ab3a"
+    },
+    {
+      "case_id": "change-03",
+      "repository": "cases/change-03",
+      "base": "92d39093d96ebb85d32c6beeccff0f82d01a914c"
+    },
+    {
+      "case_id": "change-11",
+      "repository": "cases/change-11",
+      "base": "16b5a61e7fa380052c1589870388244e47a26aa0"
+    },
+    {
+      "case_id": "change-12",
+      "repository": "cases/change-12",
+      "base": "c1e7f6d88024d1e63f7ae113b5cd7bc8a5bdb2fe"
+    },
+    {
+      "case_id": "change-05",
+      "repository": "cases/change-05",
+      "base": "adfd3a5938c710f313cb862c6aba0c84704e8c7a"
+    },
+    {
+      "case_id": "change-01",
+      "repository": "cases/change-01",
+      "base": "b2a3dbb0c922faeb32bee1d8e48452cf9cd251d5"
+    },
+    {
+      "case_id": "change-04",
+      "repository": "cases/change-04",
+      "base": "76a112446f41b655445316bdb9d04f2bd79853f2"
+    },
+    {
+      "case_id": "change-06",
+      "repository": "cases/change-06",
+      "base": "8d819ceaf0f33a345514a25ff08e18b352b54852"
+    }
+  ],
+  "input_hashes": {
+    "evals/discovery/cases.json": "7885bcb831e8ec40da74e454cda238b4284156e154eb93b468615dbc15341faf",
+    "evals/discovery/inputs/change-08/source.json": "8fda25fecc8b86ec33e7de9119eee558d9c677bbc147354426084743926722e6",
+    "evals/discovery/inputs/change-01/source.json": "8a7fb32c0507bd8b9f0e31c3f3d8a2a958d9e74d246062e0662389e18924e4e4",
+    "evals/discovery/inputs/change-06/source.json": "9ba5f9356285118eb190fee9cf1de0f8591454aa815e204d11f4c13746547c08",
+    "evals/discovery/inputs/change-07/source.json": "7d5fe4f71465c9f39022e0e682d689fa587a20516014084a08e5647fd6c047e6",
+    "evals/discovery/inputs/change-09/source.json": "a72524085e52346236b65e6e8dc8c0f19d816b5d060c18b0d10608ef26082e27",
+    "evals/discovery/inputs/change-13/source.json": "cd5bb74c85ffc81293765d4ea71f42b77fc3960d6c518cf23ed8b26b69a43a17",
+    "evals/discovery/inputs/change-14/source.json": "11970e78ddf7097788e651615eed8c432229cd5ff57ce0f11fd8e86f339fece1",
+    "evals/discovery/inputs/change-15/source.json": "dfca9be5b991d460d45ed4dbe5195f09bd9a689d9992221744c438b50bb999f1",
+    "evals/discovery/inputs/change-12/source.json": "ea3da3027b0efe2d2381409bd255c185568cc6919ddd6fd77d31b9940667ce7b",
+    "evals/discovery/inputs/change-05/source.json": "0785fbd44e7e761ba90de82970a62c13b1d93f26fc1a3f3941e2a956ddee75cf",
+    "evals/discovery/inputs/change-02/source.json": "130ff0f74585b2b8f667a430f3b47ec87d387ffe783465eca0f6ddb7f3157eb0",
+    "evals/discovery/inputs/change-03/source.json": "325d48d576b5c70a7f319d4a346e1038a86afa7e8597c4a543a947dbbe1a37e1",
+    "evals/discovery/inputs/change-04/source.json": "df5be181f13d7eeb4c5a67a233b4731a49fc86da1f4a6dd862d4d715ea5740ed",
+    "evals/discovery/inputs/change-17/source.json": "afc0255fa63798027cb4f6bacaa6e183c32a65b9ac8834872cc5e118b32e746a",
+    "evals/discovery/inputs/change-10/source.json": "9f09ef240a4352bba2cb149f1b3521de2c05b50562112a0f0753629bdb1b1c08",
+    "evals/discovery/inputs/change-19/source.json": "8d2198fc6218b45db22e412b8ce301fa0558b2d50f3bc666a43cb0d1de8086fb",
+    "evals/discovery/inputs/change-21/source.json": "fdc7baf487bfcef1f43b90233653048b84fea180b60abf2fd05be9d4f1a1eea8",
+    "evals/discovery/inputs/change-20/source.json": "7e4253ac481d146a1d9bde55a00d8d298e25d6d75a6168e3ef4f500f3dbc8249",
+    "evals/discovery/inputs/change-18/source.json": "c8ab19ac1e2e200581df25238f1d64834ee4b6fae24e925403c0e490597aa0eb",
+    "evals/discovery/inputs/change-11/source.json": "7bf72e94ab583acda34861ce6eaafdabac05ec864869a3d0953c527f0edc86e3",
+    "evals/discovery/inputs/change-16/source.json": "2ccc5bdcb4c160b7f553d44946648e23d177ffa87b3c45a6fea4a89a054400a0",
+    "skills/slop-review/LICENSE": "754e4c4017eb3435e00ca886c2b2b6c72eaf8d85bdc238754f48e4c76ca903c8",
+    "skills/slop-review/SKILL.md": "1bd74006e40ea1630757359b995a7f67de38cc381786917ba108231e1d4707b7",
+    "skills/slop-review/references/abstractions.md": "98eac7eda7bcb67fd6aacb6f2c25bee2a8cbd31b0a7c3aa14e6c30100eeb6a53",
+    "skills/slop-review/references/test-contracts.md": "03ff0b209a2336a5773f5f00c34310a6c2e2eef2d41933015b9cb2f1fe313028",
+    "skills/slop-review/references/investigation.md": "c030c8651a906c3e298b0173794ddb3203030edff9ab3185852099d33c27407f",
+    "skills/slop-review/references/phoenix.md": "e569e1cbf4796b5f801ab086d8b2c34ee0f3b270b7bdbbd3f52b2dd6542926c9",
+    "skills/slop-review/references/rules.json": "979a8ae6ea45c3830b511ac15063df00ec195d470d349f3f375c8194767feeb5",
+    "skills/slop-review/references/otp.md": "41e90910ad94913be745497399f4f9a19d80e1f91b371c2202964dd8d0e55079",
+    "skills/slop-review/references/consistency.md": "3b30ab5b44a481b67ccd92fce1703288fe24ce876ef88e44982c3c1279f38ec6",
+    "skills/slop-review/agents/openai.yaml": "789a62d0c60628badefda4a3b50aff27569c4db0a44d17ae4e51873e3a5b2d60"
+  },
+  "model": "gpt-6-astra",
+  "reasoning_effort": "max",
+  "context": "Fresh independent reviewer per arm; twelve cases share that reviewer context.",
+  "provider_api_calls": 0,
+  "usage_scope": "Reviewer sessions only; excludes fixture development, scoring, and release work.",
+  "token_accounting": "Cumulative runtime input/output counts. Cached input is a subset of input; reasoning output is a subset of output. Counts are not unique prompt lengths or an API bill.",
+  "arms": {
+    "plain": {
+      "skill": "plain",
+      "started_at": 1791668355,
+      "completed_at": 1791668635,
+      "duration_ms": 280321,
+      "usage": {
+        "input_tokens": 1581145,
+        "cached_input_tokens": 1551872,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 12209,
+        "reasoning_output_tokens": 2842,
+        "total_tokens": 1593354
+      },
+      "uncached_input_tokens": 29273,
+      "results": "plain-results.json",
+      "results_sha256": "d702c9c9c0aaf68235ca4c0b47e4ba5e9387c9bf42dd36284c28891561488583",
+      "inputs_unchanged": true
+    },
+    "previous": {
+      "skill": "v0.6.0",
+      "started_at": 1791668359,
+      "completed_at": 1791668663,
+      "duration_ms": 304512,
+      "usage": {
+        "input_tokens": 1455143,
+        "cached_input_tokens": 1422464,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 12675,
+        "reasoning_output_tokens": 3797,
+        "total_tokens": 1467818
+      },
+      "uncached_input_tokens": 32679,
+      "results": "previous-results.json",
+      "results_sha256": "b4789ae558f08816e8a235a8799da322418ec1bd7a2f2b6c5e65e242cf28e69a",
+      "inputs_unchanged": true
+    },
+    "upgraded": {
+      "skill": "v0.7.0",
+      "started_at": 1791668363,
+      "completed_at": 1791668677,
+      "duration_ms": 314350,
+      "usage": {
+        "input_tokens": 1392861,
+        "cached_input_tokens": 1348992,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 14828,
+        "reasoning_output_tokens": 3911,
+        "total_tokens": 1407689
+      },
+      "uncached_input_tokens": 43869,
+      "results": "upgraded-results.json",
+      "results_sha256": "cf02bb98649c6ca1c684c6043f51fd13f128cd01fa9b3e299e46140b71fbb46a",
+      "inputs_unchanged": true
+    }
+  }
+}

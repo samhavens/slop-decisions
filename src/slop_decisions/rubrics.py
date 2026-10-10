@@ -59,7 +59,11 @@ def instructions(rubric: dict, variant: str = "examples") -> str:
         f"Predicate: {rubric['predicate']}\nRequired context: {rubric['required_context']}"
     )
     if "investigation" in rubric:
-        text += f"\nInvestigation: {rubric['investigation']}"
+        text += (
+            "\nApply the investigation to the supplied evidence only. You cannot run tools "
+            "or retrieve more context. Do not claim to have executed a test or probe."
+            f"\nInvestigation: {rubric['investigation']}"
+        )
     if variant == "examples":
         text += f"\nPositive: {rubric['positive']}\nHard negative: {rubric['negative']}"
     return text

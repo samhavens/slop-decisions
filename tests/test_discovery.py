@@ -361,3 +361,29 @@ def test_nested_retry_budget_counts_attempts_including_first(tmp_path):
         """,
             )
         )
+
+
+def test_discovery_score_keeps_missing_reviews_separate_from_clean_results():
+    gold = [
+        {"case_id": "a", "expected": "finding"},
+        {"case_id": "b", "expected": "no_finding"},
+        {"case_id": "c", "expected": "insufficient_context"},
+    ]
+    rows = [
+        {"case_id": "a", "status": "finding", "findings": [{"evidence": "counterexample"}]},
+        {"case_id": "c", "status": "insufficient_context", "findings": []},
+    ]
+    report = HARNESS["score_reviews"](gold, rows)
+    assert report["label_matches"] == 2
+    assert report["total"] == 3
+    assert report["missing_cases"] == ["b"]
+    assert report["confusion"]["no_finding"]["missing"] == 1
+    for bad in [
+        rows + rows[:1],
+        rows + [{"case_id": "unknown", "status": "no_finding"}],
+        [{"case_id": "a", "status": "typo"}],
+        [{"case_id": "a", "status": "finding", "findings": []}],
+        [{"case_id": "b", "status": "no_finding", "findings": [{"evidence": "x"}]}],
+    ]:
+        with pytest.raises(ValueError):
+            HARNESS["score_reviews"](gold, bad)

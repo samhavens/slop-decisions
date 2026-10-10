@@ -25,7 +25,7 @@ then gives findings with evidence. There are no separate checker API calls;
 normal Codex usage still applies.
 
 [Install and select rules](docs/codex.md) · [Use with tests and CI](docs/ci.md) ·
-[Review results](reports/skill-2026-10-10/README.md)
+[Review results](reports/discovery-2026-10-10/README.md)
 
 The experimental API checker and eval suite support **OpenAI, OpenRouter, and
 local models**. See [API setup](docs/usage.md), [model options](docs/models.md),
@@ -54,7 +54,6 @@ Each rule asks about behavior and context. Matching syntax alone is not enough.
 | UI state sent through the server<br>`client_state_round_trip` | Opening a static help modal waits for an event that only changes visibility. |
 | State lost after reconnect<br>`liveview_reconnect_state_loss` | A wizard keeps earlier answers only in assigns and cannot restore them after remount. |
 | Database reads repeated per record<br>`per_record_database_read` | A helper calls `Repo.preload` for each post instead of loading the association for the list. |
-
 | Shared code that mixes separate policies<br>`false_unification` | Trial signup passes flags to skip billing steps in a shared completion function. |
 | Tests tied to private implementation<br>`test_implementation_coupling` | A counter test fails after a private state change that preserves all public behavior. |
 | Private process details spread across callers<br>`scattered_process_interface` | Several modules update an Agent's private map fields. |

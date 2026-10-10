@@ -24,6 +24,13 @@ Use the same model, effort, tools, task order and budget. Do not include rule na
 in the task. Let the reviewer read related files, local history and run local
 probes. Keep inputs fixed and preserve raw `results.json` files.
 
+Compute the declared-outcome counts without another model call:
+
+```sh
+uv run python scripts/skill_eval.py --results /tmp/review-current/results.json --format json
+```
+
+Missing reviews stay missing. The command does not judge the evidence.
 Grade each finding against the cause and evidence in `cases.json`. A matching
 rule name is insufficient; another name for the same supported cause is valid.
 Record missed causes, unsupported extra findings, and missing-context responses

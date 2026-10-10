@@ -11,7 +11,7 @@ mix test && slop-decisions check --changed origin/main --junit results/slop.xml
 ```
 
 Use your test command in place of `mix test`. The checker uses OpenAI and all
-17 rules by default. [Choose local or OpenRouter](models.md) with the same flags
+26 rules by default. [Choose local or OpenRouter](models.md) with the same flags
 used for a single file.
 
 ## Select changes

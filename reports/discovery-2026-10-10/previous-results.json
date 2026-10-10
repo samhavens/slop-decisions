@@ -1,0 +1,231 @@
+[
+  {
+    "case_id": "change-02",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Retain the existing public CSV and TSV entry points",
+        "kind": "api_hazard",
+        "rule": null,
+        "path": "lib/export.ex",
+        "line": 3,
+        "evidence": "The diff removes the public csv/1 and tsv/1 functions and only adds encode/2. Existing calls Export.csv([1, 2]) and Export.tsv([1, 2]) now raise UndefinedFunctionError instead of returning encoded text; this was reproduced with the current module. The supplied repository contains no migration or compatibility contract permitting removal.",
+        "correction": "Keep csv/1 and tsv/1 as public compatibility functions delegating to encode/2, or supply and validate an explicitly breaking migration for every consumer.",
+        "verification": "execution"
+      }
+    ],
+    "missing_context": [
+      "No callers, compatibility policy, or API migration documentation are supplied, so downstream usage and whether a breaking release was intended cannot be established."
+    ],
+    "tests_run": [
+      "Elixir probe: encode/2 returns comma-separated and tab-separated text; calls to the prior csv/1 and tsv/1 exports both raise UndefinedFunctionError."
+    ],
+    "scope": [
+      "lib/export.ex"
+    ]
+  },
+  {
+    "case_id": "change-10",
+    "status": "no_finding",
+    "findings": [],
+    "missing_context": [],
+    "tests_run": [
+      "Elixir probe: timeout retry with one stable operation_id returns success and stores exactly one shipment; replay deduplicates and a conflicting order preserves the key_conflict error."
+    ],
+    "scope": [
+      "lib/ship_order.ex",
+      "lib/shipping.ex"
+    ]
+  },
+  {
+    "case_id": "change-07",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Keep the capacity check and decrement in one atomic operation",
+        "kind": "defect",
+        "rule": null,
+        "path": "lib/slots.ex",
+        "line": 6,
+        "evidence": "reserve/1 now reads capacity and decrements it in separate Agent calls. With capacity 1, two concurrent requests can both read 1, both return :ok, and leave capacity -1, violating the module's explicit concurrent-reservation limit. A probe queued both reads while the Agent was suspended, then resumed it, and reproduced [:ok, :ok] with -1 remaining.",
+        "correction": "Restore a single Agent.get_and_update/2 that checks the count and decrements it atomically; add a concurrent capacity-one regression test.",
+        "verification": "execution"
+      }
+    ],
+    "missing_context": [],
+    "tests_run": [
+      "Deterministic Elixir concurrency probe: suspend a capacity-one Agent, queue both reservation reads, resume, and observe two successful reservations and remaining capacity -1."
+    ],
+    "scope": [
+      "lib/slots.ex"
+    ]
+  },
+  {
+    "case_id": "change-09",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Reuse the durable operation ID when retrying a timed-out shipment",
+        "kind": "defect",
+        "rule": null,
+        "path": "lib/ship_order.ex",
+        "line": 5,
+        "evidence": "The supplied Shipping.create/3 commits a new key before returning {:error, :timeout}; only reuse of that key deduplicates the operation. Retrying with make_ref() submits the same order under another key. An ordinary first call to run/2 stored two shipments for one order and still returned {:error, :timeout}.",
+        "correction": "Pass order.operation_id on the retry, preserving the same order payload, and assert that a lost initial reply followed by retry stores exactly one shipment.",
+        "verification": "execution"
+      }
+    ],
+    "missing_context": [],
+    "tests_run": [
+      "Elixir probe using the supplied Shipping Agent: one run/2 call returned {:error, :timeout} and stored two identical orders under distinct keys."
+    ],
+    "scope": [
+      "lib/ship_order.ex",
+      "lib/shipping.ex"
+    ]
+  },
+  {
+    "case_id": "change-08",
+    "status": "no_finding",
+    "findings": [],
+    "missing_context": [],
+    "tests_run": [
+      "Deterministic Elixir concurrency probe: queue two availability checks against a suspended capacity-one pool, resume, and verify exactly one :ok, one :full, and zero remaining capacity; further reservation returns :full."
+    ],
+    "scope": [
+      "lib/booking.ex",
+      "lib/slots.ex"
+    ]
+  },
+  {
+    "case_id": "change-03",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Assert the counter's public behavior instead of its private Agent state",
+        "kind": "maintenance",
+        "rule": null,
+        "path": "test/counter_test.exs",
+        "line": 9,
+        "evidence": "The module explicitly defines only start_link/0, add/2, and value/1 as public behavior, and the preceding assertion already verifies the claimed value change. The new :sys.get_state/1 equality additionally freezes the private map representation. In an isolated copy, changing only storage from %{value: n} to n preserved public start/add/value behavior but made the unchanged test fail exclusively on this new assertion.",
+        "correction": "Remove the private-state assertion and retain the public value/1 assertion; add further public-operation sequences only for behavior that needs coverage.",
+        "verification": "execution"
+      }
+    ],
+    "missing_context": [],
+    "tests_run": [
+      "Original counter test: 1 passed.",
+      "Isolated integer-state Counter probe preserved start_link/0, add/2, and value/1 across zero, positive, and negative values.",
+      "Unchanged counter test against the isolated equivalent representation: failed only at the new :sys.get_state/1 assertion."
+    ],
+    "scope": [
+      "lib/counter.ex",
+      "test/counter_test.exs"
+    ]
+  },
+  {
+    "case_id": "change-11",
+    "status": "insufficient_context",
+    "findings": [],
+    "missing_context": [
+      "The adapter implementation and send_order/2 contract are absent. A timeout may mean no delivery or successful delivery with a lost reply; it is unknown whether repeated order.id values deduplicate atomically and for the required duration.",
+      "No callers, retry policy, or tests establish whether retrying delivery on timeout is permitted."
+    ],
+    "tests_run": [],
+    "scope": [
+      "lib/delivery.ex"
+    ]
+  },
+  {
+    "case_id": "change-12",
+    "status": "insufficient_context",
+    "findings": [],
+    "missing_context": [
+      "Database schema and migrations are absent, so the required unique index/constraint for accounts.email and its name cannot be verified. unsafe_validate_unique/3 alone cannot establish concurrent uniqueness; unique_constraint/2 is correct only with the corresponding database enforcement.",
+      "App.Repo, the Ecto dependency/version, and runnable test configuration are absent; no supplied stand-in allows exercising the insert or concurrent-registration contract."
+    ],
+    "tests_run": [],
+    "scope": [
+      "lib/account.ex",
+      "lib/registration.ex"
+    ]
+  },
+  {
+    "case_id": "change-05",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Keep Worklist state access inside its owning module",
+        "kind": "maintenance",
+        "rule": null,
+        "path": "lib/dashboard.ex",
+        "line": 2,
+        "evidence": "Worklist explicitly declares its state private, but the new Dashboard.pending_count/1 and Export.pending_ids/1 both call Agent.get/2 and assume a %{pending: list} representation; Export also knows that the list is stored in reverse insertion order. Changing the queue representation while preserving start_link/add/take now requires synchronized changes in both unrelated consumers or their reads fail/return the wrong order. This is concrete representation coupling introduced by the new files, not a current count mismatch.",
+        "correction": "Expose pending_count/1 and pending_ids/1 (with explicit ordering) from Worklist and have Dashboard and Export call those public operations so storage knowledge stays with the owner.",
+        "verification": "inspection"
+      }
+    ],
+    "missing_context": [],
+    "tests_run": [
+      "Elixir observer probe passed for empty queue, two additions, and one take; confirmed current counts and insertion-order exported IDs."
+    ],
+    "scope": [
+      "lib/worklist.ex",
+      "lib/dashboard.ex",
+      "lib/export.ex"
+    ]
+  },
+  {
+    "case_id": "change-01",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Keep invoice completion and trial activation as separate domain operations",
+        "kind": "maintenance",
+        "rule": "policy_free_abstraction",
+        "path": "lib/completion.ex",
+        "line": 2,
+        "evidence": "The only two consumers always pass opposite fixed triples of flags: Billing requires an invoice with tax and payment, while Trials requires a duration with no payment. Completion.run/2 combines their different input/output contracts, tests the trial flag twice, and exposes independent include_tax/collect switches with no supplied caller needing those variations. Understanding or changing either small policy now requires tracing a generic options layer and guarding the unrelated domain's branches; the original separate map constructors express the complete supported behavior directly. The actual callers still produce correct results.",
+        "correction": "Restore the small domain-specific implementations in Billing.complete/1 and Trials.activate/1, or extract only a genuinely shared operation once one exists.",
+        "verification": "inspection"
+      }
+    ],
+    "missing_context": [],
+    "tests_run": [
+      "Elixir probe: taxed invoice, zero-value invoice, and unpaid trial all match the documented current caller behavior."
+    ],
+    "scope": [
+      "lib/policies.ex",
+      "lib/completion.ex"
+    ]
+  },
+  {
+    "case_id": "change-04",
+    "status": "no_finding",
+    "findings": [],
+    "missing_context": [],
+    "tests_run": [
+      "Original checkout test: 1 passed.",
+      "Unchanged test in an isolated copy with pay/2 mutated to call the synchronous gateway twice: failed at refute_received, demonstrating that the new assertion detects a duplicate charge."
+    ],
+    "scope": [
+      "lib/checkout.ex",
+      "test/checkout_test.exs"
+    ]
+  },
+  {
+    "case_id": "change-06",
+    "status": "no_finding",
+    "findings": [],
+    "missing_context": [],
+    "tests_run": [
+      "Supplied protocol test: 1 passed, covering atom and tuple v1 request forms.",
+      "Elixir probe: new Dashboard.status/1 returns the documented {:ready, 4} snapshot; retained tuple v1 request returns the same result."
+    ],
+    "scope": [
+      "lib/dashboard.ex",
+      "lib/status_server.ex",
+      "test/protocol_test.exs"
+    ]
+  }
+]

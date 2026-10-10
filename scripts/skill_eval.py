@@ -1,4 +1,4 @@
-"""Prepare isolated Git diffs for a blind review; no model calls are made."""
+"""Prepare blind Git reviews or score their results; no model calls are made."""
 
 import argparse
 import json
@@ -113,6 +113,45 @@ def prepare(destination, skill=None, all_cases=False):
     return {"directory": str(destination), "cases": len(tasks), "request": "request.txt"}
 
 
+def score_reviews(cases, predictions):
+    """Score declared outcomes. A separate source audit must grade finding evidence."""
+    statuses = ("finding", "no_finding", "insufficient_context")
+    gold = {case["case_id"]: case["expected"] for case in cases}
+    if not isinstance(predictions, list):
+        raise ValueError("results must be an array of review objects")
+    by_id = {}
+    for row in predictions:
+        if not isinstance(row, dict):
+            raise ValueError("each result must be a review object")
+        case_id = row.get("case_id")
+        if not isinstance(case_id, str) or case_id not in gold or case_id in by_id:
+            raise ValueError("duplicate or unknown case_id in results")
+        if row.get("status") not in statuses or not isinstance(row.get("findings"), list):
+            raise ValueError("each review needs a valid status and findings array")
+        if (row["status"] == "finding") != bool(row["findings"]):
+            raise ValueError("finding status must agree with a nonempty findings array")
+        by_id[case_id] = row
+    confusion = {expected: dict.fromkeys((*statuses, "missing"), 0) for expected in statuses}
+    matches, missing, disagreements = 0, [], []
+    for case_id, expected in gold.items():
+        actual = by_id[case_id]["status"] if case_id in by_id else "missing"
+        confusion[expected][actual] += 1
+        matches += expected == actual
+        if actual == "missing":
+            missing.append(case_id)
+        if actual != expected:
+            disagreements.append({"case_id": case_id, "expected": expected, "actual": actual})
+    return {
+        "label_matches": matches,
+        "total": len(gold),
+        "reviews": len(by_id),
+        "missing_cases": missing,
+        "confusion": confusion,
+        "disagreements": disagreements,
+        "evidence_audit": "Required: these counts score status, not finding validity.",
+    }
+
+
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__,
@@ -123,19 +162,27 @@ def main():
         ),
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument(
+    operation = parser.add_mutually_exclusive_group()
+    operation.add_argument(
         "--destination", type=Path, help="new arm directory; omitted lists case counts"
+    )
+    operation.add_argument(
+        "--results", type=Path, help="score a saved results.json; audit evidence separately"
     )
     parser.add_argument(
         "--skill", type=Path, help="standalone skill directory; omitted means plain review"
     )
     parser.add_argument(
-        "--all", action="store_true", help="prepare all 21 cases instead of the 12-case pilot"
+        "--all", action="store_true", help="use all 21 cases instead of the 12-case pilot"
     )
     parser.add_argument("--format", choices=["toon", "json"], default="toon")
     args = parser.parse_args()
     try:
-        if args.destination:
+        if args.results:
+            cases = json.loads((SUITE / "cases.json").read_text())
+            cases = [case for case in cases if args.all or case["pilot"]]
+            result = score_reviews(cases, json.loads(args.results.read_text()))
+        elif args.destination:
             result = prepare(args.destination.resolve(), args.skill, args.all)
         else:
             cases = json.loads((SUITE / "cases.json").read_text())
@@ -151,12 +198,12 @@ def main():
         error = (
             str(exc)
             if isinstance(exc, ValueError)
-            else "Could not prepare the fixture repositories."
+            else "Could not read the results or prepare the fixture repositories."
         )
         emit(
             {
                 "error": error,
-                "help": "Check Git and filesystem access; retry with --destination <new-path>.",
+                "help": "Check input paths and Git access. Preparation needs a new destination.",
             },
             args.format,
         )

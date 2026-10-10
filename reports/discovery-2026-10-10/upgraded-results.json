@@ -1,0 +1,184 @@
+[
+  {
+    "case_id": "change-02",
+    "status": "no_finding",
+    "findings": [],
+    "missing_context": [],
+    "tests_run": [
+      "elixir scratch/change-02-probe.exs — passed CSV and TSV checks for empty input, one integer, multiple integers, negative values, zero, separators, and input order. The two formats implement the same encoding contract."
+    ],
+    "scope": ["lib/export.ex"]
+  },
+  {
+    "case_id": "change-10",
+    "status": "no_finding",
+    "findings": [],
+    "missing_context": [],
+    "tests_run": [
+      "elixir scratch/change-10-probe.exs — passed against the supplied local carrier: a committed shipment with a lost reply is retried with the same operation_id, repeated delivery retains one shipment, and a changed payload receives key_conflict. Inspection confirmed atomic deduplication for the stated server lifetime."
+    ],
+    "scope": ["lib/ship_order.ex", "lib/shipping.ex"]
+  },
+  {
+    "case_id": "change-07",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Keep the capacity check and decrement in one Agent operation",
+        "kind": "defect",
+        "rule": "non_atomic_invariant",
+        "path": "lib/slots.ex",
+        "line": 7,
+        "evidence": "The diff replaces one Agent.get_and_update/2 with a separate available/1 read and Agent.update/2. With one slot, caller A and caller B can both read 1 before either decrement is processed; both then decrement and return :ok. A deterministic probe queued both reads before resuming the Agent and reproduced results [:ok, :ok] with remaining capacity -1. The documented invariant requires at most one success and a nonnegative count. Serializing the individual Agent calls does not make the caller's read/check/update sequence atomic.",
+        "correction": "Restore the single Agent.get_and_update/2 that returns :full for zero and otherwise decrements and returns :ok. Add a concurrent reservation regression check that observes one success and one rejection for a one-slot pool.",
+        "verification": "execution"
+      }
+    ],
+    "missing_context": [],
+    "tests_run": [
+      "elixir scratch/change-07-probe.exs — reproduced overbooking using the actual Slots.reserve/1 implementation; both reads were explicitly queued before either update, yielding two successes and capacity -1."
+    ],
+    "scope": ["lib/slots.ex"]
+  },
+  {
+    "case_id": "change-09",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Reuse the durable operation ID after a shipment timeout",
+        "kind": "defect",
+        "rule": "unsafe_retry",
+        "path": "lib/ship_order.ex",
+        "line": 5,
+        "evidence": "Shipping.create/3 atomically stores a new shipment and returns {:error, :timeout} to model a lost success reply. Its deduplication is keyed by the supplied key. The new retry replaces order.operation_id with make_ref(), so the carrier treats the same order as a new shipment. Running one order against the supplied carrier produced two stored shipments with identical order payloads and still returned timeout. This violates the stated requirement to submit one shipment using its durable operation_id.",
+        "correction": "Pass order.operation_id unchanged on every attempt for the same logical shipment. Verify that the carrier's ambiguous first result followed by a retry returns the existing shipment and leaves exactly one stored shipment.",
+        "verification": "execution"
+      }
+    ],
+    "missing_context": [],
+    "tests_run": [
+      "elixir scratch/change-09-probe.exs — reproduced two shipments from a single ShipOrder.run/2 call and a final {:error, :timeout}, using only the supplied local Shipping module."
+    ],
+    "scope": ["lib/ship_order.ex", "lib/shipping.ex"]
+  },
+  {
+    "case_id": "change-08",
+    "status": "no_finding",
+    "findings": [],
+    "missing_context": [],
+    "tests_run": [
+      "elixir scratch/change-08-probe.exs — passed a controlled overlap in which both Booking.reserve/1 calls first observed one free slot. Slots.reserve/1 still performed the authoritative check and decrement atomically, returning one :ok and one :full with zero remaining. A later reservation also returned :full."
+    ],
+    "scope": ["lib/booking.ex", "lib/slots.ex"]
+  },
+  {
+    "case_id": "change-03",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Assert counter behavior without fixing its private state layout",
+        "kind": "maintenance",
+        "rule": "test_implementation_coupling",
+        "path": "test/counter_test.exs",
+        "line": 9,
+        "evidence": "Counter explicitly defines only start_link/0, add/2 and value/1 as public behavior. The added :sys.get_state/1 assertion requires the private map %{value: 2}. A scratch implementation storing the number directly preserved linked process startup, synchronous atomic addition, the add return value, and the observable value. The unchanged current test passed with the map implementation but failed solely at line 9 with the scalar implementation; the pre-diff test passed with that same scalar implementation. The assertion therefore forces future private representation changes to update a behavior test without detecting a public regression.",
+        "correction": "Remove the private-state equality assertion and retain Counter.value/1 assertions. Extend public operation sequences if more counter coverage is needed.",
+        "verification": "execution"
+      }
+    ],
+    "missing_context": [],
+    "tests_run": [
+      "elixir scratch/change-03-equivalence.exs — passed public behavior comparisons between map and scalar representations for empty, positive, zero, negative, and fractional addition sequences.",
+      "elixir -r cases/change-03/lib/counter.ex cases/change-03/test/counter_test.exs — 1 test passed.",
+      "elixir -r scratch/change-03-scalar.ex cases/change-03/test/counter_test.exs — expected failure at the new line 9 assertion only: 2 was compared with %{value: 2}.",
+      "elixir -r ../../scratch/change-03-scalar.ex ../../scratch/change-03-original-test.exs (from cases/change-03) — the pre-diff test passed with the scalar representation."
+    ],
+    "scope": ["lib/counter.ex", "test/counter_test.exs"]
+  },
+  {
+    "case_id": "change-11",
+    "status": "insufficient_context",
+    "findings": [],
+    "missing_context": [
+      "No adapter implementation, send_order/2 contract, or relevant callers are supplied. It is unknown whether a timeout can occur after a side effect commits, or whether repeated calls with order.id and the same payload are atomically deduplicated or otherwise idempotent.",
+      "The adapter's key retention, conflict handling, and restart or redelivery guarantees are unavailable. Reusing the same ID alone neither proves safe retry behavior nor proves duplicate delivery. Local history only contains the original one-call wrapper."
+    ],
+    "tests_run": [],
+    "scope": ["lib/delivery.ex"]
+  },
+  {
+    "case_id": "change-12",
+    "status": "insufficient_context",
+    "findings": [],
+    "missing_context": [
+      "No migrations, database schema, or constraint inventory is supplied. The early unsafe_validate_unique/3 check can overlap across registrations, but whether a matching database unique index atomically enforces email uniqueness cannot be determined. unique_constraint/2 declares error mapping and is not evidence that the index exists or is absent.",
+      "App.Repo, its storage or isolation behavior, other account writers, mix.exs, mix.lock, and installed dependency sources are absent. There is no supplied executable setup for verifying concurrent inserts and constraint-error handling."
+    ],
+    "tests_run": [],
+    "scope": ["lib/account.ex", "lib/registration.ex"]
+  },
+  {
+    "case_id": "change-05",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Keep Worklist state access inside its owning module",
+        "kind": "maintenance",
+        "rule": "scattered_process_interface",
+        "path": "lib/dashboard.ex",
+        "line": 2,
+        "evidence": "Worklist declares its state private, but both new consumers execute callbacks against it: Dashboard.pending_count/1 assumes a :pending list, and Export.pending_ids/1 at lib/export.ex:2 additionally assumes that the list is stored in reverse insertion order. Changing Worklist's private key from :pending to :entries preserved start_link/add/take behavior in a probe, yet both consumers failed on the old key. Thus even an internal representation change now requires coordinated edits in Worklist, Dashboard, and Export, and the consumers can crash the owning Agent through stale callbacks.",
+        "correction": "Add count and insertion-order ID query operations to Worklist, implement their Agent callbacks there, and have Dashboard and Export delegate to those operations. Preserve the existing external results while keeping state layout and ordering knowledge in the owner.",
+        "verification": "execution"
+      }
+    ],
+    "missing_context": [],
+    "tests_run": [
+      "elixir scratch/change-05-probe.exs — after correcting the probe's exit-reason matching, passed the baseline query checks and confirmed unchanged Worklist public behavior under a private key rename; both new consumers then failed with the expected missing :pending key. Fixture sources were not edited."
+    ],
+    "scope": ["lib/worklist.ex", "lib/dashboard.ex", "lib/export.ex"]
+  },
+  {
+    "case_id": "change-01",
+    "status": "finding",
+    "findings": [
+      {
+        "title": "Keep invoice and trial policies separate instead of coordinating mode flags",
+        "kind": "maintenance",
+        "rule": "false_unification",
+        "path": "lib/completion.ex",
+        "line": 3,
+        "evidence": "The actual callers express separate contracts: Billing.complete/1 builds a taxed, paid invoice from subtotal and tax, whereas Trials.activate/1 activates unpaid time from days. Completion.run/2 has no shared domain calculation; its branches choose different input fields and output shapes. Billing must now coordinate trial:false, collect:true and include_tax:true, while Trials must coordinate trial:true, collect:false and an ignored include_tax:false. Policy and option changes must be understood across this runner and both callers instead of remaining in the owning operation. Specializing the runner for each actual flag set yields the original independent functions, with identical probe outputs and no mode or tax-option knowledge in the trial path.",
+        "correction": "Restore the direct implementation in Billing.complete/1 and Trials.activate/1 and remove the shared runner. Extract only a genuinely shared domain operation if one arises; the common act of adding a map key does not justify this policy coupling.",
+        "verification": "execution"
+      }
+    ],
+    "missing_context": [],
+    "tests_run": [
+      "elixir scratch/change-01-probe.exs — compared the current fixed flag combinations with the original specialized policies for zero, integer and fractional invoice totals and several trial durations; all outputs matched. Inspection confirmed there are only the two supplied callers."
+    ],
+    "scope": ["lib/policies.ex", "lib/completion.ex"]
+  },
+  {
+    "case_id": "change-04",
+    "status": "no_finding",
+    "findings": [],
+    "missing_context": [],
+    "tests_run": [
+      "elixir -r cases/change-04/lib/checkout.ex cases/change-04/test/checkout_test.exs — 1 test passed with the actual implementation and the supplied synchronous gateway contract.",
+      "elixir -r scratch/change-04-double-charge.ex cases/change-04/test/checkout_test.exs — the deliberate duplicate-charge mutation was correctly rejected by the new refute_received assertion. Exactly one charge is an observable contract, not an incidental internal call count."
+    ],
+    "scope": ["lib/checkout.ex", "test/checkout_test.exs"]
+  },
+  {
+    "case_id": "change-06",
+    "status": "no_finding",
+    "findings": [],
+    "missing_context": [],
+    "tests_run": [
+      "elixir scratch/change-06-probe.exs — passed Dashboard.status/1 and tuple-protocol checks at counts 0, 4, and 100. The atom request is explicitly documented as public, and local history explains retention of the tuple form for deployed v1 clients.",
+      "elixir -r cases/change-06/lib/status_server.ex cases/change-06/test/protocol_test.exs — 1 test passed, covering both supported v1 request forms."
+    ],
+    "scope": ["lib/status_server.ex", "lib/dashboard.ex", "test/protocol_test.exs"]
+  }
+]

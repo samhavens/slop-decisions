@@ -1,0 +1,329 @@
+{
+  "method": "Manual source and recorded-tool audit by the implementation author. Cause and consequence, not exact rule names, determine whether findings address the target. This is not independent human validation.",
+  "limitations": [
+    "One small authored trial per arm; no estimate of production accuracy.",
+    "change-02 has an unresolved compatibility contract; status-label disagreement cannot establish reviewer error."
+  ],
+  "cases": [
+    {
+      "case_id": "change-01",
+      "frozen_expected": "finding",
+      "dimension": "false_unification",
+      "adjudication": "supported_target",
+      "reason": "All reviewers identified separate invoice and trial policies forced through coupled flags. The supported cost is caller knowledge and coordinated policy edits, not an incorrect current result. The old rule name differs, but the cause is the same. The upgraded reviewer also executed specialization equivalence probes.",
+      "reviewers": {
+        "plain": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "inspection"
+          ]
+        },
+        "previous": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "inspection"
+          ]
+        },
+        "upgraded": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "execution"
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "change-02",
+      "frozen_expected": "no_finding",
+      "dimension": "false_unification",
+      "adjudication": "ambiguous_fixture",
+      "reason": "The intended clean example combines two formats with one coherent encoding contract. The diff also removes public csv/1 and tsv/1 exports. Their absence is reproducible, but no callers or compatibility policy establish whether removal is permitted. Treat this as an ambiguous fixture, not evidence that the upgraded skill avoids a false warning. Keep its frozen no_finding label and all raw outputs unchanged.",
+      "reviewers": {
+        "plain": {
+          "status": "insufficient_context",
+          "finding_count": 0,
+          "verification": []
+        },
+        "previous": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "execution"
+          ]
+        },
+        "upgraded": {
+          "status": "no_finding",
+          "finding_count": 0,
+          "verification": []
+        }
+      }
+    },
+    {
+      "case_id": "change-03",
+      "frozen_expected": "finding",
+      "dimension": "test_implementation_coupling",
+      "adjudication": "supported_target",
+      "reason": "All reviewers showed that replacing private map storage with an integer preserves the stated public counter API but fails the newly added private-state assertion. This is test maintenance coupling, not missing counter behavior.",
+      "reviewers": {
+        "plain": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "execution"
+          ]
+        },
+        "previous": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "execution"
+          ]
+        },
+        "upgraded": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "execution"
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "change-04",
+      "frozen_expected": "no_finding",
+      "dimension": "test_implementation_coupling",
+      "adjudication": "supported_clean",
+      "reason": "All reviewers accepted an exactly-once gateway assertion and verified it rejects a duplicate-charge mutation. The synchronous gateway effect is explicitly part of the contract.",
+      "reviewers": {
+        "plain": {
+          "status": "no_finding",
+          "finding_count": 0,
+          "verification": []
+        },
+        "previous": {
+          "status": "no_finding",
+          "finding_count": 0,
+          "verification": []
+        },
+        "upgraded": {
+          "status": "no_finding",
+          "finding_count": 0,
+          "verification": []
+        }
+      }
+    },
+    {
+      "case_id": "change-05",
+      "frozen_expected": "finding",
+      "dimension": "scattered_process_interface",
+      "adjudication": "supported_target",
+      "reason": "All reviewers located private Agent map and ordering knowledge in two new callers. This forces coordinated representation changes. The upgraded reviewer also renamed the private key and verified public owner operations still work while the new callers fail.",
+      "reviewers": {
+        "plain": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "inspection"
+          ]
+        },
+        "previous": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "inspection"
+          ]
+        },
+        "upgraded": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "execution"
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "change-06",
+      "frozen_expected": "no_finding",
+      "dimension": "scattered_process_interface",
+      "adjudication": "supported_clean",
+      "reason": "All reviewers accepted the documented public snapshot protocol. The local history and regression test explain the retained tuple request for deployed clients; raw messages alone are not a private-protocol defect.",
+      "reviewers": {
+        "plain": {
+          "status": "no_finding",
+          "finding_count": 0,
+          "verification": []
+        },
+        "previous": {
+          "status": "no_finding",
+          "finding_count": 0,
+          "verification": []
+        },
+        "upgraded": {
+          "status": "no_finding",
+          "finding_count": 0,
+          "verification": []
+        }
+      }
+    },
+    {
+      "case_id": "change-07",
+      "frozen_expected": "finding",
+      "dimension": "non_atomic_invariant",
+      "adjudication": "supported_target",
+      "reason": "All reviewers executed a controlled overlap using the actual reservation function: two queued reads observe one slot, both return success, and the count becomes negative. This establishes the non-atomic boundary without relying on timing luck.",
+      "reviewers": {
+        "plain": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "execution"
+          ]
+        },
+        "previous": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "execution"
+          ]
+        },
+        "upgraded": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "execution"
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "change-08",
+      "frozen_expected": "no_finding",
+      "dimension": "non_atomic_invariant",
+      "adjudication": "supported_clean",
+      "reason": "All reviewers tested overlapping advisory checks and found that the authoritative atomic reservation still permits only one success. The preliminary read does not violate the invariant.",
+      "reviewers": {
+        "plain": {
+          "status": "no_finding",
+          "finding_count": 0,
+          "verification": []
+        },
+        "previous": {
+          "status": "no_finding",
+          "finding_count": 0,
+          "verification": []
+        },
+        "upgraded": {
+          "status": "no_finding",
+          "finding_count": 0,
+          "verification": []
+        }
+      }
+    },
+    {
+      "case_id": "change-09",
+      "frozen_expected": "finding",
+      "dimension": "unsafe_retry",
+      "adjudication": "supported_target",
+      "reason": "All reviewers reproduced two shipments after one logical submission: the local carrier commits before returning timeout, then the retry uses a new key. The result establishes this supplied carrier model, not behavior of an external service.",
+      "reviewers": {
+        "plain": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "execution"
+          ]
+        },
+        "previous": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "execution"
+          ]
+        },
+        "upgraded": {
+          "status": "finding",
+          "finding_count": 1,
+          "verification": [
+            "execution"
+          ]
+        }
+      }
+    },
+    {
+      "case_id": "change-10",
+      "frozen_expected": "no_finding",
+      "dimension": "unsafe_retry",
+      "adjudication": "supported_clean",
+      "reason": "All reviewers verified that the stable operation ID deduplicates retries in the supplied local carrier and retains its payload-conflict behavior. The carrier contract is limited to that server lifetime.",
+      "reviewers": {
+        "plain": {
+          "status": "no_finding",
+          "finding_count": 0,
+          "verification": []
+        },
+        "previous": {
+          "status": "no_finding",
+          "finding_count": 0,
+          "verification": []
+        },
+        "upgraded": {
+          "status": "no_finding",
+          "finding_count": 0,
+          "verification": []
+        }
+      }
+    },
+    {
+      "case_id": "change-11",
+      "frozen_expected": "insufficient_context",
+      "dimension": "unsafe_retry",
+      "adjudication": "required_context_missing",
+      "reason": "All reviewers requested the absent adapter and idempotency contract. Reusing an ID does not establish either enforced deduplication or a duplicate side effect.",
+      "reviewers": {
+        "plain": {
+          "status": "insufficient_context",
+          "finding_count": 0,
+          "verification": []
+        },
+        "previous": {
+          "status": "insufficient_context",
+          "finding_count": 0,
+          "verification": []
+        },
+        "upgraded": {
+          "status": "insufficient_context",
+          "finding_count": 0,
+          "verification": []
+        }
+      }
+    },
+    {
+      "case_id": "change-12",
+      "frozen_expected": "insufficient_context",
+      "dimension": "non_atomic_invariant",
+      "adjudication": "required_context_missing",
+      "reason": "All reviewers requested the missing schema, migrations and Repo/dependency context. unique_constraint maps database errors but does not create a unique index; the source establishes neither presence nor absence of enforcement.",
+      "reviewers": {
+        "plain": {
+          "status": "insufficient_context",
+          "finding_count": 0,
+          "verification": []
+        },
+        "previous": {
+          "status": "insufficient_context",
+          "finding_count": 0,
+          "verification": []
+        },
+        "upgraded": {
+          "status": "insufficient_context",
+          "finding_count": 0,
+          "verification": []
+        }
+      }
+    }
+  ]
+}
