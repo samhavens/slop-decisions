@@ -51,7 +51,8 @@ Use `--api chat` for Chat Completions.
 
 Decisions also asks whether the supplied code is sufficient for the check.
 If that probability is below `--context-threshold`, the result is `unassessed`.
-The default is 0.8. See the [evaluation method](evaluation.md) before you change this limit.
+The fallback is 0.8. A [calibration study](calibration.md) tested both thresholds;
+the fitted profile failed validation. Use `--calibration` only with a passing profile.
 
 See OpenAI's [Decisions guide](https://developers.openai.com/api/docs/guides/decisions)
 and [structured output guide](https://developers.openai.com/api/docs/guides/structured-outputs).

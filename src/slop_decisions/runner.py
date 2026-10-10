@@ -52,6 +52,7 @@ def run_eval(
     variant="examples",
     max_chars=100_000,
     threshold=0.8,
+    threshold_policy=None,
     resume=False,
     dry_run=False,
 ) -> dict:
@@ -73,6 +74,7 @@ def run_eval(
             "context_characters": sum(
                 len(json.dumps(j["packet"])) for j in jobs if j["packet"] is not None
             ),
+            "threshold_policy": threshold_policy,
         }
     if output.exists() and not resume:
         raise ValueError("output exists; choose a new directory or use --resume")
@@ -100,6 +102,7 @@ def run_eval(
             "targets": [t["case_id"] for t in targets],
             "dataset_label_hash": digest(labels),
             "rubrics_hash": digest(rubrics),
+            "threshold_policy": threshold_policy,
         }
         meta_path.write_text(json.dumps(meta, indent=2) + "\n")
         experiment = {
@@ -148,6 +151,7 @@ def run_eval(
                 client.client.close()
     report = score(labels, existing, threshold)
     report["run_id"] = fingerprint
+    report["threshold_policy"] = threshold_policy
     report["latency_seconds"] = round(sum(r["latency_seconds"] for r in existing), 4)
     report["usage"] = {
         key: sum(r["usage"].get(key, 0) for r in existing)

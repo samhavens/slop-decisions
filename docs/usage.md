@@ -55,8 +55,10 @@ The checker rejects excess source instead of removing part of it.
 ## Read results
 
 An `assessed` result includes the model's estimate of the defect probability.
-A probability at or above `--threshold` produces a warning. The default is 0.8.
-This value is experimental; see [results and limits](results.md).
+A probability at or above `--threshold` produces a warning. The fallback is 0.8.
+This value is experimental; the [fitted profile failed validation](calibration.md).
+`threshold_policy` shows where each threshold came from. Use `--calibration FILE`
+to apply a passing profile, or supply explicit threshold values.
 
 An `unassessed` result means the check could not give an answer.
 This can follow a failed request, an invalid reply, a refusal, or insufficient source.

@@ -70,3 +70,6 @@ Threshold sweeps refuse holdout data.
 The `eval` command returns exit code 1 if any case is unassessed.
 It does not fail because accuracy is low.
 See the [evaluation method](evaluation.md) for score definitions and dataset rules.
+
+For the two Decisions thresholds, use the [calibration workflow](calibration.md).
+It preserves both raw scores and requires a separate held-out test.

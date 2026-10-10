@@ -1,5 +1,7 @@
 import argparse
+import json
 import sys
+from dataclasses import replace
 from pathlib import Path
 
 import httpx
@@ -9,7 +11,8 @@ from slop_decisions.context import build_packet
 from slop_decisions.dataset import fetch_sources, load_dataset, packet_for, read_jsonl
 from slop_decisions.evaluation import score, sweep
 from slop_decisions.output import emit
-from slop_decisions.providers import Provider, ProviderConfig, probability
+from slop_decisions.profiles import thresholds
+from slop_decisions.providers import Provider, ProviderConfig
 from slop_decisions.rubrics import load_rubrics
 from slop_decisions.runner import run_eval
 
@@ -44,8 +47,7 @@ def model_options(parser):
     parser.add_argument(
         "--context-threshold",
         type=float,
-        default=0.8,
-        help="Decisions context-sufficiency gate; not calibrated",
+        help="Override the Decisions context gate (fallback: 0.8, uncalibrated)",
     )
     parser.add_argument("--context", choices=["target", "window", "file"], default="file")
     parser.add_argument("--max-chars", type=int, default=100_000)
@@ -54,7 +56,12 @@ def model_options(parser):
         "--rubrics", type=Path, help="JSON bank for controlled prompt/example experiments"
     )
     parser.add_argument(
-        "--threshold", type=float, default=0.8, help="Warning threshold; uncalibrated"
+        "--threshold",
+        type=float,
+        help="Override the warning threshold (fallback: 0.8, uncalibrated)",
+    )
+    parser.add_argument(
+        "--calibration", type=Path, help="Validation JSON from slop-calibrate; must pass and match"
     )
 
 
@@ -78,10 +85,25 @@ def config(args):
                 "retries",
                 "max_tokens",
                 "temperature",
-                "context_threshold",
             )
-        }
+        },
+        context_threshold=args.context_threshold if args.context_threshold is not None else 0.8,
     )
+
+
+def model_policy(args, bank):
+    conf = config(args)
+    validation = json.loads(args.calibration.read_text()) if args.calibration else None
+    policy = thresholds(
+        conf,
+        bank,
+        args.context,
+        args.prompt,
+        validation=validation,
+        context=args.context_threshold,
+        warning=args.threshold,
+    )
+    return replace(conf, context_threshold=policy["context_threshold"]), policy
 
 
 def parser():
@@ -181,7 +203,6 @@ def run(args):
             ]
         }, 0
     if args.command == "check":
-        probability(args.threshold)
         bank = load_rubrics(args.rubrics)
         names = list(
             dict.fromkeys(
@@ -191,6 +212,7 @@ def run(args):
         )
         if any(n not in bank for n in names):
             raise ValueError("unknown dimension; run slop-decisions checks")
+        conf, policy = model_policy(args, {name: bank[name] for name in names})
         if len(args.files) * len(names) > args.max_checks:
             raise ValueError(
                 "plan exceeds --max-checks; narrow inputs or explicitly raise the limit"
@@ -216,9 +238,12 @@ def run(args):
                     max_chars=args.max_chars,
                 )
             )
-        conf = config(args)
         if args.dry_run:
-            return {"checks": len(packets) * len(names), "packets": packets}, 0
+            return {
+                "checks": len(packets) * len(names),
+                "packets": packets,
+                "threshold_policy": policy,
+            }, 0
         results = []
         with Provider(conf) as client:
             for packet in packets:
@@ -227,13 +252,15 @@ def run(args):
                     results.append({"target": packet["target"], "dimension": name, **observation})
         unassessed = sum(r["result"]["status"] == "unassessed" for r in results)
         warnings = sum(
-            r["result"]["status"] == "assessed" and r["result"]["probability"] >= args.threshold
+            r["result"]["status"] == "assessed"
+            and r["result"]["probability"] >= policy["threshold"]
             for r in results
         )
         return {
             "warnings": warnings,
             "unassessed": unassessed,
-            "threshold": args.threshold,
+            "threshold": policy["threshold"],
+            "threshold_policy": policy,
             "results": results,
         }, 1 if unassessed else (3 if warnings else 0)
     sources, targets, labels = load_dataset(args.dataset)
@@ -256,7 +283,7 @@ def run(args):
             raise ValueError("unknown case ID")
         return packet_for(matches[0], sources, args.cache, args.context), 0
     if args.command == "eval":
-        probability(args.threshold)
+        bank = load_rubrics(args.rubrics)
         targets = [
             t
             for t in targets
@@ -270,6 +297,9 @@ def run(args):
             targets = targets[: args.limit]
         if not targets:
             raise ValueError("no targets match these filters")
+        conf, policy = model_policy(
+            args, {name: bank[name] for name in {t["dimension"] for t in targets}}
+        )
         ids = {t["case_id"] for t in targets}
         labels = [r for r in labels if r["case_id"] in ids]
         report = run_eval(
@@ -277,13 +307,14 @@ def run(args):
             labels,
             sources,
             args.cache,
-            load_rubrics(args.rubrics),
-            config(args),
+            bank,
+            conf,
             args.out,
             mode=args.context,
             variant=args.prompt,
             max_chars=args.max_chars,
-            threshold=args.threshold,
+            threshold=policy["threshold"],
+            threshold_policy=policy,
             resume=args.resume,
             dry_run=args.dry_run,
         )

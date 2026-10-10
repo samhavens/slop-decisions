@@ -3,8 +3,8 @@
 The initial set has 20 targets: eight positive, twelve negative, and seven
 before/after pairs, across five repositories and six PR families. All are
 development material. Eight of the fourteen rubric dimensions have examples;
-the other six are exploratory checks without dataset coverage. There is no
-locked holdout or deployment-precision estimate.
+the other six have no seed examples. A separate [authored calibration study](calibration.md)
+covers all fourteen checks. Neither set estimates production precision.
 
 `sources.json` pins downloads by full commit and SHA256. `targets.jsonl` contains
 the source selection, dimension, group, track, and split. `labels.jsonl` contains
@@ -39,8 +39,9 @@ alongside the seed set; measuring this set is development fit, not generalizatio
 
 A prediction is positive when `probability >= threshold`. The probability from
 generative models is self-reported, and need not be calibrated or interchangeable
-with a Decisions probability. Each check/model/context combination needs its own
-calibration before a warning threshold is treated as meaningful.
+with a Decisions probability. Thresholds need validation for the model, prompts, and source selection in use.
+The published calibration study tested one shared pair of thresholds across fourteen
+checks. The fitted pair failed its held-out test; it did not validate individual checks.
 
 Primary macro balanced accuracy averages `(TP / P + TN / N) / 2` over dimensions
 with both labels. `P` and `N` include unassessed targets, so missing assessments

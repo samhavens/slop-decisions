@@ -36,3 +36,5 @@ jobs:
       - run: uv run slop-decisions fetch --format json
       - run: uv run python scripts/verify_reports.py
       - run: uv run python scripts/run_witnesses.py
+      - run: uv run python scripts/verify_calibration.py
+      - run: uv run python scripts/calibration_witnesses.py

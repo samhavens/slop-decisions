@@ -28,7 +28,11 @@ source; the included manifest fetches it on demand.
 Changes to prompts, examples, source selection, and thresholds should be tested
 separately. Save the run settings and individual outcomes, including failures.
 Report coverage alongside accuracy. A failing provider call is never a clean
-assessment. When reporting performance, identify candidate/preference labels
+assessment. For threshold studies, use the [calibration case format](calibration/README.md)
+and preserve the fit before holdout calls. Verify saved results with
+`uv run python scripts/verify_calibration.py`.
+
+When reporting performance, identify candidate/preference labels
 and distinguish full upstream tests from extracted-unit witnesses.
 
 For reader documentation, use [ASD-STE100](https://www.asd-ste100.org/).

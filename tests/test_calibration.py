@@ -181,8 +181,202 @@ def test_study_resumes_pilot_freezes_fit_then_scores_holdout(tmp_path, monkeypat
     study.collect(path, "holdout", hold, config, profile_path=profile)
     receipt = study.validate(hold, profile, tmp_path / "validation.json")
     assert receipt["accepted"]
+    assert set(receipt["profile"]["contract"]["templates"]) == {"success_shaped_failure"}
     assert receipt["holdout"]["known_correct"] == 3
     assert profile.read_bytes() == before
+    from dataclasses import replace
+
+    from slop_decisions.cli import parser, run
+    from slop_decisions.profiles import thresholds
+
+    bank = {"success_shaped_failure": load_rubrics()["success_shaped_failure"]}
+    policy = thresholds(config, bank, "file", "examples", validation=receipt)
+    assert policy["context_threshold"] == 0.95
+    assert policy["threshold"] == 0.9
+    assert policy["warning_source"] == "validated_profile"
+    with pytest.raises(ValueError, match="selected checks"):
+        thresholds(config, load_rubrics(), "file", "examples", validation=receipt)
+    for changed in [
+        replace(config, model="other"),
+        replace(config, api="responses"),
+        replace(config, base_url="https://other.example/v1"),
+        replace(config, provider="local", api="chat"),
+        replace(config, provider="openrouter", api="chat"),
+    ]:
+        with pytest.raises(ValueError, match="does not match"):
+            thresholds(changed, bank, "file", "examples", validation=receipt)
+    for mode, variant in [("window", "examples"), ("file", "minimal")]:
+        with pytest.raises(ValueError, match="does not match"):
+            thresholds(config, bank, mode, variant, validation=receipt)
+    changed_bank = {
+        **bank,
+        "success_shaped_failure": {**bank["success_shaped_failure"], "predicate": "changed"},
+    }
+    with pytest.raises(ValueError, match="does not match"):
+        thresholds(config, changed_bank, "file", "examples", validation=receipt)
+    with pytest.raises(ValueError, match="failed"):
+        thresholds(config, bank, "file", "examples", validation={**receipt, "accepted": False})
+    (tmp_path / "sample.ex").write_text("defmodule Sample do\nend\n")
+    arguments = [
+        "check",
+        "sample.ex",
+        "--root",
+        str(tmp_path),
+        "--model",
+        "x",
+        "--provider",
+        "openai",
+        "--dimension",
+        "success_shaped_failure",
+        "--calibration",
+        str(tmp_path / "validation.json"),
+        "--dry-run",
+    ]
+    report, code = run(parser().parse_args(arguments))
+    assert code == 0
+    assert report["threshold_policy"]["context_threshold"] == 0.95
+    assert report["threshold_policy"]["threshold"] == 0.9
+    manual, _ = run(
+        parser().parse_args(arguments + ["--threshold", "0.7", "--context-threshold", "0.5"])
+    )
+    assert manual["threshold_policy"]["threshold"] == 0.7
+    assert manual["threshold_policy"]["context_threshold"] == 0.5
+    assert manual["threshold_policy"]["warning_source"] == "explicit"
+    assert manual["threshold_policy"]["context_source"] == "explicit"
     assert len(sent) == 8
     with pytest.raises(ValueError, match="mismatch"):
         study.collect(path, "calibration", cal, ProviderConfig(provider="openai", model="other"))
+
+
+def test_valid_refusals_do_not_trigger_the_request_failure_stop(tmp_path, monkeypatch):
+    from pathlib import Path
+
+    from slop_decisions import calibration_study as study
+
+    monkeypatch.setenv("OPENAI_API_KEY", "test")
+
+    def refusal(request):
+        body = json.loads(request.content)
+        return httpx.Response(
+            200,
+            json={
+                "answers": [
+                    {"type": "refusal", "name": q["name"], "refusal": "Cannot assess"}
+                    for q in body["questions"]
+                ]
+            },
+        )
+
+    monkeypatch.setattr(
+        study, "Provider", lambda conf: Provider(conf, transport=httpx.MockTransport(refusal))
+    )
+    result = study.collect(
+        Path("calibration/cases.jsonl"),
+        "calibration",
+        tmp_path / "run",
+        ProviderConfig(provider="openai", model="x"),
+        stop_after=3,
+    )
+    assert result["completed"] == 3
+
+
+def test_published_rejected_profile_is_blocked_before_any_request(tmp_path):
+    from pathlib import Path
+
+    from slop_decisions.cli import parser, run
+
+    (tmp_path / "sample.ex").write_text("defmodule Sample do\nend\n")
+    args = parser().parse_args(
+        [
+            "check",
+            "sample.ex",
+            "--root",
+            str(tmp_path),
+            "--provider",
+            "openai",
+            "--model",
+            "gpt-6-luna",
+            "--calibration",
+            str(Path("reports/calibration-2026-10-10/validation.json")),
+            "--dry-run",
+        ]
+    )
+    with pytest.raises(ValueError, match="failed held-out"):
+        run(args)
+
+
+def test_collection_stops_after_two_request_errors(tmp_path, monkeypatch):
+    from pathlib import Path
+
+    from slop_decisions import calibration_study as study
+    from slop_decisions.dataset import read_jsonl
+
+    monkeypatch.setenv("OPENAI_API_KEY", "test")
+    monkeypatch.setattr(
+        study,
+        "Provider",
+        lambda conf: Provider(conf, transport=httpx.MockTransport(lambda _: httpx.Response(500))),
+    )
+    output = tmp_path / "run"
+    with pytest.raises(ValueError, match="two consecutive request failures"):
+        study.collect(
+            Path("calibration/cases.jsonl"),
+            "calibration",
+            output,
+            ProviderConfig(provider="openai", model="x", retries=0),
+            stop_after=3,
+        )
+    rows = read_jsonl(output / "predictions.jsonl")
+    assert len(rows) == 2
+    assert all(r["result"]["reason"] == "http_500" for r in rows)
+
+
+def test_validation_cli_returns_rejection_code_and_saves_evidence(tmp_path, monkeypatch, capsys):
+    from slop_decisions import calibration_study as study
+
+    output = tmp_path / "validation.json"
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "slop-calibrate",
+            "validate",
+            "reports/calibration-2026-10-10/holdout",
+            "--profile",
+            "reports/calibration-2026-10-10/profile.json",
+            "--out",
+            str(output),
+            "--format",
+            "json",
+            "--full",
+        ],
+    )
+    assert study.main() == 3
+    document = json.loads(output.read_text())
+    assert document == json.loads(capsys.readouterr().out)
+    assert document["accepted"] is False
+
+
+def test_validation_cannot_overwrite_its_frozen_profile(tmp_path):
+    from pathlib import Path
+
+    from slop_decisions import calibration_study as study
+
+    frozen = tmp_path / "profile.json"
+    frozen.write_bytes(Path("reports/calibration-2026-10-10/profile.json").read_bytes())
+    before = frozen.read_bytes()
+    with pytest.raises(ValueError, match="overwrite"):
+        study.validate(Path("reports/calibration-2026-10-10/holdout"), frozen, frozen)
+    assert frozen.read_bytes() == before
+
+
+def test_suite_rejects_invalid_target_ranges_before_requests(tmp_path):
+    from pathlib import Path
+
+    from slop_decisions.calibration import load_cases
+
+    suite = load_cases(Path("calibration/cases.jsonl"))
+    suite[0]["packet"]["target"]["end_line"] = 999
+    path = tmp_path / "cases.jsonl"
+    path.write_text("".join(json.dumps(c) + "\n" for c in suite))
+    with pytest.raises(ValueError, match="target"):
+        load_cases(path)

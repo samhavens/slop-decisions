@@ -29,24 +29,54 @@ def load_cases(path):
         packet = case["packet"]
         if set(packet) != {"target", "files"} or not packet["files"]:
             raise ValueError("packet must contain only target and files")
-        if set(packet["target"]) - {"path", "start_line", "end_line", "focus"}:
+        target = packet["target"]
+        if set(target) - {"path", "start_line", "end_line", "focus"}:
             raise ValueError("unexpected target fields")
+        for span in [target, *packet["files"]]:
+            if (
+                not isinstance(span.get("path"), str)
+                or not span["path"]
+                or type(span.get("start_line")) is not int
+                or type(span.get("end_line")) is not int
+                or not 1 <= span["start_line"] <= span["end_line"]
+            ):
+                raise ValueError("invalid source or target span")
+        if "focus" in target and not isinstance(target["focus"], str):
+            raise ValueError("target focus must be a string")
         for source in packet["files"]:
             if set(source) != {"path", "start_line", "end_line", "content"}:
                 raise ValueError("unexpected source fields")
             if source["end_line"] - source["start_line"] + 1 != len(source["content"].splitlines()):
                 raise ValueError("source line range does not match content")
+        paths = [f["path"] for f in packet["files"]]
+        if len(set(paths)) != len(paths):
+            raise ValueError("duplicate source path")
+        if not any(
+            f["path"] == target["path"]
+            and f["start_line"] <= target["start_line"] <= target["end_line"] <= f["end_line"]
+            for f in packet["files"]
+        ):
+            raise ValueError("target is not covered by its source file")
         # Ignore focus metadata when checking for repeated source across splits.
-        identity = digest(packet["files"])
+        identity = digest(sorted(f["content"] for f in packet["files"]))
         if packets.setdefault(identity, split) != split:
             raise ValueError("an identical source packet crosses splits")
         json.dumps(packet, allow_nan=False)
+    for dimension in {c["dimension"] for c in cases}:
+        for split in ("calibration", "holdout"):
+            labels = {
+                c["expected"] for c in cases if c["dimension"] == dimension and c["split"] == split
+            }
+            if labels != {"defect", "clean", "unassessable"}:
+                raise ValueError("each check needs all three labels in both splits")
     return cases
 
 
 def indexed(cases, predictions):
     gold = {}
     for case in cases:
+        if not isinstance(case["case_id"], str) or not case["case_id"]:
+            raise ValueError("case ID must be a nonempty string")
         if case["case_id"] in gold or case["expected"] not in {"defect", "clean", "unassessable"}:
             raise ValueError("duplicate case or invalid expected result")
         gold[case["case_id"]] = case

@@ -1,6 +1,5 @@
 """Collect, fit, and validate threshold studies with frozen source packets."""
 
-import argparse
 import json
 import sys
 from dataclasses import asdict
@@ -17,21 +16,9 @@ from slop_decisions.calibration import (
 )
 from slop_decisions.context import digest
 from slop_decisions.dataset import read_jsonl
-from slop_decisions.providers import Provider, ProviderConfig, build_request
+from slop_decisions.profiles import accepted, contract
+from slop_decisions.providers import Provider, ProviderConfig
 from slop_decisions.rubrics import load_rubrics
-
-
-def contract(config, rubrics, mode="file", variant="examples"):
-    return {
-        "provider": config.provider,
-        "api": config.transport_api,
-        "base_url": config.url,
-        "context": mode,
-        "templates": {
-            name: build_request(config, {"source_packet": "REPLACE_WITH_PACKET"}, rubric, variant)
-            for name, rubric in sorted(rubrics.items())
-        },
-    }
 
 
 def write_json(path, value):
@@ -69,6 +56,7 @@ def collect(cases_path, split, output, config, *, profile_path=None, stop_after=
     bank = load_rubrics()
     if any(c["dimension"] not in bank for c in cases):
         raise ValueError("unknown check in suite")
+    bank = {name: bank[name] for name in {c["dimension"] for c in cases}}
     current_contract = contract(config, bank)
     frozen = None
     if split == "holdout":
@@ -116,10 +104,14 @@ def collect(cases_path, split, output, config, *, profile_path=None, stop_after=
                 handle.write(json.dumps(row, allow_nan=False) + "\n")
                 handle.flush()
                 existing.append(row)
-                failures = failures + 1 if "decision_scores" not in row else 0
+                failed = (
+                    "decision_scores" not in row
+                    and row["result"].get("reason") != "provider_refusal"
+                )
+                failures = failures + 1 if failed else 0
                 print(f"[{len(existing)}/{len(selected)}] {case['case_id']}", file=sys.stderr)
                 if failures >= 2:
-                    raise ValueError("stopped after two consecutive requests without raw scores")
+                    raise ValueError("stopped after two consecutive request failures")
     return {"completed": len(existing), "planned": len(selected), "run_id": run["run_id"]}
 
 
@@ -145,6 +137,9 @@ def fit(directory, output):
 
 
 def validate(directory, profile_path, output):
+    protected = [profile_path, directory / "run.json", directory / "predictions.jsonl"]
+    if output.resolve() in {p.resolve() for p in protected}:
+        raise ValueError("validation must not overwrite the frozen profile or run evidence")
     profile = read_json(profile_path)
     run, rows = read_run(directory)
     if run["profile_hash"] != digest(profile) or run["contract"] != profile["contract"]:
@@ -155,19 +150,17 @@ def validate(directory, profile_path, output):
         raise ValueError("validation requires holdout only")
     if len(rows) != len(run["cases"]):
         raise ValueError("validation requires a complete run")
+    if {c["expected"] for c in run["cases"]} != {"defect", "clean", "unassessable"}:
+        raise ValueError("validation requires all three labels")
     selection = profile["selection"]
     report = diagnostics(run["cases"], rows, selection["context_threshold"], selection["threshold"])
     baseline = measure(run["cases"], rows, 0.8, 0.8)
-    accepted = (
-        report["known_coverage"] >= POLICY["min_known_coverage"]
-        and report["unsafe_context_rate"] <= POLICY["max_unsafe_context_rate"]
-        and report["review_cost"] <= baseline["review_cost"]
-    )
     result = {
         "profile_hash": digest(profile),
         "holdout_run_id": run["run_id"],
         "predictions_hash": digest(rows),
-        "accepted": accepted,
+        "accepted": accepted(report, baseline, POLICY),
+        "profile": profile,
         "holdout": report,
         "baseline": baseline,
     }
@@ -175,26 +168,69 @@ def validate(directory, profile_path, output):
     return result
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    commands = parser.add_subparsers(dest="command", required=True)
-    p = commands.add_parser("collect", help="Collect raw scores; resume exactly matching runs")
+def parser():
+    from slop_decisions.cli import Parser, common
+
+    root = Parser(description=__doc__)
+    common(root, default="toon")
+    commands = root.add_subparsers(dest="command", parser_class=Parser)
+    p = commands.add_parser(
+        "collect",
+        help="Collect raw scores; resume exactly matching runs",
+        epilog="Example: slop-calibrate collect --cases cases.jsonl --split calibration "
+        "--model gpt-6-luna --out runs/calibration --stop-after 3",
+    )
+    common(p)
     p.add_argument("--cases", type=Path, required=True)
     p.add_argument("--split", choices=["calibration", "holdout"], required=True)
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--model", required=True)
     p.add_argument("--profile", type=Path)
     p.add_argument("--stop-after", type=int, help="Bound new calls for a protocol pilot")
-    p = commands.add_parser("fit", help="Select gates using only a complete calibration run")
+    p = commands.add_parser(
+        "fit",
+        help="Select gates using only a complete calibration run",
+        epilog="Example: slop-calibrate fit runs/calibration --out runs/profile.json",
+    )
+    common(p)
     p.add_argument("run", type=Path)
     p.add_argument("--out", type=Path, required=True)
-    p = commands.add_parser("validate", help="Score the frozen profile on untouched holdout cases")
+    p.add_argument("--full", action="store_true", help="Include all fit counts on stdout")
+    p = commands.add_parser(
+        "validate",
+        help="Score the frozen profile on untouched holdout cases",
+        epilog="Example: slop-calibrate validate runs/holdout --profile runs/profile.json "
+        "--out runs/validation.json",
+    )
+    common(p)
     p.add_argument("run", type=Path)
     p.add_argument("--profile", type=Path, required=True)
     p.add_argument("--out", type=Path, required=True)
-    args = parser.parse_args()
+    p.add_argument(
+        "--full", action="store_true", help="Include all results and the profile on stdout"
+    )
+    return root
+
+
+def main():
+    from slop_decisions.output import emit
+
+    args = None
     try:
-        if args.command == "collect":
+        args = parser().parse_args()
+        if args.command is None:
+            result = {
+                "bin": str(Path(sys.argv[0]).resolve()).replace(str(Path.home()), "~"),
+                "description": "Fit and test Decisions thresholds on separate labeled source sets.",
+                "checks": len(load_rubrics()),
+                "policy": POLICY,
+                "help": [
+                    "slop-calibrate collect --help",
+                    "slop-calibrate fit --help",
+                    "slop-calibrate validate --help",
+                ],
+            }
+        elif args.command == "collect":
             result = collect(
                 args.cases,
                 args.split,
@@ -207,11 +243,39 @@ def main():
             result = fit(args.run, args.out)
         else:
             result = validate(args.run, args.profile, args.out)
-        print(json.dumps(result, indent=2, allow_nan=False))
-        return 0
+        code = 3 if result.get("accepted") is False else 0
+        if args.command == "validate" and not args.full:
+            report = result["holdout"]
+            result = {
+                "accepted": result["accepted"],
+                "context_threshold": report["context_threshold"],
+                "threshold": report["threshold"],
+                "known_coverage": report["known_coverage"],
+                "unsafe_context_rate": report["unsafe_context_rate"],
+                "true_warnings": report["true_warnings"],
+                "false_warnings": report["false_warnings"],
+                "missed_defects": report["missed_defects"],
+                "out": str(args.out),
+            }
+        elif args.command == "fit" and not args.full:
+            result = {k: v for k, v in result.items() if k != "calibration"} | {
+                "out": str(args.out)
+            }
+        emit(result, args.format)
+        return code
     except (ValueError, OSError, KeyError, TypeError) as error:
-        print(json.dumps({"error": str(error)}))
+        command = args.command if args and args.command else "collect"
+        emit(
+            {
+                "error": str(error),
+                "help": f"slop-calibrate {command} --help",
+            },
+            args.format if args else ("json" if "json" in sys.argv else "toon"),
+        )
         return 2
+    except KeyboardInterrupt:
+        emit({"error": "interrupted; rerun the same collect command to resume"})
+        return 130
 
 
 if __name__ == "__main__":

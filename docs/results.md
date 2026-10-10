@@ -1,5 +1,7 @@
 # Initial development results — October 10, 2026
 
+See the later [112-case calibration study](calibration.md) for threshold selection and held-out results.
+
 The strongest tested configuration was **OpenAI Responses with the explicit
 behavior focus and the relevant callee contract**: 18/20 correct, 20/20 assessed,
 87.5% macro balanced accuracy, and 5/7 strict before/after pairs. This is fit to a

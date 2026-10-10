@@ -26,6 +26,6 @@ Replace `lib/orders.ex` with your file. Examine each result before you change co
 ## Guides
 
 - [Choose checks and read results](docs/usage.md)
-- [Compare models](docs/run-eval.md)
+- [Compare models](docs/run-eval.md) · [Calibrate thresholds](docs/calibration.md)
 - [Results and limits](docs/results.md)
 - [Contribute](CONTRIBUTING.md) · [MIT license](LICENSE)
