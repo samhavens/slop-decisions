@@ -20,7 +20,7 @@ jobs:
       - uses: astral-sh/setup-uv@d0d8abe699bfb85fec6de9f7adb5ae17292296ff # v6
         with:
           python-version: '3.13'
-      - run: uv tool install git+https://github.com/samhavens/slop-decisions.git@v0.5.0
+      - run: uv tool install git+https://github.com/samhavens/slop-decisions.git@v0.6.0
       - name: Check changed Elixir files
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}

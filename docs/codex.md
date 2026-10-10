@@ -1,6 +1,6 @@
 # Review with Codex
 
-The skill uses all 14 rules in your current Codex session. Codex can read callers,
+The skill uses all 17 rules in your current Codex session. Codex can read callers,
 validators, and tests to check whether a suspicious pattern is a real problem.
 Each finding must include a code location and evidence.
 

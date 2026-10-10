@@ -363,6 +363,33 @@ def test_global_json_option_survives_subcommand_defaults():
     assert json.loads(result.stdout)["targets"] == 20
 
 
+@pytest.mark.parametrize("provider", ["openai", "openrouter", "local"])
+def test_phoenix_rules_are_selectable_with_every_provider(tmp_path, server, provider):
+    url, calls = server
+    rules = ["client_state_round_trip", "liveview_reconnect_state_loss", "per_record_database_read"]
+    (tmp_path / "view.ex").write_text("defmodule View do\n  def run, do: :ok\nend\n")
+    result = cli(
+        "check",
+        "view.ex",
+        "--root",
+        tmp_path,
+        "--provider",
+        provider,
+        "--model",
+        "test-model",
+        "--base-url",
+        url,
+        "--format",
+        "json",
+        *[arg for rule in rules for arg in ("--rule", rule)],
+        env={**os.environ, "OPENAI_API_KEY": "test", "OPENROUTER_API_KEY": "test"},
+    )
+    assert result.returncode == 3, result.stdout + result.stderr
+    data = json.loads(result.stdout)
+    assert data["checks"] == len(calls) == 3
+    assert {row["dimension"] for row in data["results"]} == set(rules)
+
+
 @pytest.mark.parametrize("api,endpoint", [(None, "/v1/responses"), ("decisions", "/v1/decisions")])
 def test_openai_check_runs_every_rule_and_honors_api(tmp_path, server, api, endpoint):
     url, calls = server
@@ -381,7 +408,7 @@ def test_openai_check_runs_every_rule_and_honors_api(tmp_path, server, api, endp
     )
     assert result.returncode == 3, result.stdout + result.stderr
     data = json.loads(result.stdout)
-    assert data["warnings"] == len(calls) == len(load_rubrics()) == 14
+    assert data["warnings"] == len(calls) == len(load_rubrics())
     assert {row["dimension"] for row in data["results"]} == load_rubrics().keys()
     assert all(path == endpoint for path, _, _ in calls)
     assert all(body["model"] == "gpt-6-luna" for _, _, body in calls)
@@ -539,7 +566,7 @@ def test_changed_check_preflight_and_current_source(tmp_path, server):
     assert not calls
     result = cli(*common_args)
     assert result.returncode == 0, result.stdout + result.stderr
-    assert len(calls) == 28
+    assert len(calls) == 2 * len(load_rubrics())
     packets = [json.loads(body["messages"][1]["content"]) for _, _, body in calls]
     assert {p["target"]["path"] for p in packets} == {"new file.ex", "test.exs"}
     assert all(":current_source" in p["files"][0]["content"] for p in packets)
@@ -622,7 +649,7 @@ def test_exunit_example_gates_normal_mix_tests(tmp_path, server, model, expected
         timeout=30,
     )
     assert result.returncode == expected, result.stdout + result.stderr
-    assert len(calls) == 14
+    assert len(calls) == len(load_rubrics())
 
 
 def test_junit_cannot_overwrite_source_or_make_calls_with_invalid_output(tmp_path, server):

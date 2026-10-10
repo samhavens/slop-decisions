@@ -23,7 +23,7 @@ The OpenAI model was `gpt-6-luna`.
 
 Unassessed targets count against the score. Times cover all 20 targets in one run.
 These are development results; they do not establish accuracy on your project.
-The set covers eight of the fourteen rules and includes four code-design judgments.
+The set covers eight of the original fourteen rules and includes four code-design judgments.
 
 The local run verifies the MLX connection with that small model.
 OpenRouter has protocol tests but no published live evaluation.

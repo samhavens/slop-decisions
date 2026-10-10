@@ -1,12 +1,12 @@
 ---
 name: slop-review
-description: Review Elixir code for semantic defects, weak tests, and needless complexity using 14 evidence-based rules. Use when asked to check changed code for slop, apply slop-decisions rules, or review Elixir code that passes static checks but may hide a behavior or maintenance problem.
+description: Review Elixir code for semantic defects, weak tests, and needless complexity using 17 evidence-based rules. Use when asked to check changed code for slop, apply slop-decisions rules, or review Elixir code that passes static checks but may hide a behavior or maintenance problem.
 ---
 
 # Review with evidence
 
 Use the current session to review the code. Read [all rules](references/rules.json),
-including their required context and negative examples. Apply all 14 unless the
+including their required context and negative examples. Apply all 17 unless the
 user selects a subset. Do not run `slop-decisions check`, call a separate provider,
 or start one agent per rule. The rules guide a review; they are not a scorecard.
 
@@ -40,6 +40,7 @@ Trace the contract before deciding that a pattern is a problem:
 - Check both readers and writers before claiming that stored values can disagree.
 - Read assertion helpers and fixtures before claiming that a test proves nothing.
 - Check dependency versions and behavior before proposing a framework replacement.
+- For LiveView and database checks, use the [Phoenix and Ecto boundaries](references/phoenix.md).
 
 Try to refute each candidate with the rule's negative examples and the actual
 code. A familiar shape is not evidence. If a needed contract is unavailable,
@@ -70,7 +71,7 @@ Lead with actionable findings, ordered by impact. For each one, include:
 - The file and line, trigger, consequence, and evidence.
 - The smallest useful correction or discriminating test.
 
-Combine overlapping findings. Do not fill a quota or list 14 empty rule results.
+Combine overlapping findings. Do not fill a quota or list empty rule results.
 Do not assign a probability or treat the absence of findings as a test pass.
 End with the scope reviewed, tests actually run, and any missing evidence or
 unreviewed files. If no finding is supported, say that plainly and include those

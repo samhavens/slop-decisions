@@ -110,5 +110,29 @@
     "positive": "An exhaustive case returns every matched value unchanged including its catch-all.",
     "negative": "A non-exhaustive identity case raises on unmatched input; map reconstruction drops extra keys; a result tuple is unwrapped.",
     "severity": "advisory"
+  },
+  {
+    "name": "client_state_round_trip",
+    "predicate": "Does a LiveView interaction wait for a server round trip solely to change transient presentation state that can be changed locally without altering application behavior?",
+    "required_context": "Complete template, event handler, JS commands or hooks, consumers of the affected assigns, and any data loading, authorization, persistence, shared state, or URL/navigation contract.",
+    "positive": "Opening an already-rendered help modal pushes an event whose only effect is toggling a visibility assign; no server operation needs that state.",
+    "negative": "Opening a modal fetches authorized data, starts real work, persists shared state, or changes meaningful URL state. JS.show/hide runs locally even when composed with an independent JS.push.",
+    "severity": "advisory"
+  },
+  {
+    "name": "liveview_reconnect_state_loss",
+    "predicate": "Does a concrete disconnect/reconnect or LiveView remount lose user input or workflow state that the feature must retain, because its recovery path cannot reconstruct that state?",
+    "required_context": "Mount and parameter callbacks, state transitions, rendered form fields and IDs, phx-change and recovery bindings, client hooks, storage or URL state, installed LiveView behavior, and the retention contract.",
+    "positive": "A wizard removes earlier fields from the DOM and stores their values only in assigns; remount resets those values and recovery submits only the current step, losing required earlier input.",
+    "negative": "A stable form ID and phx-change restore all needed inputs through built-in recovery; custom recovery, persisted drafts, or URL state reconstruct the workflow. Disposable UI state intentionally resets. A missing custom reconnect hook alone is not a defect.",
+    "severity": "warning"
+  },
+  {
+    "name": "per_record_database_read",
+    "predicate": "Does loading one collection perform avoidable database reads per record, so query count grows with collection size when a batch or suitable join could preserve the required semantics?",
+    "required_context": "Collection query, loops and called helpers/components, association schemas and loaded state, filters, tenant/authorization scopes, pagination or per-parent limits, and query behavior or measurements.",
+    "positive": "After fetching posts, Enum.map calls a helper that preloads each unloaded author separately, adding one database query per post.",
+    "negative": "Repo.preload on the whole list batches an association; query preloads use a fixed number of queries; already-loaded associations cause no new read. Separate batched queries can outperform a join, especially for has-many data. Distinct required per-record semantics cannot be dropped just to reduce query count.",
+    "severity": "warning"
   }
 ]

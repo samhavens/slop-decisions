@@ -1,0 +1,74 @@
+[
+  {
+    "case_id": "phoenix-01",
+    "dimension": "client_state_round_trip",
+    "path": "inputs/01.ex",
+    "expected": "defect",
+    "basis": "source_review",
+    "rationale": "The event only changes help visibility; all content is already rendered and no other behavior consumes the assign."
+  },
+  {
+    "case_id": "phoenix-02",
+    "dimension": "client_state_round_trip",
+    "path": "inputs/02.ex",
+    "expected": "clean",
+    "basis": "source_review",
+    "rationale": "The preview event fetches data scoped to the current owner before showing it."
+  },
+  {
+    "case_id": "phoenix-03",
+    "dimension": "client_state_round_trip",
+    "path": "inputs/03.ex",
+    "expected": "unassessable",
+    "basis": "source_review",
+    "rationale": "The panel template and App.Panels.open implementation are missing."
+  },
+  {
+    "case_id": "phoenix-04",
+    "dimension": "liveview_reconnect_state_loss",
+    "path": "inputs/04.ex",
+    "expected": "defect",
+    "basis": "source_review",
+    "rationale": "After step two is visible, the name exists only in assigns. A remount clears it; recovery sends only the email and cannot reconstruct the name or step."
+  },
+  {
+    "case_id": "phoenix-05",
+    "dimension": "liveview_reconnect_state_loss",
+    "path": "inputs/05.ex",
+    "expected": "clean",
+    "basis": "source_review",
+    "rationale": "The stable form ID and phx-change recover both rendered inputs through the validate callback; save uses submitted fields."
+  },
+  {
+    "case_id": "phoenix-06",
+    "dimension": "liveview_reconnect_state_loss",
+    "path": "inputs/06.ex",
+    "expected": "unassessable",
+    "basis": "source_review",
+    "rationale": "The rendered form and App.Wizard restoration/update paths are missing."
+  },
+  {
+    "case_id": "phoenix-07",
+    "dimension": "per_record_database_read",
+    "path": "inputs/07.ex",
+    "expected": "defect",
+    "basis": "source_review",
+    "rationale": "Freshly queried Post structs have unloaded authors; card/1 causes an association query for each post."
+  },
+  {
+    "case_id": "phoenix-08",
+    "dimension": "per_record_database_read",
+    "path": "inputs/08.ex",
+    "expected": "clean",
+    "basis": "source_review",
+    "rationale": "The list preload batches authors. The later per-item preload sees the association already loaded and does not reload it."
+  },
+  {
+    "case_id": "phoenix-09",
+    "dimension": "per_record_database_read",
+    "path": "inputs/09.ex",
+    "expected": "unassessable",
+    "basis": "source_review",
+    "rationale": "The helper implementations are missing, so their database behavior cannot be established."
+  }
+]

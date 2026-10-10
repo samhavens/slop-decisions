@@ -25,6 +25,8 @@ The standalone Codex skill is in `skills/slop-review`. When you change
 references work outside this repository. Test review instructions on a small
 repository with known defects and valid lookalikes; do not give the reviewer the
 answer key. Check its evidence and missed cases, not just its wording.
+Use the [Phoenix review cases](evals/phoenix/README.md) for the LiveView and
+database rule boundaries. Keep new examples separate from published eval inputs.
 
 For a new case, add pinned source and spans to `data/seed/targets.jsonl`, and put
 labels, rationale, provenance, and grading witnesses in `labels.jsonl`. The

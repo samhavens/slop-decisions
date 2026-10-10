@@ -27,7 +27,8 @@ Do not use their published holdout as a new unseen test.
 ```
 
 `build_suite.py` is the source of the published fixtures. It makes 112 cases:
-one defect, its repair, a valid look-alike, and a missing-source case for each check in each split.
+one defect, its repair, a valid look-alike, and a missing-source case for each of
+the original fourteen checks in each split.
 The required patterns come from the check definitions. The same author wrote the labels and rubrics;
 there was no independent human label review. Semantic labels can be disputed.
 

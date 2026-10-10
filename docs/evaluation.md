@@ -2,9 +2,10 @@
 
 The initial set has 20 targets: eight positive, twelve negative, and seven
 before/after pairs, across five repositories and six PR families. All are
-development material. Eight of the fourteen rubric dimensions have examples;
-the other six have no seed examples. A separate [authored calibration study](calibration.md)
-covers all fourteen checks. Neither set estimates production precision.
+development material. Eight of the seventeen rubric dimensions have seed examples.
+A separate [authored calibration study](calibration.md) covers the original
+fourteen checks. [Phoenix review cases](../evals/phoenix/README.md) cover the three
+new checks. These sets do not estimate production precision.
 
 `sources.json` pins downloads by full commit and SHA256. `targets.jsonl` contains
 the source selection, dimension, group, track, and split. `labels.jsonl` contains

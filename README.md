@@ -1,7 +1,7 @@
 # slop-decisions
 
 Agents can write working code that becomes hard to understand and maintain.
-slop-decisions gives Codex 14 rules to review behavior and context that static
+slop-decisions gives Codex 17 rules to review behavior and context that static
 checks such as [ex_slop](https://github.com/elixir-vibe/ex_slop) cannot judge.
 
 **We recommend using both.**
@@ -20,7 +20,7 @@ Then, in your code project:
 $slop-review Review my changes against origin/main.
 ```
 
-Codex reviews all 14 rules in the current session. It reads related code and tests,
+Codex reviews all 17 rules in the current session. It reads related code and tests,
 then gives findings with evidence. There are no separate checker API calls;
 normal Codex usage still applies.
 
@@ -50,7 +50,11 @@ Each rule asks about behavior and context. Matching syntax alone is not enough.
 | Comments that repeat the code<br>`semantic_comment_noise` | “Fetch users” appears directly above `fetch_users()`. |
 | Repeated scans of growing data<br>`avoidable_repeated_traversal` | Each received chunk causes another length scan of the entire accumulated body. |
 | Wrapper that changes nothing<br>`redundant_wrapper` | An exhaustive `case` returns every input unchanged. |
+| UI state sent through the server<br>`client_state_round_trip` | Opening a static help modal waits for an event that only changes visibility. |
+| State lost after reconnect<br>`liveview_reconnect_state_loss` | A wizard keeps earlier answers only in assigns and cannot restore them after remount. |
+| Database reads repeated per record<br>`per_record_database_read` | A helper calls `Repo.preload` for each post instead of loading the association for the list. |
 
 [Full rules and exceptions](src/slop_decisions/data/rubrics.json) ·
+[Phoenix and Ecto examples](docs/phoenix.md) ·
 [Compare models](docs/run-eval.md) · [Calibration](docs/calibration.md) ·
 [Contribute](CONTRIBUTING.md) · [MIT license](LICENSE)

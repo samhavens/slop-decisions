@@ -153,7 +153,7 @@ def parser():
         "--dimension",
         dest="dimension",
         action="append",
-        help="Repeat to select rules; defaults to all 14 built-in rules",
+        help="Repeat to select rules; defaults to all built-in rules",
     )
     p.add_argument(
         "--max-checks",
