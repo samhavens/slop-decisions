@@ -1,10 +1,10 @@
 # Choose a model
 
-Use OpenAI Responses when you need a written reason for each result.
+The default, OpenAI Responses, gives a written reason for each result.
 It scored higher than Decisions and the tested local model on the public-source evaluation.
 
 ```sh
-slop-decisions check lib/orders.ex --api responses
+slop-decisions check lib/orders.ex
 ```
 
 Use `--related PATH` to supply code that a check needs, such as a called function or a test helper.
@@ -13,7 +13,7 @@ See [source selection](usage.md) and [provider setup](models.md).
 ## Compare the measured results
 
 These runs used the same 20 code targets and a warning threshold of 0.8.
-The OpenAI model was `gpt-6-luna`. Decisions is the current default.
+The OpenAI model was `gpt-6-luna`.
 
 | Configuration | Correct / all targets | Assessed / all targets | Model-call time |
 | --- | ---: | ---: | ---: |

@@ -78,7 +78,14 @@ def collect(cases_path, split, output, config, *, profile_path=None, stop_after=
     existing = []
     if output.exists():
         run, existing = read_run(output)
-        if any(run[k] != v for k, v in plan.items()):
+        recorded_config = {
+            **run["config"],
+            "api": run["config"]["api"] or run["contract"]["api"],
+        }
+        requested_config = {**plan["config"], "api": config.transport_api}
+        if recorded_config != requested_config or any(
+            run[k] != v for k, v in plan.items() if k != "config"
+        ):
             raise ValueError("resume configuration, cases, or profile mismatch")
     else:
         output.mkdir(parents=True)
@@ -235,7 +242,7 @@ def main():
                 args.cases,
                 args.split,
                 args.out,
-                ProviderConfig(provider="openai", model=args.model, retries=0),
+                ProviderConfig(provider="openai", model=args.model, api="decisions", retries=0),
                 profile_path=args.profile,
                 stop_after=args.stop_after,
             )

@@ -1,7 +1,7 @@
 # Set up a model
 
 Source files go to the provider you select. Use a local server to keep source on your machine.
-The default provider is OpenAI, with `gpt-6-luna` and the Decisions API.
+The default provider is OpenAI, with `gpt-6-luna` and the Responses API.
 “Jev-style” describes a decision about a defined condition; this package does not call the Jev API.
 
 ## Local models
@@ -42,14 +42,15 @@ See [Ollama's API guide](https://docs.ollama.com/api/openai-compatibility) for i
 ## OpenAI
 
 Set `OPENAI_API_KEY` in your environment. Use `--model` to change the default model.
-For a result with a written reason, use Responses:
+Responses returns a written reason for each result:
 
 ```sh
-slop-decisions check lib/orders.ex --provider openai --api responses \
+slop-decisions check lib/orders.ex --provider openai \
   --model gpt-6-luna --rule success_shaped_failure
 ```
 
-For predicate probabilities, use `--api decisions`. This is the OpenAI default.
+For predicate probabilities without explanations, use `--api decisions`.
+It was faster but missed more defects in the [published comparison](results.md).
 Use `--api chat` for Chat Completions.
 
 Decisions also asks whether the supplied code is sufficient for the check.

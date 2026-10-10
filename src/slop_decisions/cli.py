@@ -31,7 +31,11 @@ def common(parser, *, default=argparse.SUPPRESS):
 def model_options(parser):
     parser.add_argument("--provider", choices=["openai", "openrouter", "local"], default="openai")
     parser.add_argument("--model", help="OpenAI default: gpt-6-luna; required for local/OpenRouter")
-    parser.add_argument("--api", choices=["decisions", "responses", "chat"])
+    parser.add_argument(
+        "--api",
+        choices=["decisions", "responses", "chat"],
+        help="API transport (default: responses for OpenAI; chat for local/OpenRouter)",
+    )
     parser.add_argument("--base-url", help="API root including /v1; defaults to provider endpoint")
     parser.add_argument(
         "--key-env", help="Name of environment variable; never put a key in arguments"

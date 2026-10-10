@@ -41,7 +41,7 @@ See the [selection policy](../reports/calibration-2026-10-10/plan.md) for the fu
 ## Apply a passing profile
 
 ```sh
-slop-decisions check lib/orders.ex --calibration runs/validation.json
+slop-decisions check lib/orders.ex --api decisions --calibration runs/validation.json
 ```
 
 The profile must match the model, API, endpoint, source selection, prompts, and selected rules.

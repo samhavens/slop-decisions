@@ -194,6 +194,28 @@ def test_invalid_probability_is_never_clean(bad):
     assert result["result"]["status"] == "unassessed"
 
 
+@pytest.mark.parametrize("reverse", [False, True])
+def test_decisions_maps_distinct_scores_by_name_without_inverting_them(monkeypatch, reverse):
+    monkeypatch.setenv("OPENAI_API_KEY", "test")
+    answers = [
+        {"type": "predicate", "name": "context_sufficient", "probability": 0.99},
+        {"type": "predicate", "name": "derived_state_drift", "probability": 0.03},
+    ]
+    if reverse:
+        answers.reverse()
+    with Provider(
+        ProviderConfig(provider="openai", model="gpt-6-luna", api="decisions"),
+        transport=httpx.MockTransport(lambda _: httpx.Response(200, json={"answers": answers})),
+    ) as provider:
+        row = provider.assess({}, load_rubrics()["derived_state_drift"])
+    assert row["result"] == {
+        "status": "assessed",
+        "probability": 0.03,
+        "context_probability": 0.99,
+    }
+    assert row["decision_scores"] == {"context_probability": 0.99, "defect_probability": 0.03}
+
+
 @pytest.mark.parametrize("finish", ["length", "content_filter", "tool_calls", None])
 def test_truncated_or_nontext_answer_cannot_pass(finish):
     def handle(_):

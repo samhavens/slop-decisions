@@ -23,6 +23,35 @@ def cases(split="calibration"):
     ]
 
 
+def test_calibration_cli_pins_decisions_instead_of_using_checker_default(tmp_path, monkeypatch):
+    from slop_decisions import calibration_study as study
+
+    seen = []
+
+    def collect(_cases, _split, _out, config, **_kwargs):
+        seen.append(config)
+        return {"completed": 0}
+
+    monkeypatch.setattr(study, "collect", collect)
+    monkeypatch.setattr(
+        "sys.argv",
+        [
+            "slop-calibrate",
+            "collect",
+            "--cases",
+            "calibration/cases.jsonl",
+            "--split",
+            "calibration",
+            "--model",
+            "gpt-6-luna",
+            "--out",
+            str(tmp_path / "run"),
+        ],
+    )
+    assert study.main() == 0
+    assert seen[0].api == "decisions"
+
+
 def predictions():
     return [
         {"case_id": name, "decision_scores": {"context_probability": c, "defect_probability": p}}
@@ -35,6 +64,45 @@ def predictions():
     ]
 
 
+def test_resume_preserves_runs_that_used_the_old_implicit_decisions_default(tmp_path, monkeypatch):
+    from pathlib import Path
+
+    from slop_decisions import calibration_study as study
+    from slop_decisions.providers import DEFAULTS
+
+    monkeypatch.setenv("OPENAI_API_KEY", "test")
+    sent = []
+
+    def respond(request):
+        body = json.loads(request.content)
+        sent.append(body)
+        return httpx.Response(
+            200,
+            json={
+                "answers": [
+                    {"type": "predicate", "name": q["name"], "probability": 0.9}
+                    for q in body["questions"]
+                ]
+            },
+        )
+
+    monkeypatch.setattr(
+        study, "Provider", lambda conf: Provider(conf, transport=httpx.MockTransport(respond))
+    )
+    suite, output = Path("calibration/cases.jsonl"), tmp_path / "run"
+    with monkeypatch.context() as old_version:
+        old_version.setitem(DEFAULTS, "openai", (*DEFAULTS["openai"][:2], "decisions"))
+        study.collect(suite, "calibration", output, ProviderConfig("openai", "x"), stop_after=1)
+    before = (output / "run.json").read_bytes()
+    assert json.loads(before)["config"]["api"] is None
+    result = study.collect(
+        suite, "calibration", output, ProviderConfig("openai", "x", api="decisions"), stop_after=1
+    )
+    assert result["completed"] == len(sent) == 2
+    assert (output / "run.json").read_bytes() == before
+    assert sent[0] != sent[1]
+
+
 def test_context_gate_keeps_raw_scores_but_never_calls_it_clean(monkeypatch):
     monkeypatch.setenv("OPENAI_API_KEY", "test")
     response = {
@@ -44,7 +112,7 @@ def test_context_gate_keeps_raw_scores_but_never_calls_it_clean(monkeypatch):
         ]
     }
     with Provider(
-        ProviderConfig(provider="openai", model="x"),
+        ProviderConfig(provider="openai", model="x", api="decisions"),
         transport=httpx.MockTransport(lambda _: httpx.Response(200, json=response)),
     ) as provider:
         row = provider.assess({}, load_rubrics()["success_shaped_failure"])
@@ -161,7 +229,7 @@ def test_study_resumes_pilot_freezes_fit_then_scores_holdout(tmp_path, monkeypat
     monkeypatch.setattr(
         study, "Provider", lambda conf: Provider(conf, transport=httpx.MockTransport(respond))
     )
-    config = ProviderConfig(provider="openai", model="x", retries=0)
+    config = ProviderConfig(provider="openai", model="x", api="decisions", retries=0)
     cal, hold, profile = tmp_path / "cal", tmp_path / "hold", tmp_path / "profile.json"
     with pytest.raises(ValueError, match="frozen"):
         study.collect(path, "holdout", hold, config)
@@ -226,6 +294,8 @@ def test_study_resumes_pilot_freezes_fit_then_scores_holdout(tmp_path, monkeypat
         "x",
         "--provider",
         "openai",
+        "--api",
+        "decisions",
         "--dimension",
         "success_shaped_failure",
         "--calibration",
@@ -245,7 +315,12 @@ def test_study_resumes_pilot_freezes_fit_then_scores_holdout(tmp_path, monkeypat
     assert manual["threshold_policy"]["context_source"] == "explicit"
     assert len(sent) == 8
     with pytest.raises(ValueError, match="mismatch"):
-        study.collect(path, "calibration", cal, ProviderConfig(provider="openai", model="other"))
+        study.collect(
+            path,
+            "calibration",
+            cal,
+            ProviderConfig(provider="openai", model="other", api="decisions"),
+        )
 
 
 def test_valid_refusals_do_not_trigger_the_request_failure_stop(tmp_path, monkeypatch):
@@ -274,7 +349,7 @@ def test_valid_refusals_do_not_trigger_the_request_failure_stop(tmp_path, monkey
         Path("calibration/cases.jsonl"),
         "calibration",
         tmp_path / "run",
-        ProviderConfig(provider="openai", model="x"),
+        ProviderConfig(provider="openai", model="x", api="decisions"),
         stop_after=3,
     )
     assert result["completed"] == 3
@@ -323,7 +398,7 @@ def test_collection_stops_after_two_request_errors(tmp_path, monkeypatch):
             Path("calibration/cases.jsonl"),
             "calibration",
             output,
-            ProviderConfig(provider="openai", model="x", retries=0),
+            ProviderConfig(provider="openai", model="x", api="decisions", retries=0),
             stop_after=3,
         )
     rows = read_jsonl(output / "predictions.jsonl")

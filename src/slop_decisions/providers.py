@@ -22,7 +22,7 @@ VERDICT_SCHEMA = {
     "required": ["status", "probability", "reason"],
 }
 DEFAULTS = {
-    "openai": ("https://api.openai.com/v1", "OPENAI_API_KEY", "decisions"),
+    "openai": ("https://api.openai.com/v1", "OPENAI_API_KEY", "responses"),
     "openrouter": ("https://openrouter.ai/api/v1", "OPENROUTER_API_KEY", "chat"),
     "local": ("http://127.0.0.1:11434/v1", "LOCAL_API_KEY", "chat"),
 }

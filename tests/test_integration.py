@@ -42,6 +42,17 @@ def server():
                         for q in body["questions"]
                     ]
                 }
+            elif self.path == "/v1/responses":
+                data = {
+                    "status": "completed",
+                    "output": [
+                        {
+                            "type": "message",
+                            "content": [{"type": "output_text", "text": json.dumps(verdict)}],
+                        }
+                    ],
+                    "usage": {"input_tokens": 10, "output_tokens": 20},
+                }
             payload = json.dumps(data).encode()
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -280,7 +291,7 @@ def test_retry_limits_and_error_redaction(monkeypatch, status, expected_calls):
 def test_decision_unknowns_are_not_negative(monkeypatch, answers):
     monkeypatch.setenv("OPENAI_API_KEY", "test")
     with Provider(
-        ProviderConfig(provider="openai", model="x"),
+        ProviderConfig(provider="openai", model="x", api="decisions"),
         transport=httpx.MockTransport(lambda _: httpx.Response(200, json={"answers": answers})),
     ) as p:
         result = p.assess({}, load_rubrics()["success_shaped_failure"])
@@ -352,7 +363,8 @@ def test_global_json_option_survives_subcommand_defaults():
     assert json.loads(result.stdout)["targets"] == 20
 
 
-def test_default_check_runs_every_rule_with_openai(tmp_path, server):
+@pytest.mark.parametrize("api,endpoint", [(None, "/v1/responses"), ("decisions", "/v1/decisions")])
+def test_openai_check_runs_every_rule_and_honors_api(tmp_path, server, api, endpoint):
     url, calls = server
     (tmp_path / "a.ex").write_text("def run, do: :ok\n")
     result = cli(
@@ -364,13 +376,14 @@ def test_default_check_runs_every_rule_with_openai(tmp_path, server):
         url,
         "--format",
         "json",
+        *(["--api", api] if api else []),
         env={**os.environ, "OPENAI_API_KEY": "test-key"},
     )
     assert result.returncode == 3, result.stdout + result.stderr
     data = json.loads(result.stdout)
     assert data["warnings"] == len(calls) == len(load_rubrics()) == 14
     assert {row["dimension"] for row in data["results"]} == load_rubrics().keys()
-    assert all(path == "/v1/decisions" for path, _, _ in calls)
+    assert all(path == endpoint for path, _, _ in calls)
     assert all(body["model"] == "gpt-6-luna" for _, _, body in calls)
     assert all(headers["Authorization"] == "Bearer test-key" for _, headers, _ in calls)
 

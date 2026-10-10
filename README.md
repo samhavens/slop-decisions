@@ -16,7 +16,7 @@ uv tool install git+https://github.com/samhavens/slop-decisions.git
 slop-decisions check lib/orders.ex
 ```
 
-This runs **all 14 rules** with OpenAI `gpt-6-luna` through the Decisions API.
+This runs **all 14 rules** with OpenAI `gpt-6-luna` through the Responses API, with a reason for each result.
 Review the results before you change code. See the [model comparison](docs/results.md).
 
 Use a local model with [Ollama running](docs/models.md#local-models):
