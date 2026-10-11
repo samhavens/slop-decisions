@@ -1,7 +1,7 @@
 # Review agent slop with Codex
 
 The skill looks for manufactured evidence, repeated tests, test-only production
-machinery and weakened verification in Elixir changes. Its 13 default rules come
+machinery and weakened verification in Elixir code. Its 13 default rules come
 from [observed cleanups and agent reports](../skills/slop-review/references/sources.md).
 It is a focused review, not a complete correctness audit.
 
@@ -22,13 +22,25 @@ it. Keep the references: they contain the exceptions and preservation rules.
 
 ## Review
 
+Check the whole codebase:
+
+```text
+$slop-review Review this codebase for accumulated slop.
+```
+
+Or check changes:
+
 ```text
 $slop-review Check my changes against origin/main for accumulated slop.
 ```
 
-This includes branch commits, staged and unstaged edits, and non-ignored new files.
-The skill follows related code, test setup and CI selection. Fetch the comparison
-ref if it is missing or stale. Without a ref, it reviews local changes against `HEAD`.
+The change review includes branch commits, staged and unstaged edits, and
+non-ignored new files. Fetch the comparison ref if it is missing or stale.
+For local changes without a ref, the comparison is `HEAD`.
+
+Both reviews follow related code, test setup and CI selection. Large reviews can
+use parallel reviewers; each finding needs the same evidence and preservation
+checks.
 
 You can narrow the review:
 
@@ -47,8 +59,8 @@ consolidation recommendation must name the retained test and the failure it
 still catches. Review alone does not edit your tests. If you ask for cleanup, the
 same preservation standard applies to the changes.
 
-The skill uses your current Codex model and allowance. It does not start a
-separate checker. See [tests and CI](ci.md) for scripted runs,
+The skill uses Codex and needs no separate checker API calls.
+See [tests and CI](ci.md) for scripted runs,
 [dependency guidance](../skills/slop-review/references/investigation.md#dependency-contracts)
 for optional `usage_rules` support, and the
 [eval guide](../evals/accumulation/README.md) for evidence and limits.

@@ -9,8 +9,8 @@ history is unavailable, state the uncertainty.
 For an assertion, trace its expected value, fixture and mock to their producers.
 For a test-only seam, trace callers and public commitments. After confirming a
 cause, search sibling tests and wrappers for the same cause, then check each
-match's contract. Stay within the requested change or cleanup scope. Related old
-code can explain a finding; it does not automatically expand the assignment.
+match's contract. Stay within the requested review or cleanup scope. Related code
+can explain a finding; it does not automatically expand the assignment.
 
 These selective history and variant techniques adapt
 [Trail of Bits differential review](https://github.com/trailofbits/skills/blob/main/plugins/differential-review/skills/differential-review/SKILL.md)

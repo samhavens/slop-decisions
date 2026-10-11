@@ -18,13 +18,13 @@ Use $skill-installer to install https://github.com/samhavens/slop-decisions/tree
 Then, in your Elixir project:
 
 ```text
-$slop-review Check my changes against origin/main for accumulated slop.
+$slop-review Review this codebase for accumulated slop.
 ```
 
-The skill uses **13 focused checks** in your current session. It reads the real
-code and tests, identifies what a test actually proves, and names retained coverage
-before recommending removal. It makes no separate checker API calls; normal
-Codex usage applies.
+Use it on a whole codebase, selected files, or changes. Its **13 focused checks**
+identify what tests actually prove and name retained coverage before recommending
+removal. Reviews can run in parallel. No separate checker API calls are needed;
+normal Codex usage applies.
 
 [Install and select checks](docs/codex.md) · [Tests and CI](docs/ci.md) ·
 [Skill eval and limits](reports/accumulation-2026-10-10/README.md)

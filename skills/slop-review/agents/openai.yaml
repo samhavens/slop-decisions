@@ -1,4 +1,4 @@
 interface:
   display_name: "Slop review"
   short_description: "Find manufactured tests and agent-accumulated machinery"
-  default_prompt: "Use $slop-review to check my changes for accumulated slop against origin/main."
+  default_prompt: "Use $slop-review to find accumulated slop in this project."
