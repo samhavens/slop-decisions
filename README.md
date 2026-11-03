@@ -9,7 +9,24 @@ This skill reviews context and evidence; it does not guess who wrote the code.
 
 ## Use it
 
-In Codex, ask:
+Choose the standalone skill for your project:
+
+| Language | Skill | Guide |
+| --- | --- | --- |
+| Python | [`slop-review-python`](skills/slop-review-python/SKILL.md) | [Install and review Python](docs/python.md) |
+| Elixir | [`slop-review`](skills/slop-review/SKILL.md) | [Install and select checks](docs/codex.md) |
+
+For Python, ask Codex:
+
+```text
+Use $skill-installer to install https://github.com/samhavens/slop-decisions/tree/main/skills/slop-review-python
+```
+
+Then use `$slop-review-python Review this codebase for accumulated slop.`
+The Python version covers pytest and unittest fixtures, mocks, async call/await
+boundaries, database effects, runtime validation, and public package contracts.
+
+For Elixir, ask Codex:
 
 ```text
 Use $skill-installer to install https://github.com/samhavens/slop-decisions/tree/main/skills/slop-review
@@ -53,7 +70,7 @@ boundaries, useful adapters and justified isolation must survive a cleanup.
 [Sources from real cleanups](skills/slop-review/references/sources.md) ·
 [Coverage preservation](skills/slop-review/references/test-contracts.md)
 
-The experimental API checker supports **OpenAI, OpenRouter, and local models**,
+The experimental Elixir API checker supports **OpenAI, OpenRouter, and local models**,
 with the same 13 defaults. [API setup](docs/usage.md) · [Model options](docs/models.md).
 The [22 broader review checks](skills/slop-review/references/broader-review.md)
 remain available by explicit selection. This is not a general code-quality gate.

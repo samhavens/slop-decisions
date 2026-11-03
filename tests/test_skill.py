@@ -22,9 +22,10 @@ def test_skill_rules_match_the_api_rules():
     assert broader == [r for name, r in bank.items() if name not in default_rule_names()]
 
 
-def test_skill_references_work_after_standalone_install(tmp_path):
-    installed = tmp_path / ".agents" / "skills" / "slop-review"
-    shutil.copytree(SKILL, installed)
+@pytest.mark.parametrize("skill_name", ["slop-review", "slop-review-python"])
+def test_skill_references_work_after_standalone_install(tmp_path, skill_name):
+    installed = tmp_path / ".agents" / "skills" / skill_name
+    shutil.copytree(ROOT / "skills" / skill_name, installed)
     local_links = []
     for document in installed.rglob("*.md"):
         for link in re.findall(r"\[[^\]]+\]\(([^)]+)\)", document.read_text()):
@@ -36,6 +37,25 @@ def test_skill_references_work_after_standalone_install(tmp_path):
             assert target.is_file(), f"Missing standalone skill resource: {link}"
     assert local_links, "The installed skill must include its rules."
     assert json.loads((installed / "references" / "rules.json").read_text())
+
+
+def test_python_skill_preserves_focused_predicates_and_exceptions():
+    python_skill = ROOT / "skills" / "slop-review-python"
+    rules = json.loads((python_skill / "references" / "rules.json").read_text())
+    bank = load_rubrics()
+    assert [rule["name"] for rule in rules] == default_rule_names()
+    for rule in rules:
+        original = bank[rule["name"]]
+        for field in ("predicate", "severity", "sources"):
+            assert rule[field] == original[field]
+        for field in (
+            "required_context",
+            "search_trigger",
+            "investigation",
+            "positive",
+            "negative",
+        ):
+            assert isinstance(rule[field], str) and rule[field].strip()
 
 
 def test_phoenix_examples_cover_boundaries_and_build_source_only_packets():

@@ -1,0 +1,185 @@
+[
+  {
+    "name": "declaration_substituted_for_behavior",
+    "predicate": "Does a test claim application behavior while checking only a declaration, configuration, symbol, or result shape that can stay correct when that behavior is broken?",
+    "required_context": "The complete test, claimed contract, declarations, behavior owner, transaction or async boundary, and retained behavioral coverage.",
+    "positive": "A test named persists_account checks only the returned dataclass fields. Removing the repository write leaves those fields and the test unchanged.",
+    "negative": "A plugin capability-discovery contract is tested by asserting its advertised flags or exports; actual delivery has its own test.",
+    "severity": "test_gap",
+    "search_trigger": "Behavioral names paired with annotations, hasattr/callable, route or plugin registration, model fields, schema declarations, or shape-only assertions; AsyncMock call assertions used to claim an awaited effect.",
+    "investigation": "Name the claimed effect and where it occurs. Disable that effect while preserving the declaration or return shape. Distinguish constructing an ORM object, adding or flushing it, and committing a transaction; check which boundary the application promises. An AsyncMock call assertion does not establish that its coroutine was awaited, and an await assertion alone does not establish the real dependency effect. Repair the proof or narrow its claim; preserve declarations that are themselves public contracts.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/pull/155040",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
+    ]
+  },
+  {
+    "name": "mock_defined_behavior",
+    "predicate": "Is the decision or effect a test claims to verify supplied by its own mock or fixture instead of produced by the application component under test?",
+    "required_context": "Setup, conftest.py and autouse fixtures, patch/monkeypatch targets, mock return values and side effects, asserted values, production call path, and the boundary named by the test.",
+    "positive": "A fixture inserts the expected database row before calling save_account; replacing save_account with a no-op leaves the persistence assertion green.",
+    "negative": "A gateway double raises PermissionError and the caller test verifies its user-visible rejection; the test does not claim to verify the gateway authorization policy.",
+    "severity": "test_gap",
+    "search_trigger": "Mock or AsyncMock returns the expected receipt, sorted data, permission decision, or ID; fixtures prepopulate the asserted store; a patch replaces the behavior owner being claimed.",
+    "investigation": "Trace each asserted fact backward to its producer. Inspect the namespace where the dependency is looked up, nested mock attributes, autouse setup, and side effects. Replace the production decision or effect while preserving setup. Distinguish valuable forwarding, awaiting, and error-handling contracts from a double doing the work attributed to the application owner. A mock or monkeypatch is not itself evidence of a weak test.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/pull/155040",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
+    ]
+  },
+  {
+    "name": "circular_expected_value",
+    "predicate": "Does the expected value depend on the same implementation being checked, so a credible defect changes both sides and passes?",
+    "required_context": "Actual and expected computations, shared fixture/helper dependencies, the application contract, and any independent oracle.",
+    "positive": "A checkout test computes expected with pricing.total(cart) and compares it to a checkout result that uses the same function; a wrong tax factor changes both sides together.",
+    "negative": "A codec round-trip test also checks independently specified wire bytes and rejects a broken decoder; sharing an input factory does not make the expected value circular.",
+    "severity": "test_gap",
+    "search_trigger": "Expected values produced by the same serializer, normalizer, parser, mapper, or calculation as actual; snapshots regenerated directly from the changed implementation.",
+    "investigation": "Trace dependencies of actual and expected. Introduce one credible shared implementation error and check whether both sides move together. Use independently derived values or invariants, including useful property-based or metamorphic checks. Do not demand a duplicate implementation as an oracle or dismiss every round-trip property without checking the contract it distinguishes.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md",
+      "https://github.com/openclaw/openclaw/pull/156316"
+    ]
+  },
+  {
+    "name": "unreachable_negative_control",
+    "predicate": "Does a negative test pass for an unrelated precondition without reaching the rejection or guard it claims to verify?",
+    "required_context": "Fixture existence and validity, authentication, authorization and validation order, expected exception or response, target guard, and pytest collection/selection.",
+    "positive": "A cannot-delete-another-users-record test supplies a missing record and uses pytest.raises(Exception); removing the ownership guard still produces the unrelated lookup failure.",
+    "negative": "The record exists, the payload is valid, and the identity is authenticated; bypassing only ownership authorization makes the specific denial assertion fail.",
+    "severity": "test_gap",
+    "search_trigger": "Negative cases with absent records, invalid payloads, anonymous clients, already restricted fixtures, broad pytest.raises(Exception), try/except assertions, conditional branches, or skipped/xfail cases.",
+    "investigation": "Satisfy every prerequisite except the prohibited condition, establish the passing baseline, then bypass only the intended guard. Verify that the case is collected, selected, and reaches the guard. Check the relevant exception or response and forbidden side effects. Repair the fixture or assertion while preserving the needed negative contract; a broad exception assertion is a lead, not a finding by itself.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md",
+      "https://github.com/openclaw/openclaw/pull/156316"
+    ]
+  },
+  {
+    "name": "redundant_test_expansion",
+    "predicate": "Does added coverage repeat an existing, stronger test of the same failure at another layer, without protecting a distinct boundary or interaction?",
+    "required_context": "Both complete tests, fixtures and mocks, the production path, supported runtimes and pytest/CI selection, and the exact failure each test detects.",
+    "positive": "A parametrized wrapper suite repeats the owner test through a pass-through function with identical mocks. Both reject the same normalization mutation, and the added layer supplies no separate contract.",
+    "negative": "An HTTP or worker integration test exercises request serialization, dependency wiring, transaction boundaries, or task lifecycle that the unit test cannot reach.",
+    "severity": "maintenance",
+    "search_trigger": "Copied pytest parametrizations, unittest subclasses replaying a base suite, provider-local copies, wrapper tests, and near-identical fixtures/assertions.",
+    "investigation": "Name the retained test node ID and file, shared failure, and boundary; then try a defect specific to the candidate layer. Check markers, skips, platform/Python-version gates, and CI commands before treating another test as retained coverage. Consolidate only when the retained check covers the contract in the relevant gate. Similar text or a matching mutation is insufficient; speed and failure localization can justify useful layers.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/pull/155040",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md",
+      "https://www.linkedin.com/posts/sasajuric_i-recently-reviewed-some-ai-assisted-code-activity-7435287708752658432-JwE0"
+    ]
+  },
+  {
+    "name": "mechanical_test_expansion",
+    "predicate": "Do inventory, constructor or case-matrix assertions add no application discrimination beyond language behavior or independently tested dimensions?",
+    "required_context": "Constructor or mapper behavior, public/default/compatibility requirements, parametrization dimensions, and retained distinguishing cases.",
+    "positive": "A pytest parametrization constructs a plain dataclass with each supplied status and merely reads that same field back; there is no custom initialization, validation, default, or independent public compatibility contract.",
+    "negative": "Cases distinguish __post_init__ validation, normalization, default_factory isolation, a published wire inventory, or real interactions among options.",
+    "severity": "maintenance",
+    "search_trigger": "Dataclass or dict literal read-backs, enum lists copied from the implementation, field inventories, and Cartesian parametrizations with identical assertions.",
+    "investigation": "For each proposed extra row, identify a different credible application defect it catches. Check constructor customization, defaults and factory aliasing, descriptors, serialization, supported types, and independently specified inventories before dismissing a read-back. Check whether dimensions interact. Preserve each distinct contract; count, uniform syntax, and line coverage do not establish value or redundancy.",
+    "sources": [
+      "https://github.com/codenameakshay/async_wallpaper/pull/65",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
+    ]
+  },
+  {
+    "name": "test_only_production_scaffolding",
+    "predicate": "Does a low-value test require a production export, reverse mapper, flag, wrapper or alternate path that serves no application or public compatibility contract?",
+    "required_context": "All direct and dynamic callers, documented package/module API, registrations and entry points, test purpose, actual production boundary, and history for the seam.",
+    "positive": "An internal application module adds get_state_for_tests() solely so a test can inspect its private cache dictionary; neither the application nor an external compatibility contract needs that accessor.",
+    "negative": "A clock or external-service adapter is a coherent production boundary even when tests are its only alternate implementation; a documented package export or plugin entry point may have external callers.",
+    "severity": "maintenance",
+    "search_trigger": "Test-named accessors, test_mode branches, reverse transforms, environment flags, wrappers, and inspection properties introduced to support weak tests.",
+    "investigation": "Trace non-test and dynamic callers, including package exports, import strings, decorators, plugin registries, entry points, dependency injection, and reflection. Check external API commitments before calling a symbol unused. Identify the weak test sustaining the seam and a real boundary that preserves needed coverage. Test-only caller counts and underscore names are not sufficient proof. State uncertainty when external contracts are unavailable.",
+    "sources": [
+      "https://github.com/openclaw/openclaw/pull/155040",
+      "https://github.com/codenameakshay/async_wallpaper/pull/65",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
+    ]
+  },
+  {
+    "name": "test_implementation_coupling",
+    "predicate": "Does this test reject a concrete implementation change that preserves the behavior the test is meant to protect?",
+    "required_context": "The test and its fixtures/helpers, implementation, public and operational contracts, and a specific behavior-preserving alternative.",
+    "search_trigger": "Assertions on private attributes or __dict__, incidental helper call sequences, patched internal functions, or snapshots of internal representations.",
+    "investigation": "Propose a concrete equivalent implementation or representation. Check that required outputs, effects, exceptions, ordering, awaiting, cleanup, and resource budgets stay the same. Run the unchanged test against both when possible and identify the assertion that rejects only the representation. Do not infer equivalence merely because the old assertion fails.",
+    "positive": "A queue test compares its private list directly with an expected list; changing storage to collections.deque preserves the public FIFO contract but fails that representation assertion.",
+    "negative": "A call or await assertion enforces exactly one charge; a query budget, specified ordering, wire serialization, or documented low-level representation is a real contract.",
+    "severity": "advisory",
+    "sources": [
+      "https://www.linkedin.com/posts/sasajuric_i-recently-reviewed-some-ai-assisted-code-activity-7435287708752658432-JwE0",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
+    ]
+  },
+  {
+    "name": "verification_weakening",
+    "predicate": "Does a change allow previously rejected wrong behavior by loosening assertions, fixtures, exclusions, snapshots or quality gates without an independent contract change?",
+    "required_context": "Before/after tests and source, requirements/history, pytest and CI selection, warning/type/lint gates, and retained behavioral coverage.",
+    "positive": "A refund test replaces an exact amount assertion with isinstance(amount, int), so a wrong integer amount previously rejected now passes.",
+    "negative": "A redundant test is removed while a named retained owner test rejects its meaningful failure in the same gate; an independently documented requirement change justifies a new expected result.",
+    "severity": "test_gap",
+    "search_trigger": "Removed or widened assertions, overbroad pytest.approx tolerances, pytest.skip/xfail, broad warning filters, lint/type/coverage exclusions, accepted snapshots, narrower test selection, or CI commands that ignore failures.",
+    "investigation": "Hold the requirement and one credible broken implementation fixed. Compare old and new verification and identify the wrong behavior newly accepted. Inspect xfail run/strict settings, conditional skips, warning handling, and CI selection as relevant. Check independent requirement changes and stronger retained coverage before reporting erosion. Correcting an invalid fixture, using justified tolerances, or removing useless tests is not automatically weakening.",
+    "sources": [
+      "https://github.com/anthropics/claude-code/issues/7074",
+      "https://github.com/anthropics/claude-code/issues/32376",
+      "https://github.com/openclaw/openclaw/blob/80930af448ebabc84174146b56bc106d37fab3b4/.agents/skills/test-audit/SKILL.md"
+    ]
+  },
+  {
+    "name": "test_environment_workaround",
+    "predicate": "Does a test repair add persistent waiting, seeding, serialization or special configuration that demonstrably does not address the failure mechanism and adds cost or hides the problem?",
+    "required_context": "Old/new setup, the failing trace or path, fixture scope, process/event-loop/resource ownership, synchronization, relevant history, and environment scope.",
+    "positive": "A repair adds time.sleep after a synchronous insert although the failure was a wrong ID and no asynchronous work remains; fixing the ID alone makes the test discriminate correctly.",
+    "negative": "Serializing tests protects a demonstrated process-global resource, or a bounded wait observes a real worker-completion contract instead of guessing when work finishes.",
+    "severity": "maintenance",
+    "search_trigger": "New time.sleep/asyncio.sleep, rerun decorators, disabled parallelism, broader fixture scope, global seeds or environment changes, and test-only production branches after a failure.",
+    "investigation": "Recover or reproduce the original failure. Trace what the workaround can change, including shared fixtures, event-loop ownership, background tasks, random state, and external resources. Construct a control without it. Report a demonstrated mismatch or concealed failure, not merely a missing comment. Preserve justified isolation, bounded synchronization, and reproducible seeds that address the actual cause.",
+    "sources": [
+      "https://getboothiq.com/blog/150k-lines-vibe-coded-elixir-good-bad-ugly"
+    ]
+  },
+  {
+    "name": "success_shaped_failure",
+    "predicate": "Does a reachable error path disguise an unexpected failure as success, empty data, absence, denial, or another ordinary domain outcome that the evidence does not establish?",
+    "required_context": "The error source, exception handler or fallback, documented domain outcomes, consumers, and recovery/logging policy.",
+    "positive": "except Exception returns None from an account lookup after database outages or programming errors; callers treat that return as a genuinely missing account.",
+    "negative": "A successful lookup returns no row and maps it to None, or a documented best-effort boundary returns a fallback while preserving the failure information its consumers require.",
+    "severity": "warning",
+    "search_trigger": "Broad except blocks, contextlib.suppress, fallback empty collections or defaults, and ordinary not-found/denied results after unexpected exceptions.",
+    "investigation": "Inject or trace an unexpected failure separately from legitimate absence and follow the fallback into the caller. Logging alone does not restore a distinction lost by the return contract. Inspect the actual exception hierarchy and targeted Python/framework version, especially for cancellation and shutdown, rather than assuming except Exception catches everything. Preserve explicit best-effort behavior and expected domain mappings.",
+    "sources": [
+      "https://github.com/MaxPayne89/klass-hero/pull/1611",
+      "https://getboothiq.com/blog/150k-lines-vibe-coded-elixir-good-bad-ugly"
+    ]
+  },
+  {
+    "name": "invalid_state_accommodation",
+    "predicate": "Does internal code accommodate representations excluded by an established input contract?",
+    "required_context": "The normalization or validation boundary, all reachable input paths, object lifetime/mutation, target helper, and established internal input contract.",
+    "positive": "After every caller performs runtime validation into a concrete request object, private helpers still independently accept None, JSON strings, and dictionaries even though no supported path supplies them.",
+    "negative": "A public compatibility adapter intentionally accepts several representations, or a None guard protects inputs that a type annotation alone cannot prevent at runtime.",
+    "severity": "advisory",
+    "sources": [
+      "https://getboothiq.com/blog/150k-lines-vibe-coded-elixir-good-bad-ugly"
+    ],
+    "search_trigger": "Repeated None/isinstance checks, dict-or-object branches, getattr defaults, and reparsing after an established runtime normalization boundary.",
+    "investigation": "Demonstrate that the boundary and every relevant caller exclude the alternate representations before recommending removal. Python annotations, dataclass field types, TypedDict, and cast do not themselves enforce runtime input validity. Check bypass constructors, deserialization, dynamic callers, and later mutation; retain guards that protect supported paths. Do not infer unreachable state solely from a successful type check or a function annotation."
+  },
+  {
+    "name": "semantic_duplicate",
+    "predicate": "Does the target independently reimplement a supplied existing domain operation without a meaningful contract difference?",
+    "required_context": "Both complete implementations, fixtures or helpers they depend on, their consumers, domain policies, compatibility promises, and relevant history.",
+    "positive": "A new conftest.py helper repeats the same account, workspace, and backend setup already supplied by a canonical fixture, with the same lifetime and policy and no separate test boundary.",
+    "negative": "Similar validators enforce different policies, fixtures deliberately need different ownership or lifetimes, or implementations coexist during a documented migration.",
+    "severity": "advisory",
+    "investigation": "Compare semantics and reasons to change, including fixture scope, side effects, ordering, errors, and ownership, rather than syntax alone. Check migration and compatibility history and name the canonical owner before suggesting reuse. Do not merge independently evolving policies just to reduce repeated lines, and do not introduce a generic abstraction whose configuration recreates the separate policies.",
+    "sources": [
+      "https://getboothiq.com/blog/150k-lines-vibe-coded-elixir-good-bad-ugly",
+      "https://www.linkedin.com/posts/sasajuric_i-recently-reviewed-some-ai-assisted-code-activity-7435287708752658432-JwE0"
+    ],
+    "search_trigger": "Copied fixtures, serializers, normalizers, retry helpers, and provider-local implementations of an existing domain operation."
+  }
+]

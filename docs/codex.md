@@ -1,5 +1,7 @@
 # Review agent slop with Codex
 
+For a Python project, use the separate [Python skill](python.md).
+
 The skill looks for manufactured evidence, repeated tests, test-only production
 machinery and weakened verification in Elixir code. Its 13 default rules come
 from [observed cleanups and agent reports](../skills/slop-review/references/sources.md).

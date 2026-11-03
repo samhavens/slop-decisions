@@ -1,0 +1,98 @@
+[
+  {
+    "case_id": "python-01",
+    "path": "inputs/01.py",
+    "target": "AlertTests.test_submits_alert_before_returning",
+    "dimension": "declaration_substituted_for_behavior",
+    "expected": "defect",
+    "rationale": "AsyncMock records a call when its coroutine is constructed. A called-only assertion does not establish that the required submission was awaited. Preserve the caller contract and repair the assertion."
+  },
+  {
+    "case_id": "python-02",
+    "path": "inputs/02.py",
+    "target": "AlertTests.test_awaits_one_transport_submission",
+    "dimension": "declaration_substituted_for_behavior",
+    "expected": "clean",
+    "rationale": "The declared boundary is the caller awaiting the dependency, not remote delivery. The await assertion rejects a caller that merely constructs the coroutine."
+  },
+  {
+    "case_id": "python-03",
+    "path": "inputs/03.py",
+    "target": "normalize_slug",
+    "dimension": "invalid_state_accommodation",
+    "expected": "clean",
+    "rationale": "A type annotation does not prevent invalid runtime input. This is a public normalization boundary whose ValueError behavior is independently specified and tested."
+  },
+  {
+    "case_id": "python-04",
+    "path": "inputs/04.py",
+    "target": "_route",
+    "dimension": "invalid_state_accommodation",
+    "expected": "defect",
+    "rationale": "The only application call constructs a validated _Request before reaching _route. Its None and dict accommodation branches serve no public contract in this closed fixture. Preserve the actual validation in _normalize."
+  },
+  {
+    "case_id": "python-05a",
+    "path": "inputs/05.py",
+    "target": "AccountTests.test_saves_account",
+    "dimension": "mock_defined_behavior",
+    "expected": "defect",
+    "rationale": "The fixture commits the expected row before save. A no-op save passes this assertion. The adjacent cold-connection test retains new-account persistence coverage, but update semantics would require separate evidence."
+  },
+  {
+    "case_id": "python-05b",
+    "path": "inputs/05.py",
+    "target": "AccountTests.test_new_account_survives_reopening_database",
+    "dimension": "mock_defined_behavior",
+    "expected": "clean",
+    "rationale": "The row is absent initially and read through a separate connection after the owner returns. A no-op save is rejected without a mocked persistence boundary."
+  },
+  {
+    "case_id": "python-06a",
+    "path": "inputs/06.py",
+    "target": "AuthorizationTests.test_other_user_cannot_delete",
+    "dimension": "unreachable_negative_control",
+    "expected": "defect",
+    "rationale": "The document does not exist, so the authorization branch is never reached. Bypassing ownership leaves this check green. It may be relabeled as missing-record coverage; retain the existing-record denial check."
+  },
+  {
+    "case_id": "python-06b",
+    "path": "inputs/06.py",
+    "target": "AuthorizationTests.test_existing_document_requires_its_owner",
+    "dimension": "unreachable_negative_control",
+    "expected": "clean",
+    "rationale": "The document exists and only ownership is wrong. Bypassing the ownership guard changes the result and deletes the row, which the unchanged test rejects."
+  },
+  {
+    "case_id": "python-07a",
+    "path": "inputs/07.py",
+    "target": "PublicApiTests.test_discovery_inventory",
+    "dimension": "mechanical_test_expansion",
+    "expected": "clean",
+    "rationale": "The advertised capability inventory is itself a documented public compatibility contract. The test claims discovery, not execution of a scheduling operation."
+  },
+  {
+    "case_id": "python-07b",
+    "path": "inputs/07.py",
+    "target": "expires_at",
+    "dimension": "test_only_production_scaffolding",
+    "expected": "clean",
+    "rationale": "The clock is an explicit public dependency boundary with a production default. Its only local override being a test does not make it dead scaffolding or rule out external users."
+  },
+  {
+    "case_id": "python-08a",
+    "path": "inputs/08.py",
+    "target": "CheckoutTests.test_checkout_charges_five_percent_fee",
+    "dimension": "circular_expected_value",
+    "expected": "defect",
+    "rationale": "Both expected and actual depend on total. Changing the fee to seven percent moves both sides and passes. The adjacent independent amount check rejects this mutation."
+  },
+  {
+    "case_id": "python-08b",
+    "path": "inputs/08.py",
+    "target": "CheckoutTests.test_known_fee_amount",
+    "dimension": "circular_expected_value",
+    "expected": "clean",
+    "rationale": "The literal expected amount is independently derived from the stated fee contract and rejects a changed fee factor."
+  }
+]

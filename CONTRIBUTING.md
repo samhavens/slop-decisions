@@ -31,6 +31,13 @@ database rule boundaries. Use the [discovery eval](evals/discovery/README.md) to
 test ordinary diffs without rule hints, with matched plain and skill reviews.
 Keep new examples separate from published eval inputs.
 
+The Python sibling skill is in `skills/slop-review-python`. Keep its focused rule
+names, predicates, and severities aligned with the original, while maintaining
+Python-specific examples and exceptions. It does not replace the API rule bank.
+Use the [Python development cases](evals/python/README.md) for executable controls
+and useful lookalikes. Keep their answer key and mutation witnesses out of review
+inputs; report them as synthetic development checks, not Python accuracy scores.
+
 For a new case, add pinned source and spans to `data/seed/targets.jsonl`, and put
 labels, rationale, provenance, and grading witnesses in `labels.jsonl`. The
 package data lives under `src/slop_decisions/`. Keep every revision, neighboring
