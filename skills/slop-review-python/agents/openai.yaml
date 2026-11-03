@@ -1,0 +1,4 @@
+interface:
+  display_name: "Python Slop Review"
+  short_description: "Find weak tests and accumulated Python scaffolding"
+  default_prompt: "Use $slop-review-python to review this Python codebase for accumulated slop."
